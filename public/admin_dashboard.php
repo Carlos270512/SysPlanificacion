@@ -21,6 +21,10 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
 <body>
     <nav class="navbar navbar-dark bg-dark w-100">
         <div class="container-fluid d-flex justify-content-between">
+            <!-- Botón para alternar el sidebar -->
+            <button id="toggleSidebar" class="btn btn-dark me-3">
+                <i class="fas fa-bars"></i>
+            </button>
             <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center">
                 <img src="assets/img/logo.png" alt="Logo" height="40" class="me-2">
                 <span>Panel Administrador</span>
@@ -56,6 +60,17 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleSidebarButton = document.getElementById("toggleSidebar");
+            const sidebar = document.getElementById("sidebar");
+            const content = document.getElementById("content");
+
+            toggleSidebarButton.addEventListener("click", function () {
+                sidebar.classList.toggle("hidden");
+                content.classList.toggle("full-width");
+            });
+        });
+    </script></body>
 
 </html>
