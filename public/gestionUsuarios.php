@@ -10,9 +10,15 @@ if (isset($_GET['exito'])) {
     $mensaje = '<div class="alert alert-success">Usuarios cargados correctamente desde Excel.</div>';
 } elseif (isset($_GET['error'])) {
     $mensaje = '<div class="alert alert-danger">Hubo un error al procesar el archivo.</div>';
+} elseif (isset($_GET['error_encabezados'])) {
+    $mensaje = '<div class="alert alert-danger">Los encabezados del archivo no son válidos.</div>';
+} elseif (isset($_GET['error_subida'])) {
+    $mensaje = '<div class="alert alert-danger">Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.</div>';
+} elseif (isset($_GET['error_formato'])) {
+    $mensaje = '<div class="alert alert-danger">El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.</div>';
 }
-
 $hayErrores = isset($_GET['errores']);
+$archivoSubido = isset($_GET['archivo_subido']);
 ?>
 
 <!DOCTYPE html>
@@ -38,6 +44,19 @@ $hayErrores = isset($_GET['errores']);
         </form>
     </div>
 
+    <?php if ($archivoSubido): ?>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast align-items-center text-bg-warning border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Este archivo ya fue subido anteriormente.
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php if ($hayErrores): ?>
     <div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -48,7 +67,7 @@ $hayErrores = isset($_GET['errores']);
                 </div>
                 <div class="modal-body">
                     Algunos registros no se pudieron procesar. Puedes descargar el archivo con los errores desde el siguiente enlace:
-                    <a href="errores.xlsx" class="btn btn-link">Descargar errores.xlsx</a>
+                    <a href="../storage/uploads/errores.xlsx" class="btn btn-link">Descargar errores.xlsx</a>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

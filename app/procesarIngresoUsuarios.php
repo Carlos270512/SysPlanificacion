@@ -1,5 +1,4 @@
 <?php
-
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/conexion.php';
 
@@ -13,14 +12,21 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Validar archivo recibido
-if (!isset($_FILES['archivo_excel'])) {
-    die('No se recibió ningún archivo.');
+if (!isset($_FILES['archivo_excel']) || $_FILES['archivo_excel']['error'] !== UPLOAD_ERR_OK) {
+    header("Location: ../public/gestionUsuarios.php?error_subida=1");
+    exit();
 }
 
 $archivo = $_FILES['archivo_excel']['tmp_name'];
 
-// Cargar el archivo
-$documento = IOFactory::load($archivo);
+// Validar que el archivo sea un Excel válido
+try {
+    $documento = IOFactory::load($archivo);
+} catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
+    header("Location: ../public/gestionUsuarios.php?error_formato=1");
+    exit();
+}
+
 $hoja = $documento->getActiveSheet();
 $filas = $hoja->toArray(null, true, true, true);
 
@@ -35,10 +41,33 @@ $encabezadosValidos = [
     'PASSWORD'
 ];
 
+// Validar encabezados
+$encabezadosArchivo = array_map(function ($valor) {
+    return strtoupper(trim((string)($valor ?? '')));
+}, $filas[1] ?? []);
+
+if (array_diff($encabezadosValidos, $encabezadosArchivo)) {
+    header("Location: ../public/gestionUsuarios.php?error_encabezados=1");
+    exit();
+}
+
+// Generar un hash único del archivo subido
+$hashArchivo = hash_file('sha256', $archivo);
+
+// Verificar si el archivo ya fue subido
+session_start();
+if (isset($_SESSION['ultimo_hash']) && $_SESSION['ultimo_hash'] === $hashArchivo) {
+    header("Location: ../public/gestionUsuarios.php?archivo_subido=1");
+    exit();
+}
+
+// Actualizar el hash en la sesión
+$_SESSION['ultimo_hash'] = $hashArchivo;
+
 // Buscar índices de las columnas
 $indices = [];
 foreach ($filas[1] as $col => $valor) {
-    $valorLimpio = strtoupper(trim($valor ?? ''));
+    $valorLimpio = strtoupper(trim((string)($valor ?? '')));
     if (in_array($valorLimpio, $encabezadosValidos)) {
         $indices[$valorLimpio] = $col;
     }
@@ -49,13 +78,14 @@ $filasConErrores = [];
 for ($i = 2; $i <= count($filas); $i++) {
     $fila = $filas[$i];
 
-    $codigo = trim((string)($fila[$indices['CODIGO']] ?? ''));
-    $carrera = trim((string)($fila[$indices['CARRERA']] ?? ''));
-    $titulo = trim((string)($fila[$indices['TITULO']] ?? ''));
-    $nombre = trim((string)($fila[$indices['NOMBRES Y APELLIDOS']] ?? ''));
-    $correo = trim((string)($fila[$indices['DIRECCION ELECTRONICA INSTITUCIONAL']] ?? ''));
-    $rol = trim((string)($fila[$indices['ROL']] ?? ''));
-    $password = trim((string)($fila[$indices['PASSWORD']] ?? ''));
+    // Validar que los valores no sean null antes de usar trim()
+    $codigo = isset($fila[$indices['CODIGO']]) ? trim((string)$fila[$indices['CODIGO']]) : '';
+    $carrera = isset($fila[$indices['CARRERA']]) ? trim((string)$fila[$indices['CARRERA']]) : '';
+    $titulo = isset($fila[$indices['TITULO']]) ? trim((string)$fila[$indices['TITULO']]) : '';
+    $nombre = isset($fila[$indices['NOMBRES Y APELLIDOS']]) ? trim((string)$fila[$indices['NOMBRES Y APELLIDOS']]) : '';
+    $correo = isset($fila[$indices['DIRECCION ELECTRONICA INSTITUCIONAL']]) ? trim((string)$fila[$indices['DIRECCION ELECTRONICA INSTITUCIONAL']]) : '';
+    $rol = isset($fila[$indices['ROL']]) ? trim((string)$fila[$indices['ROL']]) : '';
+    $password = isset($fila[$indices['PASSWORD']]) ? trim((string)$fila[$indices['PASSWORD']]) : '';
 
     // Validación básica
     if (!$codigo || !$carrera || !$titulo || !$nombre || !$correo || !$rol || !$password) {
@@ -99,17 +129,26 @@ if (!empty($filasConErrores)) {
     $spreadsheetErrores = new Spreadsheet();
     $hojaErrores = $spreadsheetErrores->getActiveSheet();
 
+    // Agregar encabezados y filas con errores
     $hojaErrores->fromArray($filas[1], null, 'A1');
     $hojaErrores->fromArray($filasConErrores, null, 'A2');
 
+    // Verificar si la carpeta storage/uploads existe, si no, crearla
+    $rutaUploads = __DIR__ . '/../storage/uploads';
+    if (!is_dir($rutaUploads)) {
+        mkdir($rutaUploads, 0777, true); // Crear la carpeta con permisos recursivos
+    }
+
+    // Guardar el archivo en la carpeta storage/uploads
+    $rutaErrores = $rutaUploads . '/errores.xlsx';
     $writer = new Xlsx($spreadsheetErrores);
-    $rutaErrores = __DIR__ . '/../public/errores.xlsx';
     $writer->save($rutaErrores);
 
-    header("Location: ../public/subirExcel.php?exito=1&errores=1");
+    // Redirigir con indicador de errores
+    header("Location: ../public/gestionUsuarios.php?exito=1&errores=1");
     exit();
 }
 
 // Redirigir si todo fue exitoso
-header("Location: ../public/subirExcel.php?exito=1");
+header("Location: ../public/gestionUsuarios.php?exito=1");
 exit();
