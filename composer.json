@@ -1,0 +1,15 @@
+{
+    "name": "user/sys-planificacion",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "carlos"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^4.2",
+        "dompdf/dompdf": "^3.1",
+        "tecnickcom/tcpdf": "^6.9"
+    }
+}

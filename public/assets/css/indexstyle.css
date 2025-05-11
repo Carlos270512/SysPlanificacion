@@ -1,0 +1,44 @@
+/* indexstyle.css */
+body {
+    background-color: #978f7b;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-body {
+    background-color: #ffffff;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+h3 {
+    color: #333;
+    font-size: 1.75rem;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.btn {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.container {
+    max-width: 500px;
+}
+
+.card {
+    margin-top: 100px;
+}
