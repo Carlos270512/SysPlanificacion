@@ -10,6 +10,14 @@ if (isset($_GET['exito'])) {
     $mensaje = '<div class="alert alert-success">Archivo Excel cargado correctamente.</div>';
 } elseif (isset($_GET['error'])) {
     $mensaje = '<div class="alert alert-danger">Hubo un error al procesar el archivo.</div>';
+} elseif (isset($_GET['error_encabezados'])) {
+    $mensaje = '<div class="alert alert-danger">Los encabezados del archivo no son válidos. Por favor, verifica el formato.</div>';
+} elseif (isset($_GET['error_subida'])) {
+    $mensaje = '<div class="alert alert-danger">Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.</div>';
+} elseif (isset($_GET['error_formato'])) {
+    $mensaje = '<div class="alert alert-danger">El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.</div>';
+} elseif (isset($_GET['archivo_duplicado'])) {
+    $mensaje = '<div class="alert alert-warning">Este archivo ya fue subido anteriormente.</div>';
 }
 
 $hayErrores = isset($_GET['errores']);
@@ -37,29 +45,5 @@ $hayErrores = isset($_GET['errores']);
             <button class="btn btn-primary" type="submit" name="submit">Subir</button>
         </form>
     </div>
-
-    <?php if ($hayErrores): ?>
-    <div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Algunos registros no se pudieron procesar. Puedes descargar el archivo con los errores desde el siguiente enlace:
-                    <a href="errores.xlsx" class="btn btn-link">Descargar errores.xlsx</a>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
-        erroresModal.show();
-    </script>
-    <?php endif; ?>
 </body>
 </html>

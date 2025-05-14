@@ -33,41 +33,18 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Información General</title>
     <!-- Bootstrap 5 CSS -->
-     <!-- JOSE POR FAVOR AQUI TU DEBES DE  CONCENTRARTE EN EL FRONTEND ESTO FUNCIONA BIEN -->
-      <!-- Bootstrap 5 CSS -->
-       <!-- Bootstrap 5 CSS -->
+    <!-- JOSE POR FAVOR AQUI TU DEBES DE  CONCENTRARTE EN EL FRONTEND ESTO FUNCIONA BIEN -->
+    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="../assets/css/gestionPlanificaciones.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJx3WQf8K7p2K3bGvX5J1csOeK5C1nZq+dZTgkVfO1zzRaY0lxxw2d34mBgl" crossorigin="anonymous">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .form-container {
-            max-width: 800px;
-            margin: auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .form-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #343a40;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-    </style>
     <script>
         function cargarAsignaturas(docenteCodigo) {
             if (!docenteCodigo) return;
@@ -125,6 +102,7 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
 </head>
+
 <body>
     <div class="container mt-5">
         <div class="form-container">
@@ -164,4 +142,5 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0CkMxuW3fj3DgWe2gSYbs4dRvo9KzKq0MbEgtQyMzHmGh6bN" crossorigin="anonymous"></script>
 </body>
+
 </html>

@@ -1,15 +1,28 @@
 body {
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
 }
 
-h2 {
-    font-weight: bold;
-    color: #333;
-}
-
-form {
-    background: white;
+.form-container {
+    max-width: 800px;
+    margin: auto;
+    background: #ffffff;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
 }
