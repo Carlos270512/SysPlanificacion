@@ -1,4 +1,3 @@
-
 <?php
 $pdo = require_once __DIR__ . '/../config/conexion.php';
 
@@ -25,11 +24,22 @@ if (isset($_GET['codigo'])) {
     exit;
 }
 
-// 2. Procesar envío del formulario
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<pre>";
-    print_r($_POST);
-    echo "</pre>";
+// 2. Procesar envío del formulario de unidad (AJAX)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'], $_POST['asignatura_codigo'])) {
+    $stmt = $pdo->prepare("INSERT INTO unidad (nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $ok = $stmt->execute([
+        $_POST['nombre'],
+        $_POST['objetivo_unidad'],
+        $_POST['metodologia'],
+        $_POST['actividades_recuperacion'],
+        $_POST['recursos_didacticos'],
+        $_POST['semana_inicio'],
+        $_POST['semana_fin'],
+        $_POST['asignatura_codigo']
+    ]);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => $ok]);
     exit;
 }
 
@@ -176,12 +186,128 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </button>
                     </div>
                 </form>
+
+                <!-- Botón para mostrar/ocultar el formulario de unidad -->
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-success" id="btnNuevaUnidad">
+                        <i class="fas fa-plus"></i> Nueva Unidad
+                    </button>
+                </div>
+
+                <!-- Card/formulario de unidad oculto por defecto -->
+                <div class="card mt-4" id="cardUnidad" style="display:none;">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Agregar Nueva Unidad</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="formUnidad">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre Unidad</label>
+                                    <input type="text" name="nombre" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Asignatura Código</label>
+                                    <input type="text" id="unidad_asignatura" name="asignatura_codigo" class="form-control" readonly required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Objetivo Unidad</label>
+                                <textarea name="objetivo_unidad" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Metodología</label>
+                                <textarea name="metodologia" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Actividades de Recuperación</label>
+                                <textarea name="actividades_recuperacion" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Recursos Didácticos</label>
+                                <textarea name="recursos_didacticos" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Semana Inicio</label>
+                                    <input type="date" name="semana_inicio" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Semana Fin</label>
+                                    <input type="date" name="semana_fin" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">Guardar Unidad</button>
+                                <button type="button" class="btn btn-secondary" id="btnCancelarUnidad">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Fin card unidad -->
+
             </div>
         </div>
     </div>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mostrar la card de unidad y rellenar el código de asignatura
+        document.getElementById('btnNuevaUnidad').addEventListener('click', function() {
+            document.getElementById('cardUnidad').style.display = 'block';
+            // Obtener el código de asignatura seleccionado
+            const select = document.getElementById('asignatura');
+            if (select.value) {
+                const asig = JSON.parse(select.value);
+                document.getElementById('unidad_asignatura').value = asig.codigo || asig.codigo_asignatura || '';
+            } else {
+                document.getElementById('unidad_asignatura').value = '';
+            }
+        });
+
+        // Cancelar y ocultar la card de unidad
+        document.getElementById('btnCancelarUnidad').addEventListener('click', function() {
+            document.getElementById('cardUnidad').style.display = 'none';
+            document.getElementById('formUnidad').reset();
+        });
+
+        // Actualizar el código de asignatura en el formulario de unidad si cambia la asignatura principal
+        document.getElementById('asignatura').addEventListener('change', function() {
+            if (document.getElementById('cardUnidad').style.display === 'block') {
+                const select = document.getElementById('asignatura');
+                if (select.value) {
+                    const asig = JSON.parse(select.value);
+                    document.getElementById('unidad_asignatura').value = asig.codigo || asig.codigo_asignatura || '';
+                } else {
+                    document.getElementById('unidad_asignatura').value = '';
+                }
+            }
+        });
+
+        // Enviar formulario de unidad por AJAX
+        document.getElementById('formUnidad').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch('Gestionplanificaciones.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Unidad guardada correctamente');
+                    form.reset();
+                    document.getElementById('cardUnidad').style.display = 'none';
+                } else {
+                    alert('Error al guardar la unidad');
+                }
+            })
+            .catch(() => alert('Error en la petición'));
+        });
+    </script>
 </body>
 
 </html>
