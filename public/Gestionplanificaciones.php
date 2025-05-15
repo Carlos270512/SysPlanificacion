@@ -148,7 +148,7 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="form-title mb-0">Formulario - Información General</h2>
             </div>
             <div class="card-body">
-                <form method="POST" action="../app/generarPdf.php">
+                <form method="POST" action="../app/generarPdf.php" id="formPrincipal">
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="fecha" class="form-label">Fecha</label>
@@ -179,6 +179,16 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div id="info-asignatura"></div>
+
+                    <!-- Campos ocultos para los datos de la unidad -->
+                    <input type="hidden" name="unidad[nombre]">
+                    <input type="hidden" name="unidad[objetivo_unidad]">
+                    <input type="hidden" name="unidad[metodologia]">
+                    <input type="hidden" name="unidad[actividades_recuperacion]">
+                    <input type="hidden" name="unidad[recursos_didacticos]">
+                    <input type="hidden" name="unidad[semana_inicio]">
+                    <input type="hidden" name="unidad[semana_fin]">
+                    <input type="hidden" name="unidad[asignatura_codigo]">
 
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-danger">
@@ -301,11 +311,29 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     alert('Unidad guardada correctamente');
                     form.reset();
                     document.getElementById('cardUnidad').style.display = 'none';
+                    // Redirigir después del mensaje
+                    window.location.href = 'generarReportes.php';
                 } else {
                     alert('Error al guardar la unidad');
                 }
             })
             .catch(() => alert('Error en la petición'));
+        });
+
+        // Copiar datos de unidad al formulario principal antes de enviar para PDF
+        document.getElementById('formPrincipal').addEventListener('submit', function(e) {
+            // Solo copiar si la card de unidad está visible
+            if (document.getElementById('cardUnidad').style.display === 'block') {
+                const unidadForm = document.getElementById('formUnidad');
+                this.querySelector('input[name="unidad[nombre]"]').value = unidadForm.nombre.value;
+                this.querySelector('input[name="unidad[objetivo_unidad]"]').value = unidadForm.objetivo_unidad.value;
+                this.querySelector('input[name="unidad[metodologia]"]').value = unidadForm.metodologia.value;
+                this.querySelector('input[name="unidad[actividades_recuperacion]"]').value = unidadForm.actividades_recuperacion.value;
+                this.querySelector('input[name="unidad[recursos_didacticos]"]').value = unidadForm.recursos_didacticos.value;
+                this.querySelector('input[name="unidad[semana_inicio]"]').value = unidadForm.semana_inicio.value;
+                this.querySelector('input[name="unidad[semana_fin]"]').value = unidadForm.semana_fin.value;
+                this.querySelector('input[name="unidad[asignatura_codigo]"]').value = unidadForm.asignatura_codigo.value;
+            }
         });
     </script>
 </body>
