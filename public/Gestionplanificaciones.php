@@ -1,9 +1,18 @@
+
 <?php
 $pdo = require_once __DIR__ . '/../config/conexion.php';
 
 // 1. Obtener asignaturas dinámicamente si se pide con AJAX
 if (isset($_GET['codigo'])) {
     $codigo = $_GET['codigo'];
+    // Si se pide solo el nombre del docente
+    if (isset($_GET['get_nombre']) && $_GET['get_nombre'] == '1') {
+        $stmt = $pdo->prepare("SELECT nombre FROM docente WHERE codigo = ?");
+        $stmt->execute([$codigo]);
+        $docente = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode($docente);
+        exit;
+    }
     $stmt = $pdo->prepare("
         SELECT a.*, d.carrera 
         FROM asignatura a
@@ -41,10 +50,23 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="assets/css/gestionPlanificacionesStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
+        function cargarNombreDocente(codigo) {
+            if (!codigo) {
+                document.getElementById('nombre_docente').value = '';
+                return;
+            }
+            fetch('Gestionplanificaciones.php?codigo=' + codigo + '&get_nombre=1')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('nombre_docente').value = data && data.nombre ? data.nombre : '';
+                });
+        }
+
         function cargarAsignaturas(docenteCodigo) {
+            cargarNombreDocente(docenteCodigo);
             if (!docenteCodigo) return;
 
-            fetch('GestionPlanificaciones.php?codigo=' + docenteCodigo)
+            fetch('Gestionplanificaciones.php?codigo=' + docenteCodigo)
                 .then(response => response.json())
                 .then(data => {
                     const selectAsignatura = document.getElementById('asignatura');
@@ -63,6 +85,10 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         function mostrarDatosAsignatura(valor) {
+            if (!valor) {
+                document.getElementById('info-asignatura').innerHTML = '';
+                return;
+            }
             const asig = JSON.parse(valor);
 
             document.getElementById('info-asignatura').innerHTML = `  
@@ -119,17 +145,22 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <input type="date" name="fecha" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>" readonly>
                         </div>
 
-                        <div class="col-md-5 mb-3">
-                            <label for="docente" class="form-label">Docente</label>
-                            <select name="docente" class="form-select form-select-md" onchange="cargarAsignaturas(this.value)" required>
-                                <option value="">Seleccione un docente</option>
+                        <div class="col-md-3 mb-3">
+                            <label for="docente" class="form-label">Código Docente</label>
+                            <select name="docente" id="docente" class="form-select form-select-md" onchange="cargarAsignaturas(this.value)" required>
+                                <option value="">Seleccione código</option>
                                 <?php foreach ($docentes as $docente): ?>
-                                    <option value="<?= $docente['codigo'] ?>"><?= $docente['nombre'] ?></option>
+                                    <option value="<?= $docente['codigo'] ?>"><?= $docente['codigo'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label for="nombre_docente" class="form-label">Nombre Docente</label>
+                            <input type="text" name="nombre_docente" id="nombre_docente" class="form-control" readonly required>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
                             <label for="asignatura" class="form-label">Asignatura</label>
                             <select name="asignatura" id="asignatura" class="form-select" onchange="mostrarDatosAsignatura(this.value)" required>
                                 <option value="">Seleccione</option>
