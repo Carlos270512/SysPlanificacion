@@ -5,7 +5,6 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -25,8 +24,8 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
             <button id="toggleSidebar" class="btn btn-dark me-3">
                 <i class="fas fa-bars"></i>
             </button>
-            <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center">
-                <img src="assets/img/logo.png" alt="Logo" height="40" class="me-2">
+            <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center ms-auto">
+                <img src="assets/img/logoTUVN.png" alt="Logo" style="height: 40px; max-width: 100%; object-fit: contain;" class="me-2">
                 <span>Panel Administrador</span>
             </a>
             <div class="dropdown">
@@ -39,7 +38,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                         <strong><?php echo $_SESSION['usuario']['nombre']; ?></strong><br>
                         <small class="text-muted"><?php echo $_SESSION['usuario']['correo']; ?></small>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                 </ul>
             </div>
@@ -60,17 +61,18 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleSidebarButton = document.getElementById("toggleSidebar");
-            const sidebar = document.getElementById("sidebar");
-            const content = document.getElementById("content");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleSidebarButton = document.getElementById("toggleSidebar");
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
 
-            toggleSidebarButton.addEventListener("click", function () {
-                sidebar.classList.toggle("hidden");
-                content.classList.toggle("full-width");
-            });
+        toggleSidebarButton.addEventListener("click", function () {
+            sidebar.classList.toggle("hidden");
+            content.classList.toggle("full-width"); // Agrega o quita la clase para expandir el contenido
         });
-    </script></body>
+    });
+</script>
+</body>
 
 </html>

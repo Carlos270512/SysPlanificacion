@@ -10,6 +10,11 @@ body {
     padding-top: 20px;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease; /* Animación para mostrar/ocultar */
+}
+
+#sidebar.hidden {
+    transform: translateX(-100%); /* Oculta el sidebar */
 }
 
 #sidebar a {
@@ -27,20 +32,18 @@ body {
     flex-grow: 1;
     padding: 20px;
     background-color: #f8f9fa;
+    transition: margin-left 0.3s ease, width 0.3s ease; /* Animación para ajustar el contenido */
 }
 
+#content.full-width {
+    margin-left: 0; /* Ajusta el contenido cuando el sidebar está oculto */
+    width: 100%; /* Ocupa todo el ancho disponible */
 
-
+}
 
 html, body {
     height: 100%;
     margin: 0;
-}
-
-#content {
-    flex-grow: 1;
-    height: calc(100vh - 56px); /* Resta la altura del navbar */
-    overflow: hidden;
 }
 
 #mainFrame {
@@ -48,6 +51,7 @@ html, body {
     height: 100%;
     border: none;
 }
+
 .navbar-brand {
     margin-left: -900px; /* Ajusta este valor según lo que necesites */
 }

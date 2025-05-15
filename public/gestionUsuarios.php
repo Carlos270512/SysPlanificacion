@@ -20,13 +20,16 @@ if (isset($_GET['exito'])) {
 $hayErrores = isset($_GET['errores']);
 $archivoSubido = isset($_GET['archivo_subido']);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Usuarios (Docentes)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -40,10 +43,40 @@ $archivoSubido = isset($_GET['archivo_subido']);
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
                 <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
             </div>
-            <button class="btn btn-primary" type="submit" name="submit">Subir</button>
+            <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
         </form>
+        <!-- Tabla para mostrar los usuarios -->
+        <div class="table-responsive">
+            <table id="usuariosTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Carrera</th>
+                        <th>Título</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    require __DIR__ . '/../config/conexion.php';
+                    $stmt = $pdo->query("SELECT codigo, carrera, titulo, nombre, correo, rol FROM docente");
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['codigo']) ?></td>
+                            <td><?= htmlspecialchars($row['carrera']) ?></td>
+                            <td><?= htmlspecialchars($row['titulo']) ?></td>
+                            <td><?= htmlspecialchars($row['nombre']) ?></td>
+                            <td><?= htmlspecialchars($row['correo']) ?></td>
+                            <td><?= htmlspecialchars($row['rol']) ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-
+    
     <?php if ($archivoSubido): ?>
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div class="toast align-items-center text-bg-warning border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -80,5 +113,15 @@ $archivoSubido = isset($_GET['archivo_subido']);
         erroresModal.show();
     </script>
     <?php endif; ?>
+
+    <script>
+        $(document).ready(function () {
+            $('#usuariosTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                }
+            });
+        });
+    </script>
 </body>
 </html>
