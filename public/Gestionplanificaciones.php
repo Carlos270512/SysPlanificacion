@@ -188,33 +188,35 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Enviar formulario por AJAX y mostrar modal de éxito
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('formPrincipal');
-            form.addEventListener('submit', function (e) {
+            form.addEventListener('submit', function(e) {
                 // Solo enviar por AJAX si hay unidad (campos de unidad visibles)
                 if (document.getElementById('campos-unidad').style.display === 'block') {
                     e.preventDefault();
                     const formData = new FormData(form);
                     fetch('', {
-                        method: 'POST',
-                        body: formData,
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Mostrar modal de éxito
-                            var modal = new bootstrap.Modal(document.getElementById('modalExito'));
-                            modal.show();
-                            // Limpiar campos de unidad
-                            mostrarCamposUnidad(false);
-                        }
-                    });
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Mostrar modal de éxito
+                                var modal = new bootstrap.Modal(document.getElementById('modalExito'));
+                                modal.show();
+                                // Limpiar campos de unidad
+                                mostrarCamposUnidad(false);
+                            }
+                        });
                 }
             });
 
             // Redirigir al dar click en "Aceptar" del modal
-            document.getElementById('btnAceptarModalExito').addEventListener('click', function () {
+            document.getElementById('btnAceptarModalExito').addEventListener('click', function() {
                 if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
                     // Codificar parámetros para URL
                     const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
@@ -326,25 +328,65 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- Modal de éxito -->
-    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+<!-- Modal de éxito -->
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header bg-success text-white">
-            <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            Unidad generada correctamente.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-success" id="btnAceptarModalExito" data-bs-dismiss="modal">Aceptar</button>
-          </div>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
+                <!-- Botón de cerrar (X) eliminado para que solo se pueda cerrar con "Aceptar" -->
+            </div>
+            <div class="modal-body">
+                Unidad generada correctamente.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnAceptarModalExito" data-bs-dismiss="modal">Aceptar</button>
+            </div>
         </div>
-      </div>
     </div>
+</div>
+
+<script>
+    // Deshabilita todos los enlaces y botones fuera del modal cuando el modal está abierto
+    document.addEventListener('DOMContentLoaded', function() {
+        var modalEl = document.getElementById('modalExito');
+        var modal = new bootstrap.Modal(modalEl);
+
+        modalEl.addEventListener('show.bs.modal', function () {
+            // Deshabilitar todos los enlaces y botones fuera del modal
+            document.querySelectorAll('a, button').forEach(function(el) {
+                if (!modalEl.contains(el) && el.id !== 'btnAceptarModalExito') {
+                    el.setAttribute('data-prev-disabled', el.disabled);
+                    el.disabled = true;
+                    el.classList.add('disabled');
+                    if (el.tagName === 'A') {
+                        el.setAttribute('data-prev-href', el.getAttribute('href'));
+                        el.removeAttribute('href');
+                    }
+                }
+            });
+        });
+
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            // Restaurar enlaces y botones
+            document.querySelectorAll('a, button').forEach(function(el) {
+                if (!modalEl.contains(el) && el.hasAttribute('data-prev-disabled')) {
+                    el.disabled = (el.getAttribute('data-prev-disabled') === 'true');
+                    el.classList.remove('disabled');
+                    el.removeAttribute('data-prev-disabled');
+                    if (el.tagName === 'A' && el.hasAttribute('data-prev-href')) {
+                        el.setAttribute('href', el.getAttribute('data-prev-href'));
+                        el.removeAttribute('data-prev-href');
+                    }
+                }
+            });
+        });
+        
+    });
+</script>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
