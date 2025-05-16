@@ -24,23 +24,33 @@ if (isset($_GET['codigo'])) {
     exit;
 }
 
-// 2. Procesar envío del formulario de unidad (AJAX)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'], $_POST['asignatura_codigo'])) {
+// 2. Procesar envío del formulario principal (PDF o guardar unidad)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad']['nombre'], $_POST['asignatura'])) {
+    // Guardar la unidad en la base de datos
+    $unidad = $_POST['unidad'];
     $stmt = $pdo->prepare("INSERT INTO unidad (nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $ok = $stmt->execute([
-        $_POST['nombre'],
-        $_POST['objetivo_unidad'],
-        $_POST['metodologia'],
-        $_POST['actividades_recuperacion'],
-        $_POST['recursos_didacticos'],
-        $_POST['semana_inicio'],
-        $_POST['semana_fin'],
-        $_POST['asignatura_codigo']
+        $unidad['nombre'],
+        $unidad['objetivo_unidad'],
+        $unidad['metodologia'],
+        $unidad['actividades_recuperacion'],
+        $unidad['recursos_didacticos'],
+        $unidad['semana_inicio'],
+        $unidad['semana_fin'],
+        $unidad['asignatura_codigo']
     ]);
-    header('Content-Type: application/json');
-    echo json_encode(['success' => $ok]);
-    exit;
+    // Si se quiere generar PDF, puedes redirigir o manejar aquí
+    // Por ahora, solo devolvemos JSON si es AJAX
+    if (
+        isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+    ) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+    // Si no es AJAX, puedes redirigir o mostrar mensaje
 }
 
 // 3. Mostrar formulario
@@ -60,6 +70,10 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="assets/css/gestionPlanificacionesStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
+        // Variables globales para asignatura seleccionada
+        let asignaturaSeleccionadaCodigo = '';
+        let asignaturaSeleccionadaNombre = '';
+
         function cargarNombreDocente(codigo) {
             if (!codigo) {
                 document.getElementById('nombre_docente').value = '';
@@ -91,12 +105,20 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     });
 
                     info.innerHTML = ''; // Limpiar si cambia el docente
+                    mostrarCamposUnidad(false);
+                    // Limpiar variables globales
+                    asignaturaSeleccionadaCodigo = '';
+                    asignaturaSeleccionadaNombre = '';
                 });
         }
 
         function mostrarDatosAsignatura(valor) {
             if (!valor) {
                 document.getElementById('info-asignatura').innerHTML = '';
+                mostrarCamposUnidad(false);
+                // Limpiar variables globales
+                asignaturaSeleccionadaCodigo = '';
+                asignaturaSeleccionadaNombre = '';
                 return;
             }
             const asig = JSON.parse(valor);
@@ -137,7 +159,73 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             `;
+
+            // Guardar en variables globales
+            asignaturaSeleccionadaCodigo = asig.codigo || asig.codigo_asignatura || '';
+            asignaturaSeleccionadaNombre = asig.nombre_asignatura || '';
+
+            // Mostrar campos de unidad y poner el código de asignatura
+            mostrarCamposUnidad(true, asignaturaSeleccionadaCodigo);
         }
+
+        function mostrarCamposUnidad(mostrar, codigoAsignatura = '') {
+            const unidad = document.getElementById('campos-unidad');
+            if (mostrar) {
+                unidad.style.display = 'block';
+                document.getElementById('unidad_asignatura').value = codigoAsignatura;
+            } else {
+                unidad.style.display = 'none';
+                document.getElementById('unidad_asignatura').value = '';
+                // Limpiar campos
+                document.getElementById('unidad_nombre').value = '';
+                document.getElementById('unidad_objetivo').value = '';
+                document.getElementById('unidad_metodologia').value = '';
+                document.getElementById('unidad_actividades').value = '';
+                document.getElementById('unidad_recursos').value = '';
+                document.getElementById('unidad_semana_inicio').value = '';
+                document.getElementById('unidad_semana_fin').value = '';
+            }
+        }
+
+        // Enviar formulario por AJAX y mostrar modal de éxito
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formPrincipal');
+            form.addEventListener('submit', function (e) {
+                // Solo enviar por AJAX si hay unidad (campos de unidad visibles)
+                if (document.getElementById('campos-unidad').style.display === 'block') {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    fetch('', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Mostrar modal de éxito
+                            var modal = new bootstrap.Modal(document.getElementById('modalExito'));
+                            modal.show();
+                            // Limpiar campos de unidad
+                            mostrarCamposUnidad(false);
+                        }
+                    });
+                }
+            });
+
+            // Redirigir al dar click en "Aceptar" del modal
+            document.getElementById('btnAceptarModalExito').addEventListener('click', function () {
+                if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
+                    // Codificar parámetros para URL
+                    const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
+                    const nombre = encodeURIComponent(asignaturaSeleccionadaNombre);
+                    window.location.href = `gestionarReportes.php?codigo=${codigo}&nombre=${nombre}`;
+                } else {
+                    // Si por alguna razón no hay datos, solo recarga la página
+                    window.location.reload();
+                }
+            });
+        });
     </script>
 </head>
 
@@ -148,7 +236,7 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="form-title mb-0">Formulario - Información General</h2>
             </div>
             <div class="card-body">
-                <form method="POST" action="../app/generarPdf.php" id="formPrincipal">
+                <form method="POST" action="" id="formPrincipal">
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="fecha" class="form-label">Fecha</label>
@@ -180,162 +268,83 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <div id="info-asignatura"></div>
 
-                    <!-- Campos ocultos para los datos de la unidad -->
-                    <input type="hidden" name="unidad[nombre]">
-                    <input type="hidden" name="unidad[objetivo_unidad]">
-                    <input type="hidden" name="unidad[metodologia]">
-                    <input type="hidden" name="unidad[actividades_recuperacion]">
-                    <input type="hidden" name="unidad[recursos_didacticos]">
-                    <input type="hidden" name="unidad[semana_inicio]">
-                    <input type="hidden" name="unidad[semana_fin]">
-                    <input type="hidden" name="unidad[asignatura_codigo]">
+                    <!-- Campos de Unidad (se muestran solo si hay asignatura seleccionada) -->
+                    <div id="campos-unidad" style="display:none;">
+                        <div class="card mt-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">Datos de la Unidad</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nombre Unidad</label>
+                                        <input type="text" name="unidad[nombre]" id="unidad_nombre" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Asignatura Código</label>
+                                        <input type="text" id="unidad_asignatura" name="unidad[asignatura_codigo]" class="form-control" readonly required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Objetivo Unidad</label>
+                                    <textarea name="unidad[objetivo_unidad]" id="unidad_objetivo" class="form-control" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Metodología</label>
+                                    <textarea name="unidad[metodologia]" id="unidad_metodologia" class="form-control" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Actividades de Recuperación</label>
+                                    <textarea name="unidad[actividades_recuperacion]" id="unidad_actividades" class="form-control" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Recursos Didácticos</label>
+                                    <textarea name="unidad[recursos_didacticos]" id="unidad_recursos" class="form-control" rows="2" required></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Semana Inicio</label>
+                                        <input type="date" name="unidad[semana_inicio]" id="unidad_semana_inicio" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Semana Fin</label>
+                                        <input type="date" name="unidad[semana_fin]" id="unidad_semana_fin" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fin campos unidad -->
 
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-file-pdf"></i> Generar PDF
+                            <i class="fas fa-file-pdf"></i> Guardar Unidad y/o Generar PDF
                         </button>
                     </div>
                 </form>
-
-                <!-- Botón para mostrar/ocultar el formulario de unidad -->
-                <div class="text-center mt-4">
-                    <button type="button" class="btn btn-success" id="btnNuevaUnidad">
-                        <i class="fas fa-plus"></i> Nueva Unidad
-                    </button>
-                </div>
-
-                <!-- Card/formulario de unidad oculto por defecto -->
-                <div class="card mt-4" id="cardUnidad" style="display:none;">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">Agregar Nueva Unidad</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="formUnidad">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nombre Unidad</label>
-                                    <input type="text" name="nombre" class="form-control" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Asignatura Código</label>
-                                    <input type="text" id="unidad_asignatura" name="asignatura_codigo" class="form-control" readonly required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Objetivo Unidad</label>
-                                <textarea name="objetivo_unidad" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Metodología</label>
-                                <textarea name="metodologia" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Actividades de Recuperación</label>
-                                <textarea name="actividades_recuperacion" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Recursos Didácticos</label>
-                                <textarea name="recursos_didacticos" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Semana Inicio</label>
-                                    <input type="date" name="semana_inicio" class="form-control" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Semana Fin</label>
-                                    <input type="date" name="semana_fin" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary">Guardar Unidad</button>
-                                <button type="button" class="btn btn-secondary" id="btnCancelarUnidad">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!-- Fin card unidad -->
-
             </div>
         </div>
     </div>
 
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            Unidad generada correctamente.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btnAceptarModalExito" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Mostrar la card de unidad y rellenar el código de asignatura
-        document.getElementById('btnNuevaUnidad').addEventListener('click', function() {
-            document.getElementById('cardUnidad').style.display = 'block';
-            // Obtener el código de asignatura seleccionado
-            const select = document.getElementById('asignatura');
-            if (select.value) {
-                const asig = JSON.parse(select.value);
-                document.getElementById('unidad_asignatura').value = asig.codigo || asig.codigo_asignatura || '';
-            } else {
-                document.getElementById('unidad_asignatura').value = '';
-            }
-        });
-
-        // Cancelar y ocultar la card de unidad
-        document.getElementById('btnCancelarUnidad').addEventListener('click', function() {
-            document.getElementById('cardUnidad').style.display = 'none';
-            document.getElementById('formUnidad').reset();
-        });
-
-        // Actualizar el código de asignatura en el formulario de unidad si cambia la asignatura principal
-        document.getElementById('asignatura').addEventListener('change', function() {
-            if (document.getElementById('cardUnidad').style.display === 'block') {
-                const select = document.getElementById('asignatura');
-                if (select.value) {
-                    const asig = JSON.parse(select.value);
-                    document.getElementById('unidad_asignatura').value = asig.codigo || asig.codigo_asignatura || '';
-                } else {
-                    document.getElementById('unidad_asignatura').value = '';
-                }
-            }
-        });
-
-        // Enviar formulario de unidad por AJAX
-        document.getElementById('formUnidad').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-
-            fetch('Gestionplanificaciones.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Unidad guardada correctamente');
-                    form.reset();
-                    document.getElementById('cardUnidad').style.display = 'none';
-                    // Redirigir después del mensaje
-                    window.location.href = 'generarReportes.php';
-                } else {
-                    alert('Error al guardar la unidad');
-                }
-            })
-            .catch(() => alert('Error en la petición'));
-        });
-
-        // Copiar datos de unidad al formulario principal antes de enviar para PDF
-        document.getElementById('formPrincipal').addEventListener('submit', function(e) {
-            // Solo copiar si la card de unidad está visible
-            if (document.getElementById('cardUnidad').style.display === 'block') {
-                const unidadForm = document.getElementById('formUnidad');
-                this.querySelector('input[name="unidad[nombre]"]').value = unidadForm.nombre.value;
-                this.querySelector('input[name="unidad[objetivo_unidad]"]').value = unidadForm.objetivo_unidad.value;
-                this.querySelector('input[name="unidad[metodologia]"]').value = unidadForm.metodologia.value;
-                this.querySelector('input[name="unidad[actividades_recuperacion]"]').value = unidadForm.actividades_recuperacion.value;
-                this.querySelector('input[name="unidad[recursos_didacticos]"]').value = unidadForm.recursos_didacticos.value;
-                this.querySelector('input[name="unidad[semana_inicio]"]').value = unidadForm.semana_inicio.value;
-                this.querySelector('input[name="unidad[semana_fin]"]').value = unidadForm.semana_fin.value;
-                this.querySelector('input[name="unidad[asignatura_codigo]"]').value = unidadForm.asignatura_codigo.value;
-            }
-        });
-    </script>
 </body>
-
 </html>
