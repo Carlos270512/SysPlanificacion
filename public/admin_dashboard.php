@@ -25,7 +25,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                 <i class="fas fa-bars"></i>
             </button>
             <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center ms-auto">
-                <img src="assets/img/logoTUVN.png" alt="Logo" style="height: 40px; max-width: 100%; object-fit: contain;" class="me-2">
+                <img src="assets/img/logotvn.png" alt="Logo" style="height: 40px; max-width: 100%; object-fit: contain;" class="me-2">
                 <span>Panel Administrador</span>
             </a>
             <div class="dropdown">

@@ -3,8 +3,6 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/conexion.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 // Habilitar errores en desarrollo (opcional)
 ini_set('display_errors', 1);
@@ -147,7 +145,7 @@ for ($i = 2; $i <= count($filas); $i++) {
 // Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
     $_SESSION['errores_excel'] = $filasConErrores;
-    header("Location: ../public/gestionUsuarios.php?exito=1&errores=1");
+    header("Location: ../public/gestionUsuarios.php?errores=1");
     exit();
 }
 

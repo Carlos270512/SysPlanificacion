@@ -37,113 +37,115 @@ $hayErrores = isset($_GET['errores']);
 <div class="container-fluid mt-5">
     <h2 class="mb-4">Importar Usuarios desde Excel</h2>
 
-        <?php echo $mensaje; ?>
+    <?php echo $mensaje; ?>
 
-        <form action="../app/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
-                <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
-            </div>
-            <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
-        </form>
-        <!-- Tabla para mostrar los usuarios -->
-        <div class="table-responsive">
-            <table id="usuariosTable" class="table table-striped table-bordered">
-                <thead>
+    <form action="../app/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
+            <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
+        </div>
+        <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
+    </form>
+    <!-- Tabla para mostrar los usuarios -->
+    <div class="table-responsive">
+        <table id="usuariosTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Carrera</th>
+                    <th>Título</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                require __DIR__ . '/../config/conexion.php';
+                $stmt = $pdo->query("SELECT codigo, carrera, titulo, nombre, correo, rol FROM docente");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
-                        <th>Código</th>
-                        <th>Carrera</th>
-                        <th>Título</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
+                        <td><?= htmlspecialchars($row['codigo']) ?></td>
+                        <td><?= htmlspecialchars($row['carrera']) ?></td>
+                        <td><?= htmlspecialchars($row['titulo']) ?></td>
+                        <td><?= htmlspecialchars($row['nombre']) ?></td>
+                        <td><?= htmlspecialchars($row['correo']) ?></td>
+                        <td><?= htmlspecialchars($row['rol']) ?></td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    require __DIR__ . '/../config/conexion.php';
-                    $stmt = $pdo->query("SELECT codigo, carrera, titulo, nombre, correo, rol FROM docente");
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['codigo']) ?></td>
-                            <td><?= htmlspecialchars($row['carrera']) ?></td>
-                            <td><?= htmlspecialchars($row['titulo']) ?></td>
-                            <td><?= htmlspecialchars($row['nombre']) ?></td>
-                            <td><?= htmlspecialchars($row['correo']) ?></td>
-                            <td><?= htmlspecialchars($row['rol']) ?></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
-    <div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Algunos registros no se pudieron procesar. Revisa los detalles:</p>
-                    <div class="table-responsive">
-                        <table id="tablaErroresExcel" class="table table-bordered table-sm">
-                            <thead>
+<?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
+<div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Algunos registros no se pudieron procesar porque tienen campos vacíos o inválidos. Revisa los detalles:</p>
+                <div class="table-responsive">
+                    <table id="tablaErroresExcel" class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Carrera</th>
+                                <th>Título</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Errores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($_SESSION['errores_excel'] as $err): ?>
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Carrera</th>
-                                    <th>Título</th>
-                                    <th>Nombre</th>
-                                    <th>Correo</th>
-                                    <th>Rol</th>
-                                    <th>Errores</th>
+                                    <td><?= htmlspecialchars($err['codigo']) ?></td>
+                                    <td><?= htmlspecialchars($err['carrera']) ?></td>
+                                    <td><?= htmlspecialchars($err['titulo']) ?></td>
+                                    <td><?= htmlspecialchars($err['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($err['correo']) ?></td>
+                                    <td><?= htmlspecialchars($err['rol']) ?></td>
+                                    <td class="text-danger"><?= htmlspecialchars($err['errores']) ?></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($_SESSION['errores_excel'] as $err): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($err['codigo']) ?></td>
-                                        <td><?= htmlspecialchars($err['carrera']) ?></td>
-                                        <td><?= htmlspecialchars($err['titulo']) ?></td>
-                                        <td><?= htmlspecialchars($err['nombre']) ?></td>
-                                        <td><?= htmlspecialchars($err['correo']) ?></td>
-                                        <td><?= htmlspecialchars($err['rol']) ?></td>
-                                        <td class="text-danger"><?= htmlspecialchars($err['errores']) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
-    <?php unset($_SESSION['errores_excel']); ?>
-    <?php endif; ?>
-
-    <script>
-        $(document).ready(function () {
-            $('#usuariosTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                }
-            });
-            <?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
-            $('#tablaErroresExcel').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                },
-                pageLength: 5
-            });
-            var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
-            erroresModal.show();
-            <?php endif; ?>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#tablaErroresExcel').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+            },
+            pageLength: 5
         });
-    </script>
+        var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
+        erroresModal.show();
+    });
+</script>
+<?php unset($_SESSION['errores_excel']); ?>
+<?php endif; ?>
+
+<script>
+    $(document).ready(function () {
+        $('#usuariosTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+            }
+        });
+    });
+</script>
 </body>
 </html>

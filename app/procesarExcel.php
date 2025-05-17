@@ -4,8 +4,6 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/conexion.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 // Habilitar errores en desarrollo (opcional)
 ini_set('display_errors', 1);
@@ -77,25 +75,31 @@ $filasConErrores = [];
 // Procesar filas
 for ($i = 2; $i <= count($filas); $i++) {
     $fila = $filas[$i];
-    $motivoError = '';
+    $erroresFila = [];
 
     // Extraer valores
-    $codigoAsignatura = isset($indices['CODIGO']) ? trim((string)($fila[$indices['CODIGO']] ?? '')) : null;
-    $nombreAsignatura = isset($indices['ASIGNATURA']) ? trim((string)($fila[$indices['ASIGNATURA']] ?? '')) : null;
-    $profesorRaw = isset($indices['PROFESOR']) ? trim((string)($fila[$indices['PROFESOR']] ?? '')) : null;
+    $codigoAsignatura = isset($indices['CODIGO']) ? trim((string)($fila[$indices['CODIGO']] ?? '')) : '';
+    $nombreAsignatura = isset($indices['ASIGNATURA']) ? trim((string)($fila[$indices['ASIGNATURA']] ?? '')) : '';
+    $profesorRaw = isset($indices['PROFESOR']) ? trim((string)($fila[$indices['PROFESOR']] ?? '')) : '';
 
     // Validar datos obligatorios
-    if (!$codigoAsignatura) {
-        $motivoError = 'Falta el código de la asignatura';
-    } elseif (!$nombreAsignatura) {
-        $motivoError = 'Falta el nombre de la asignatura';
-    } elseif (!$profesorRaw) {
-        $motivoError = 'Falta el profesor';
-    }
+    if (!$codigoAsignatura) $erroresFila[] = 'Falta el código de la asignatura';
+    if (!$nombreAsignatura) $erroresFila[] = 'Falta el nombre de la asignatura';
+    if (!$profesorRaw) $erroresFila[] = 'Falta el profesor';
 
-    if ($motivoError) {
-        $fila['MOTIVO_ERROR'] = $motivoError;
-        $filasConErrores[] = $fila;
+    if (!empty($erroresFila)) {
+        $filasConErrores[] = [
+            'codigo' => $codigoAsignatura,
+            'asignatura' => $nombreAsignatura,
+            'horario' => $fila[$indices['HORARIO']] ?? '',
+            'jornada' => $fila[$indices['JORNADA']] ?? '',
+            'aula' => $fila[$indices['AULA']] ?? '',
+            'nivel' => $fila[$indices['NIVEL']] ?? '',
+            'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
+            'fecha_fin' => $fila[$indices['FECHA FIN']] ?? '',
+            'profesor' => $profesorRaw,
+            'errores' => implode(', ', $erroresFila)
+        ];
         continue;
     }
 
@@ -119,32 +123,24 @@ for ($i = 2; $i <= count($filas); $i++) {
             explode('-', $profesorRaw)[0] ?? null
         ]);
     } catch (PDOException $e) {
-        $fila['MOTIVO_ERROR'] = 'Error en la base de datos: ' . $e->getMessage();
-        $filasConErrores[] = $fila;
+        $filasConErrores[] = [
+            'codigo' => $codigoAsignatura,
+            'asignatura' => $nombreAsignatura,
+            'horario' => $fila[$indices['HORARIO']] ?? '',
+            'jornada' => $fila[$indices['JORNADA']] ?? '',
+            'aula' => $fila[$indices['AULA']] ?? '',
+            'nivel' => $fila[$indices['NIVEL']] ?? '',
+            'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
+            'fecha_fin' => $fila[$indices['FECHA FIN']] ?? '',
+            'profesor' => $profesorRaw,
+            'errores' => 'Error en la base de datos'
+        ];
     }
 }
 
-// Generar archivo de errores si los hay
+// Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
-    $spreadsheetErrores = new Spreadsheet();
-    $hojaErrores = $spreadsheetErrores->getActiveSheet();
-
-    // Agregar encabezados y filas con errores
-    $hojaErrores->fromArray($filas[1], null, 'A1');
-    $hojaErrores->fromArray($filasConErrores, null, 'A2');
-
-    // Verificar si la carpeta storage/uploads existe, si no, crearla
-    $rutaUploads = __DIR__ . '/../storage/uploads';
-    if (!is_dir($rutaUploads)) {
-        mkdir($rutaUploads, 0777, true);
-    }
-
-    // Guardar el archivo en la carpeta storage/uploads
-    $rutaErrores = $rutaUploads . '/errores.xlsx';
-    $writer = new Xlsx($spreadsheetErrores);
-    $writer->save($rutaErrores);
-
-    // Redirigir con indicador de errores
+    $_SESSION['errores_excel'] = $filasConErrores;
     header("Location: ../public/subirExcel.php?exito=1&errores=1");
     exit();
 }
