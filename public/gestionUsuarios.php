@@ -16,9 +16,10 @@ if (isset($_GET['exito'])) {
     $mensaje = '<div class="alert alert-danger">Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.</div>';
 } elseif (isset($_GET['error_formato'])) {
     $mensaje = '<div class="alert alert-danger">El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.</div>';
+} elseif (isset($_GET['archivo_subido'])) {
+    $mensaje = '<div class="alert alert-warning">Ya se subió este archivo anteriormente. Por favor, selecciona un archivo diferente.</div>';
 }
 $hayErrores = isset($_GET['errores']);
-$archivoSubido = isset($_GET['archivo_subido']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -33,8 +34,8 @@ $archivoSubido = isset($_GET['archivo_subido']);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Importar Usuarios desde Excel</h2>
+<div class="container-fluid mt-5">
+    <h2 class="mb-4">Importar Usuarios desde Excel</h2>
 
         <?php echo $mensaje; ?>
 
@@ -76,31 +77,45 @@ $archivoSubido = isset($_GET['archivo_subido']);
             </table>
         </div>
     </div>
-    
-    <?php if ($archivoSubido): ?>
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div class="toast align-items-center text-bg-warning border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    Este archivo ya fue subido anteriormente.
-                </div>
-                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
 
-    <?php if ($hayErrores): ?>
+    <?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
     <div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    Algunos registros no se pudieron procesar. Puedes descargar el archivo con los errores desde el siguiente enlace:
-                    <a href="../storage/uploads/errores.xlsx" class="btn btn-link">Descargar errores.xlsx</a>
+                    <p>Algunos registros no se pudieron procesar. Revisa los detalles:</p>
+                    <div class="table-responsive">
+                        <table id="tablaErroresExcel" class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Carrera</th>
+                                    <th>Título</th>
+                                    <th>Nombre</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Errores</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($_SESSION['errores_excel'] as $err): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($err['codigo']) ?></td>
+                                        <td><?= htmlspecialchars($err['carrera']) ?></td>
+                                        <td><?= htmlspecialchars($err['titulo']) ?></td>
+                                        <td><?= htmlspecialchars($err['nombre']) ?></td>
+                                        <td><?= htmlspecialchars($err['correo']) ?></td>
+                                        <td><?= htmlspecialchars($err['rol']) ?></td>
+                                        <td class="text-danger"><?= htmlspecialchars($err['errores']) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -108,10 +123,7 @@ $archivoSubido = isset($_GET['archivo_subido']);
             </div>
         </div>
     </div>
-    <script>
-        var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
-        erroresModal.show();
-    </script>
+    <?php unset($_SESSION['errores_excel']); ?>
     <?php endif; ?>
 
     <script>
@@ -121,6 +133,16 @@ $archivoSubido = isset($_GET['archivo_subido']);
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
                 }
             });
+            <?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
+            $('#tablaErroresExcel').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                pageLength: 5
+            });
+            var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
+            erroresModal.show();
+            <?php endif; ?>
         });
     </script>
 </body>

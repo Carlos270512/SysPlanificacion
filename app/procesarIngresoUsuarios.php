@@ -72,13 +72,11 @@ foreach ($filas[1] as $col => $valor) {
         $indices[$valorLimpio] = $col;
     }
 }
-
 $filasConErrores = [];
 
 for ($i = 2; $i <= count($filas); $i++) {
     $fila = $filas[$i];
 
-    // Validar que los valores no sean null antes de usar trim()
     $codigo = isset($fila[$indices['CODIGO']]) ? trim((string)$fila[$indices['CODIGO']]) : '';
     $carrera = isset($fila[$indices['CARRERA']]) ? trim((string)$fila[$indices['CARRERA']]) : '';
     $titulo = isset($fila[$indices['TITULO']]) ? trim((string)$fila[$indices['TITULO']]) : '';
@@ -87,68 +85,71 @@ for ($i = 2; $i <= count($filas); $i++) {
     $rol = isset($fila[$indices['ROL']]) ? trim((string)$fila[$indices['ROL']]) : '';
     $password = isset($fila[$indices['PASSWORD']]) ? trim((string)$fila[$indices['PASSWORD']]) : '';
 
+    $erroresFila = [];
+    if (!$codigo) $erroresFila[] = "Código vacío";
+    if (!$carrera) $erroresFila[] = "Carrera vacía";
+    if (!$titulo) $erroresFila[] = "Título vacío";
+    if (!$nombre) $erroresFila[] = "Nombre vacío";
+    if (!$correo) $erroresFila[] = "Correo vacío";
+    if (!$rol) $erroresFila[] = "Rol vacío";
+    if (!$password) $erroresFila[] = "Password vacío";
+
     // Validación básica
-    if (!$codigo || !$carrera || !$titulo || !$nombre || !$correo || !$rol || !$password) {
-        $filasConErrores[] = $fila;
+    if (count($erroresFila) > 0) {
+        $filasConErrores[] = [
+            'codigo' => $codigo,
+            'carrera' => $carrera,
+            'titulo' => $titulo,
+            'nombre' => $nombre,
+            'correo' => $correo,
+            'rol' => $rol,
+            'errores' => implode(', ', $erroresFila)
+        ];
         continue;
     }
 
     try {
-        // Validar si ya existe el código o correo
         $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM docente WHERE codigo = ? OR correo = ?");
         $stmtCheck->execute([$codigo, $correo]);
-
         if ($stmtCheck->fetchColumn() > 0) {
-            $filasConErrores[] = $fila;
+            $filasConErrores[] = [
+                'codigo' => $codigo,
+                'carrera' => $carrera,
+                'titulo' => $titulo,
+                'nombre' => $nombre,
+                'correo' => $correo,
+                'rol' => $rol,
+                'errores' => 'Código o correo duplicado'
+            ];
             continue;
         }
 
-        // Insertar sin fecha_ingreso
         $stmtInsert = $pdo->prepare("
             INSERT INTO docente (codigo, carrera, nombre, titulo, rol, correo, password)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
-
         $stmtInsert->execute([
-            $codigo,
-            $carrera,
-            $nombre,
-            $titulo,
-            $rol,
-            $correo,
-            $password
+            $codigo, $carrera, $nombre, $titulo, $rol, $correo, $password
         ]);
-
     } catch (PDOException $e) {
-        $filasConErrores[] = $fila;
+        $filasConErrores[] = [
+            'codigo' => $codigo,
+            'carrera' => $carrera,
+            'titulo' => $titulo,
+            'nombre' => $nombre,
+            'correo' => $correo,
+            'rol' => $rol,
+            'errores' => 'Error en base de datos'
+        ];
     }
 }
 
-// Generar archivo de errores si los hay
+// Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
-    $spreadsheetErrores = new Spreadsheet();
-    $hojaErrores = $spreadsheetErrores->getActiveSheet();
-
-    // Agregar encabezados y filas con errores
-    $hojaErrores->fromArray($filas[1], null, 'A1');
-    $hojaErrores->fromArray($filasConErrores, null, 'A2');
-
-    // Verificar si la carpeta storage/uploads existe, si no, crearla
-    $rutaUploads = __DIR__ . '/../storage/uploads';
-    if (!is_dir($rutaUploads)) {
-        mkdir($rutaUploads, 0777, true); // Crear la carpeta con permisos recursivos
-    }
-
-    // Guardar el archivo en la carpeta storage/uploads
-    $rutaErrores = $rutaUploads . '/errores.xlsx';
-    $writer = new Xlsx($spreadsheetErrores);
-    $writer->save($rutaErrores);
-
-    // Redirigir con indicador de errores
+    $_SESSION['errores_excel'] = $filasConErrores;
     header("Location: ../public/gestionUsuarios.php?exito=1&errores=1");
     exit();
 }
 
-// Redirigir si todo fue exitoso
 header("Location: ../public/gestionUsuarios.php?exito=1");
 exit();
