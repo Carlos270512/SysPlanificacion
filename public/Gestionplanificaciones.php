@@ -71,11 +71,6 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Quill CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <style>
-        .ql-container {
-            min-height: 100px;
-        }
-    </style>
     <script>
         // Variables globales para asignatura seleccionada
         let asignaturaSeleccionadaCodigo = '';
