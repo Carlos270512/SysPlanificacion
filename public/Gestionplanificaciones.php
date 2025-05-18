@@ -69,6 +69,13 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/gestionPlanificacionesStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Quill CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .ql-container {
+            min-height: 100px;
+        }
+    </style>
     <script>
         // Variables globales para asignatura seleccionada
         let asignaturaSeleccionadaCodigo = '';
@@ -178,10 +185,11 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 document.getElementById('unidad_asignatura').value = '';
                 // Limpiar campos
                 document.getElementById('unidad_nombre').value = '';
-                document.getElementById('unidad_objetivo').value = '';
-                document.getElementById('unidad_metodologia').value = '';
-                document.getElementById('unidad_actividades').value = '';
-                document.getElementById('unidad_recursos').value = '';
+                // Limpiar Quill
+                if (window.quill_objetivo) quill_objetivo.setContents([]);
+                if (window.quill_metodologia) quill_metodologia.setContents([]);
+                if (window.quill_actividades) quill_actividades.setContents([]);
+                if (window.quill_recursos) quill_recursos.setContents([]);
                 document.getElementById('unidad_semana_inicio').value = '';
                 document.getElementById('unidad_semana_fin').value = '';
             }
@@ -189,10 +197,22 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Enviar formulario por AJAX y mostrar modal de éxito
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Quill
+            window.quill_objetivo = new Quill('#quill_objetivo', { theme: 'snow' });
+            window.quill_metodologia = new Quill('#quill_metodologia', { theme: 'snow' });
+            window.quill_actividades = new Quill('#quill_actividades', { theme: 'snow' });
+            window.quill_recursos = new Quill('#quill_recursos', { theme: 'snow' });
+
             const form = document.getElementById('formPrincipal');
             form.addEventListener('submit', function(e) {
                 // Solo enviar por AJAX si hay unidad (campos de unidad visibles)
                 if (document.getElementById('campos-unidad').style.display === 'block') {
+                    // Copiar contenido de Quill a los inputs ocultos
+                    document.getElementById('unidad_objetivo').value = quill_objetivo.root.innerHTML;
+                    document.getElementById('unidad_metodologia').value = quill_metodologia.root.innerHTML;
+                    document.getElementById('unidad_actividades').value = quill_actividades.root.innerHTML;
+                    document.getElementById('unidad_recursos').value = quill_recursos.root.innerHTML;
+
                     e.preventDefault();
                     const formData = new FormData(form);
                     fetch('', {
@@ -229,6 +249,8 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         });
     </script>
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 </head>
 
 <body>
@@ -289,19 +311,23 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Objetivo Unidad</label>
-                                    <textarea name="unidad[objetivo_unidad]" id="unidad_objetivo" class="form-control" rows="2" required></textarea>
+                                    <div id="quill_objetivo"></div>
+                                    <input type="hidden" name="unidad[objetivo_unidad]" id="unidad_objetivo" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Metodología</label>
-                                    <textarea name="unidad[metodologia]" id="unidad_metodologia" class="form-control" rows="2" required></textarea>
+                                    <div id="quill_metodologia"></div>
+                                    <input type="hidden" name="unidad[metodologia]" id="unidad_metodologia" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Actividades de Recuperación</label>
-                                    <textarea name="unidad[actividades_recuperacion]" id="unidad_actividades" class="form-control" rows="2" required></textarea>
+                                    <div id="quill_actividades"></div>
+                                    <input type="hidden" name="unidad[actividades_recuperacion]" id="unidad_actividades" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Recursos Didácticos</label>
-                                    <textarea name="unidad[recursos_didacticos]" id="unidad_recursos" class="form-control" rows="2" required></textarea>
+                                    <div id="quill_recursos"></div>
+                                    <input type="hidden" name="unidad[recursos_didacticos]" id="unidad_recursos" required>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">

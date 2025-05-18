@@ -26,6 +26,16 @@ if ($codigo) {
     <title>Gestionar Reportes</title>
     <!-- Opcional: Bootstrap para estilos bonitos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Opcional: mejora visual para los campos con HTML */
+        .campo-html {
+            border: 1px solid #ced4da;
+            border-radius: .375rem;
+            padding: .5rem;
+            background: #fff;
+            min-height: 40px;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
@@ -80,19 +90,19 @@ if ($codigo) {
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Objetivo</label>
-                                        <textarea class="form-control" rows="2" readonly>${data.objetivo_unidad || ''}</textarea>
+                                        <div class="campo-html">${data.objetivo_unidad || ''}</div>
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Metodología</label>
-                                        <textarea class="form-control" rows="2" readonly>${data.metodologia || ''}</textarea>
+                                        <div class="campo-html">${data.metodologia || ''}</div>
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Actividades de Recuperación</label>
-                                        <textarea class="form-control" rows="2" readonly>${data.actividades_recuperacion || ''}</textarea>
+                                        <div class="campo-html">${data.actividades_recuperacion || ''}</div>
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Recursos Didácticos</label>
-                                        <textarea class="form-control" rows="2" readonly>${data.recursos_didacticos || ''}</textarea>
+                                        <div class="campo-html">${data.recursos_didacticos || ''}</div>
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Semana Inicio</label>
