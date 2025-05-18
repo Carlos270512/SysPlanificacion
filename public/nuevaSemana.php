@@ -10,11 +10,13 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
     </div>
     <div class="mb-3">
         <label class="form-label">Actividades Previas</label>
-        <textarea class="form-control" name="actividades_previas" rows="2"></textarea>
+        <div id="quill_actividades_previas" class="quill-editor"></div>
+        <input type="hidden" name="actividades_previas" id="input_actividades_previas">
     </div>
     <div class="mb-3">
         <label class="form-label">Contenido</label>
-        <textarea class="form-control" name="contenido" rows="2"></textarea>
+        <div id="quill_contenido" class="quill-editor"></div>
+        <input type="hidden" name="contenido" id="input_contenido">
     </div>
 
     <!-- Acordeón para los días de la semana -->
@@ -27,7 +29,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
             'jueves' => 'Jueves',
             'viernes' => 'Viernes'
         ];
-        foreach ($dias as $dia_key => $dia_nombre): 
+        foreach ($dias as $dia_key => $dia_nombre):
         ?>
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading<?= $dia_key ?>">
@@ -49,39 +51,48 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Objetivo</label>
-                        <textarea class="form-control" name="objetivo_<?= $dia_key ?>" rows="1"></textarea>
+                        <div id="quill_objetivo_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="objetivo_<?= $dia_key ?>" id="input_objetivo_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Objetivo</label>
-                        <input type="text" class="form-control" name="tiempo_objetivo_<?= $dia_key ?>">
+                        <div id="quill_tiempo_objetivo_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="tiempo_objetivo_<?= $dia_key ?>" id="input_tiempo_objetivo_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Apertura</label>
-                        <textarea class="form-control" name="apertura_<?= $dia_key ?>" rows="1"></textarea>
+                        <div id="quill_apertura_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="apertura_<?= $dia_key ?>" id="input_apertura_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Apertura</label>
-                        <input type="text" class="form-control" name="tiempo_apertura_<?= $dia_key ?>">
+                        <div id="quill_tiempo_apertura_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="tiempo_apertura_<?= $dia_key ?>" id="input_tiempo_apertura_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Desarrollo</label>
-                        <textarea class="form-control" name="desarrollo_<?= $dia_key ?>" rows="1"></textarea>
+                        <div id="quill_desarrollo_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="desarrollo_<?= $dia_key ?>" id="input_desarrollo_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Desarrollo</label>
-                        <input type="text" class="form-control" name="tiempo_desarrollo_<?= $dia_key ?>">
+                        <div id="quill_tiempo_desarrollo_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="tiempo_desarrollo_<?= $dia_key ?>" id="input_tiempo_desarrollo_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Cierre</label>
-                        <textarea class="form-control" name="cierre_<?= $dia_key ?>" rows="1"></textarea>
+                        <div id="quill_cierre_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="cierre_<?= $dia_key ?>" id="input_cierre_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Cierre</label>
-                        <input type="text" class="form-control" name="tiempo_cierre_<?= $dia_key ?>">
+                        <div id="quill_tiempo_cierre_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="tiempo_cierre_<?= $dia_key ?>" id="input_tiempo_cierre_<?= $dia_key ?>">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Trabajo Autónomo</label>
-                        <textarea class="form-control" name="trabajo_autonomo_<?= $dia_key ?>" rows="1"></textarea>
+                        <div id="quill_trabajo_autonomo_<?= $dia_key ?>" class="quill-editor"></div>
+                        <input type="hidden" name="trabajo_autonomo_<?= $dia_key ?>" id="input_trabajo_autonomo_<?= $dia_key ?>">
                     </div>
                 </div>
             </div>

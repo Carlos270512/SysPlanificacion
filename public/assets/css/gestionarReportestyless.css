@@ -1,0 +1,7 @@
+        .campo-html {
+            border: 1px solid #ced4da;
+            border-radius: .375rem;
+            padding: .5rem;
+            background: #fff;
+            min-height: 40px;
+        }
