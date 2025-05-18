@@ -82,73 +82,113 @@ if ($codigo) {
         </div>
     </div>
 
+    <!-- Modal de error de validación general -->
+    <div class="modal fade" id="modalErrorCampos" tabindex="-1" aria-labelledby="modalErrorCamposLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="modalErrorCamposLabel">Campos obligatorios</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="modalErrorCamposBody">
+            <!-- Aquí se mostrará el mensaje de error específico -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Aceptar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="modalExitoSemana" tabindex="-1" aria-labelledby="modalExitoSemanaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalExitoSemanaLabel">¡Éxito!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            La semana se agregó correctamente.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script>
-        let idUnidadActual = null;
+<script>
+    let idUnidadActual = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-unidad').forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const idUnidad = this.getAttribute('data-id');
-                    idUnidadActual = idUnidad;
-                    fetch('verUnidad.php?id_unidad=' + encodeURIComponent(idUnidad))
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data && data.id_unidad) {
-                                document.getElementById('unidad-detalle').innerHTML = `
-                                <form class="border p-3 mt-3 bg-light">
-                                    <div class="mb-2">
-                                        <label class="form-label">Nombre de la Unidad</label>
-                                        <input type="text" class="form-control" value="${data.nombre || ''}" readonly>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Objetivo</label>
-                                        <div class="campo-html">${data.objetivo_unidad || ''}</div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Metodología</label>
-                                        <div class="campo-html">${data.metodologia || ''}</div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Actividades de Recuperación</label>
-                                        <div class="campo-html">${data.actividades_recuperacion || ''}</div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Recursos Didácticos</label>
-                                        <div class="campo-html">${data.recursos_didacticos || ''}</div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Semana Inicio</label>
-                                        <input type="date" class="form-control" value="${data.semana_inicio || ''}" readonly>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label">Semana Fin</label>
-                                        <input type="date" class="form-control" value="${data.semana_fin || ''}" readonly>
-                                    </div>
-                                    <div class="mt-3 d-flex gap-2">
-                                        <button type="button" class="btn btn-success" onclick="abrirModalSemana(${data.id_unidad})">Agregar nueva semana</button>
-                                        <a href="verSemanas.php?id_unidad=${data.id_unidad}" class="btn btn-info">Ver semanas</a>
-                                    </div>
-                                </form>
-                            `;
-                            } else {
-                                document.getElementById('unidad-detalle').innerHTML = '<div class="alert alert-warning mt-3">No se encontraron datos de la unidad.</div>';
-                            }
-                        })
-                        .catch(() => {
-                            document.getElementById('unidad-detalle').innerHTML = '<div class="alert alert-danger mt-3">Error al cargar los datos de la unidad.</div>';
-                        });
-                });
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-unidad').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const idUnidad = this.getAttribute('data-id');
+                idUnidadActual = idUnidad;
+                fetch('verUnidad.php?id_unidad=' + encodeURIComponent(idUnidad))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.id_unidad) {
+                            document.getElementById('unidad-detalle').innerHTML = `
+                            <form class="border p-3 mt-3 bg-light">
+                                <div class="mb-2">
+                                    <label class="form-label">Nombre de la Unidad</label>
+                                    <input type="text" class="form-control" value="${data.nombre || ''}" readonly>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Objetivo</label>
+                                    <div class="campo-html">${data.objetivo_unidad || ''}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Metodología</label>
+                                    <div class="campo-html">${data.metodologia || ''}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Actividades de Recuperación</label>
+                                    <div class="campo-html">${data.actividades_recuperacion || ''}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Recursos Didácticos</label>
+                                    <div class="campo-html">${data.recursos_didacticos || ''}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Semana Inicio</label>
+                                    <input type="date" class="form-control" value="${data.semana_inicio || ''}" readonly>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Semana Fin</label>
+                                    <input type="date" class="form-control" value="${data.semana_fin || ''}" readonly>
+                                </div>
+                                <div class="mt-3 d-flex gap-2">
+                                    <button type="button" class="btn btn-success" onclick="abrirModalSemana(${data.id_unidad})">Agregar nueva semana</button>
+                                    <a href="verSemanas.php?id_unidad=${data.id_unidad}" class="btn btn-info">Ver semanas</a>
+                                </div>
+                            </form>
+                        `;
+                        } else {
+                            document.getElementById('unidad-detalle').innerHTML = '<div class="alert alert-warning mt-3">No se encontraron datos de la unidad.</div>';
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('unidad-detalle').innerHTML = '<div class="alert alert-danger mt-3">Error al cargar los datos de la unidad.</div>';
+                    });
             });
         });
+    });
 
-        // Función global para abrir el modal y cargar el formulario dinámicamente
-        function abrirModalSemana(idUnidad) {
+    // Variable para saber si el usuario quiere forzar el guardado
+    let forzarGuardadoSemana = false;
+
+    // Función global para abrir el modal y cargar el formulario dinámicamente
+    function abrirModalSemana(idUnidad) {
         fetch('nuevaSemana.php?id_unidad=' + encodeURIComponent(idUnidad))
             .then(res => res.text())
             .then(html => {
@@ -270,10 +310,91 @@ if ($codigo) {
                     });
                 });
 
-                // Manejar el submit del formulario cargado (AJAX)
+                // Manejar el submit del formulario cargado (AJAX) con validación de lunes y campos generales
                 document.getElementById('formAgregarSemana').addEventListener('submit', function(e) {
                     e.preventDefault();
                     const form = e.target;
+
+                    // Validar solo los campos de lunes
+                    const camposLunes = [
+                        'fecha_lunes',
+                        'fecha_entrega_lunes',
+                        'input_objetivo_lunes',
+                        'input_tiempo_objetivo_lunes',
+                        'input_apertura_lunes',
+                        'input_tiempo_apertura_lunes',
+                        'input_desarrollo_lunes',
+                        'input_tiempo_desarrollo_lunes',
+                        'input_cierre_lunes',
+                        'input_tiempo_cierre_lunes',
+                        'input_trabajo_autonomo_lunes'
+                    ];
+
+                    // Validar campos generales
+                    const camposGenerales = [
+                        { id: 'fecha_semana', nombre: 'Fecha de la Semana' },
+                        { id: 'input_actividades_previas', nombre: 'Actividades Previas' },
+                        { id: 'input_contenido', nombre: 'Contenido' }
+                    ];
+
+                    let errores = [];
+
+                    // Validación de campos generales
+                    camposGenerales.forEach(function(campo) {
+                        const el = document.getElementById(campo.id);
+                        if (el && (!el.value.trim() || el.value.trim() === '<p><br></p>')) {
+                            errores.push('Debe llenar el campo: <b>' + campo.nombre + '</b>.');
+                        }
+                    });
+
+                    // Validación de lunes
+                    camposLunes.forEach(function(id) {
+                        const el = document.getElementById(id);
+                        if (el && (!el.value.trim() || el.value.trim() === '<p><br></p>')) {
+                            let nombreCampo = '';
+                            switch (id) {
+                                case 'fecha_lunes': nombreCampo = 'Fecha (Lunes)'; break;
+                                case 'fecha_entrega_lunes': nombreCampo = 'Fecha Entrega (Lunes)'; break;
+                                case 'input_objetivo_lunes': nombreCampo = 'Objetivo (Lunes)'; break;
+                                case 'input_tiempo_objetivo_lunes': nombreCampo = 'Tiempo Objetivo (Lunes)'; break;
+                                case 'input_apertura_lunes': nombreCampo = 'Apertura (Lunes)'; break;
+                                case 'input_tiempo_apertura_lunes': nombreCampo = 'Tiempo Apertura (Lunes)'; break;
+                                case 'input_desarrollo_lunes': nombreCampo = 'Desarrollo (Lunes)'; break;
+                                case 'input_tiempo_desarrollo_lunes': nombreCampo = 'Tiempo Desarrollo (Lunes)'; break;
+                                case 'input_cierre_lunes': nombreCampo = 'Cierre (Lunes)'; break;
+                                case 'input_tiempo_cierre_lunes': nombreCampo = 'Tiempo Cierre (Lunes)'; break;
+                                case 'input_trabajo_autonomo_lunes': nombreCampo = 'Trabajo Autónomo (Lunes)'; break;
+                                default: nombreCampo = id;
+                            }
+                            errores.push('Debe llenar el campo: <b>' + nombreCampo + '</b>.');
+                        }
+                    });
+
+                    if (errores.length > 0 && !forzarGuardadoSemana) {
+                        document.getElementById('modalErrorCamposBody').innerHTML = errores.join('<br>');
+                        var modalErrorEl = document.getElementById('modalErrorCampos');
+                        var modalError = bootstrap.Modal.getOrCreateInstance(modalErrorEl);
+                        modalError.show();
+
+                        // Al hacer click en aceptar, forzar el guardado
+                        const aceptarBtn = modalErrorEl.querySelector('.btn-danger');
+                        aceptarBtn.onclick = function() {
+                            modalError.hide();
+                            forzarGuardadoSemana = true;
+                            form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
+                        };
+                        // Al cancelar, no hace nada especial
+                        const cancelarBtn = modalErrorEl.querySelector('.btn-secondary');
+                        cancelarBtn.onclick = function() {
+                            modalError.hide();
+                            forzarGuardadoSemana = false;
+                        };
+                        return;
+                    }
+
+                    // Resetear el flag para el siguiente submit
+                    forzarGuardadoSemana = false;
+
                     const formData = new FormData(form);
                     fetch('agregarSemana.php', {
                             method: 'POST',
@@ -296,25 +417,6 @@ if ($codigo) {
                 });
             });
     }
-
 </script>
-
-<!-- Modal de éxito -->
-<div class="modal fade" id="modalExitoSemana" tabindex="-1" aria-labelledby="modalExitoSemanaLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered"><!-- Se agregó modal-dialog-centered -->
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="modalExitoSemanaLabel">¡Éxito!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        La semana se agregó correctamente.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
