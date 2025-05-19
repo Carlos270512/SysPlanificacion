@@ -109,38 +109,81 @@ if ($docente) {
                         }
                     });
             }
+// ...existing code...
+// ...existing code...
+function mostrarUnidad(id_unidad) {
+    // Convierte HTML de Quill a texto plano numerado
+    function quillHtmlToText(html) {
+        if (!html) return '';
+        // Maneja listas ordenadas <ol><li>...</li></ol>
+        html = html.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(_, list) {
+            let i = 1;
+            return list.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(_, item) {
+                item = item.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+                return (i++) + '. ' + item + '\n';
+            });
+        });
+        // Maneja listas no ordenadas <ul><li>...</li></ul>
+        html = html.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(_, list) {
+            return list.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(_, item) {
+                item = item.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+                return '- ' + item + '\n';
+            });
+        });
+        // Reemplaza <br> y <p>
+        html = html.replace(/<br\s*\/?>/gi, '\n');
+        html = html.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, function(_, p) {
+            return p.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim() + '\n';
+        });
+        // Quita cualquier etiqueta HTML restante
+        html = html.replace(/<[^>]+>/g, '');
+        // Quita saltos de línea extra
+        return html.replace(/\n{2,}/g, '\n').trim();
+    }
 
-            function mostrarUnidad(id_unidad) {
-                fetch('../app/get_unidades.php?id_unidad=' + encodeURIComponent(id_unidad))
-                    .then(res => res.json())
-                    .then(unidad => {
-                        if (unidad && unidad.id_unidad) {
-                            unidadCard.style.display = 'block';
-                            unidadCardBody.innerHTML = `
-                                <h5 class="card-title mb-3">${unidad.nombre}</h5>
-                                <div class="table-responsive">
-                                <table class="asig-table">
-                                    <tr>
-                                        <td><strong>Objetivo:</strong> ${unidad.objetivo_unidad || ''}</td>
-                                        <td><strong>Metodología:</strong> ${unidad.metodologia || ''}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Actividades Recuperación:</strong> ${unidad.actividades_recuperacion || ''}</td>
-                                        <td><strong>Recursos Didácticos:</strong> ${unidad.recursos_didacticos || ''}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Semana Inicio:</strong> ${unidad.semana_inicio ? (new Date(unidad.semana_inicio)).toLocaleDateString() : ''}</td>
-                                        <td><strong>Semana Fin:</strong> ${unidad.semana_fin ? (new Date(unidad.semana_fin)).toLocaleDateString() : ''}</td>
-                                    </tr>
-                                </table>
-                                </div>
-                            `;
-                        } else {
-                            unidadCard.style.display = 'none';
-                        }
-                    });
+    fetch('../app/get_unidades.php?id_unidad=' + encodeURIComponent(id_unidad))
+        .then(res => res.json())
+        .then(unidad => {
+            if (unidad && unidad.id_unidad) {
+                unidadCard.style.display = 'block';
+                unidadCardBody.innerHTML = `
+                    <h5 class="card-title mb-3">${unidad.nombre}</h5>
+                    <div class="table-responsive">
+                    <table class="asig-table">
+                        <tr>
+                            <td>
+                                <strong>Objetivo:</strong>
+                                <input type="text" class="form-control" readonly value="${quillHtmlToText(unidad.objetivo_unidad)}">
+                            </td>
+                            <td>
+                                <strong>Metodología:</strong>
+                                <input type="text" class="form-control" readonly value="${quillHtmlToText(unidad.metodologia)}">
+                            </td>
+                            <td>
+                                <strong>Actividades Recuperación:</strong>
+                                <input type="text" class="form-control" readonly value="${quillHtmlToText(unidad.actividades_recuperacion)}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <strong>Recursos Didácticos:</strong>
+                                <textarea class="form-control" rows="3" readonly style="resize:vertical;">${quillHtmlToText(unidad.recursos_didacticos)}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Semana Inicio:</strong> ${unidad.semana_inicio ? (new Date(unidad.semana_inicio)).toLocaleDateString() : ''}</td>
+                            <td><strong>Semana Fin:</strong> ${unidad.semana_fin ? (new Date(unidad.semana_fin)).toLocaleDateString() : ''}</td>
+                        </tr>
+                    </table>
+                    </div>
+                `;
+            } else {
+                unidadCard.style.display = 'none';
             }
-
+        });
+}
+// ...existing code...
+// ...existing code...        
             select.addEventListener('change', function () {
                 const codigo = this.value;
                 const asig = asignaturas.find(a => a.codigo === codigo);
