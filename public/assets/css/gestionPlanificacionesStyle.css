@@ -30,3 +30,18 @@ body {
 .ql-container {
   min-height: 100px;
 }
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
+        }
+        .ql-container.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
+        }
+        .quill-editor {
+            min-height: 90px;
+            background: #fff;
+            border-radius: .375rem;
+            border: 1px solid #ced4da;
+            margin-bottom: 10px;
+        }

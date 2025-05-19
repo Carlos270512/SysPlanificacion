@@ -26,29 +26,48 @@ if (isset($_GET['codigo'])) {
 
 // 2. Procesar envío del formulario principal (PDF o guardar unidad)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad']['nombre'], $_POST['asignatura'])) {
-    // Guardar la unidad en la base de datos
+    // Validación del lado del servidor (extra)
     $unidad = $_POST['unidad'];
-    $stmt = $pdo->prepare("INSERT INTO unidad (nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $ok = $stmt->execute([
-        $unidad['nombre'],
-        $unidad['objetivo_unidad'],
-        $unidad['metodologia'],
-        $unidad['actividades_recuperacion'],
-        $unidad['recursos_didacticos'],
-        $unidad['semana_inicio'],
-        $unidad['semana_fin'],
-        $unidad['asignatura_codigo']
-    ]);
-    // Si se quiere generar PDF, puedes redirigir o manejar aquí
-    // Por ahora, solo devolvemos JSON si es AJAX
-    if (
-        isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
-    ) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => $ok]);
-        exit;
+    $errores = [];
+    if (empty($unidad['nombre'])) $errores[] = 'nombre';
+    if (empty($unidad['objetivo_unidad'])) $errores[] = 'objetivo_unidad';
+    if (empty($unidad['metodologia'])) $errores[] = 'metodologia';
+    if (empty($unidad['actividades_recuperacion'])) $errores[] = 'actividades_recuperacion';
+    if (empty($unidad['recursos_didacticos'])) $errores[] = 'recursos_didacticos';
+    if (empty($unidad['semana_inicio'])) $errores[] = 'semana_inicio';
+    if (empty($unidad['semana_fin'])) $errores[] = 'semana_fin';
+    if (empty($unidad['asignatura_codigo'])) $errores[] = 'asignatura_codigo';
+
+    if (!empty($errores)) {
+        if (
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'errores' => $errores]);
+            exit;
+        }
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO unidad (nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $ok = $stmt->execute([
+            $unidad['nombre'],
+            $unidad['objetivo_unidad'],
+            $unidad['metodologia'],
+            $unidad['actividades_recuperacion'],
+            $unidad['recursos_didacticos'],
+            $unidad['semana_inicio'],
+            $unidad['semana_fin'],
+            $unidad['asignatura_codigo']
+        ]);
+        if (
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => $ok]);
+            exit;
+        }
     }
     // Si no es AJAX, puedes redirigir o mostrar mensaje
 }
@@ -71,8 +90,8 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Quill CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
     <script>
-        // Variables globales para asignatura seleccionada
         let asignaturaSeleccionadaCodigo = '';
         let asignaturaSeleccionadaNombre = '';
 
@@ -106,9 +125,8 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         selectAsignatura.appendChild(option);
                     });
 
-                    info.innerHTML = ''; // Limpiar si cambia el docente
+                    info.innerHTML = '';
                     mostrarCamposUnidad(false);
-                    // Limpiar variables globales
                     asignaturaSeleccionadaCodigo = '';
                     asignaturaSeleccionadaNombre = '';
                 });
@@ -118,7 +136,6 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (!valor) {
                 document.getElementById('info-asignatura').innerHTML = '';
                 mostrarCamposUnidad(false);
-                // Limpiar variables globales
                 asignaturaSeleccionadaCodigo = '';
                 asignaturaSeleccionadaNombre = '';
                 return;
@@ -162,11 +179,8 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             `;
 
-            // Guardar en variables globales
             asignaturaSeleccionadaCodigo = asig.codigo || asig.codigo_asignatura || '';
             asignaturaSeleccionadaNombre = asig.nombre_asignatura || '';
-
-            // Mostrar campos de unidad y poner el código de asignatura
             mostrarCamposUnidad(true, asignaturaSeleccionadaCodigo);
         }
 
@@ -178,9 +192,7 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } else {
                 unidad.style.display = 'none';
                 document.getElementById('unidad_asignatura').value = '';
-                // Limpiar campos
                 document.getElementById('unidad_nombre').value = '';
-                // Limpiar Quill
                 if (window.quill_objetivo) quill_objetivo.setContents([]);
                 if (window.quill_metodologia) quill_metodologia.setContents([]);
                 if (window.quill_actividades) quill_actividades.setContents([]);
@@ -189,62 +201,7 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 document.getElementById('unidad_semana_fin').value = '';
             }
         }
-
-        // Enviar formulario por AJAX y mostrar modal de éxito
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar Quill
-            window.quill_objetivo = new Quill('#quill_objetivo', { theme: 'snow' });
-            window.quill_metodologia = new Quill('#quill_metodologia', { theme: 'snow' });
-            window.quill_actividades = new Quill('#quill_actividades', { theme: 'snow' });
-            window.quill_recursos = new Quill('#quill_recursos', { theme: 'snow' });
-
-            const form = document.getElementById('formPrincipal');
-            form.addEventListener('submit', function(e) {
-                // Solo enviar por AJAX si hay unidad (campos de unidad visibles)
-                if (document.getElementById('campos-unidad').style.display === 'block') {
-                    // Copiar contenido de Quill a los inputs ocultos
-                    document.getElementById('unidad_objetivo').value = quill_objetivo.root.innerHTML;
-                    document.getElementById('unidad_metodologia').value = quill_metodologia.root.innerHTML;
-                    document.getElementById('unidad_actividades').value = quill_actividades.root.innerHTML;
-                    document.getElementById('unidad_recursos').value = quill_recursos.root.innerHTML;
-
-                    e.preventDefault();
-                    const formData = new FormData(form);
-                    fetch('', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Mostrar modal de éxito
-                                var modal = new bootstrap.Modal(document.getElementById('modalExito'));
-                                modal.show();
-                                // Limpiar campos de unidad
-                                mostrarCamposUnidad(false);
-                            }
-                        });
-                }
-            });
-
-            // Redirigir al dar click en "Aceptar" del modal
-            document.getElementById('btnAceptarModalExito').addEventListener('click', function() {
-                if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
-                    // Codificar parámetros para URL
-                    const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
-                    const nombre = encodeURIComponent(asignaturaSeleccionadaNombre);
-                    window.location.href = `gestionarReportes.php?codigo=${codigo}&nombre=${nombre}`;
-                } else {
-                    // Si por alguna razón no hay datos, solo recarga la página
-                    window.location.reload();
-                }
-            });
-        });
     </script>
-    <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 </head>
 
@@ -255,13 +212,12 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="form-title mb-0">Formulario - Información General</h2>
             </div>
             <div class="card-body">
-                <form method="POST" action="" id="formPrincipal">
+                <form method="POST" action="" id="formPrincipal" autocomplete="off">
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="fecha" class="form-label">Fecha</label>
                             <input type="date" name="fecha" class="form-control form-control-sm" value="<?= date('Y-m-d') ?>" readonly>
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <label for="docente" class="form-label">Código Docente</label>
                             <select name="docente" id="docente" class="form-select form-select-md" onchange="cargarAsignaturas(this.value)" required>
@@ -270,18 +226,19 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <option value="<?= $docente['codigo'] ?>"><?= $docente['codigo'] ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <div class="invalid-feedback"></div>
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <label for="nombre_docente" class="form-label">Nombre Docente</label>
                             <input type="text" name="nombre_docente" id="nombre_docente" class="form-control" readonly required>
+                            <div class="invalid-feedback"></div>
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <label for="asignatura" class="form-label">Asignatura</label>
                             <select name="asignatura" id="asignatura" class="form-select" onchange="mostrarDatosAsignatura(this.value)" required>
                                 <option value="">Seleccione</option>
                             </select>
+                            <div class="invalid-feedback"></div>
                         </div>
                     </div>
 
@@ -298,40 +255,48 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Nombre Unidad</label>
                                         <input type="text" name="unidad[nombre]" id="unidad_nombre" class="form-control" required>
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Asignatura Código</label>
                                         <input type="text" id="unidad_asignatura" name="unidad[asignatura_codigo]" class="form-control" readonly required>
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Objetivo Unidad</label>
                                     <div id="quill_objetivo"></div>
+                                    <div class="invalid-feedback"></div>
                                     <input type="hidden" name="unidad[objetivo_unidad]" id="unidad_objetivo" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Metodología</label>
                                     <div id="quill_metodologia"></div>
+                                    <div class="invalid-feedback"></div>
                                     <input type="hidden" name="unidad[metodologia]" id="unidad_metodologia" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Actividades de Recuperación</label>
                                     <div id="quill_actividades"></div>
+                                    <div class="invalid-feedback"></div>
                                     <input type="hidden" name="unidad[actividades_recuperacion]" id="unidad_actividades" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Recursos Didácticos</label>
                                     <div id="quill_recursos"></div>
+                                    <div class="invalid-feedback"></div>
                                     <input type="hidden" name="unidad[recursos_didacticos]" id="unidad_recursos" required>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Semana Inicio</label>
                                         <input type="date" name="unidad[semana_inicio]" id="unidad_semana_inicio" class="form-control" required>
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Semana Fin</label>
                                         <input type="date" name="unidad[semana_fin]" id="unidad_semana_fin" class="form-control" required>
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
                             </div>
@@ -355,7 +320,6 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
-                <!-- Botón de cerrar (X) eliminado para que solo se pueda cerrar con "Aceptar" -->
             </div>
             <div class="modal-body">
                 Unidad generada correctamente.
@@ -366,48 +330,251 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
-
 <script>
-    // Deshabilita todos los enlaces y botones fuera del modal cuando el modal está abierto
-    document.addEventListener('DOMContentLoaded', function() {
-        var modalEl = document.getElementById('modalExito');
-        var modal = new bootstrap.Modal(modalEl);
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Quill
+    window.quill_objetivo = new Quill('#quill_objetivo', { theme: 'snow' });
+    window.quill_metodologia = new Quill('#quill_metodologia', { theme: 'snow' });
+    window.quill_actividades = new Quill('#quill_actividades', { theme: 'snow' });
+    window.quill_recursos = new Quill('#quill_recursos', { theme: 'snow' });
 
-        modalEl.addEventListener('show.bs.modal', function () {
-            // Deshabilitar todos los enlaces y botones fuera del modal
-            document.querySelectorAll('a, button').forEach(function(el) {
-                if (!modalEl.contains(el) && el.id !== 'btnAceptarModalExito') {
-                    el.setAttribute('data-prev-disabled', el.disabled);
-                    el.disabled = true;
-                    el.classList.add('disabled');
-                    if (el.tagName === 'A') {
-                        el.setAttribute('data-prev-href', el.getAttribute('href'));
-                        el.removeAttribute('href');
+    const form = document.getElementById('formPrincipal');
+    form.addEventListener('submit', function(e) {
+        let valido = true;
+
+        // Lista de campos a validar
+        const campos = [
+            { id: 'docente', tipo: 'select' },
+            { id: 'nombre_docente', tipo: 'input' },
+            { id: 'asignatura', tipo: 'select' },
+            { id: 'unidad_nombre', tipo: 'input' },
+            { id: 'unidad_asignatura', tipo: 'input' },
+            { id: 'unidad_objetivo', tipo: 'quill', quill: window.quill_objetivo },
+            { id: 'unidad_metodologia', tipo: 'quill', quill: window.quill_metodologia },
+            { id: 'unidad_actividades', tipo: 'quill', quill: window.quill_actividades },
+            { id: 'unidad_recursos', tipo: 'quill', quill: window.quill_recursos },
+            { id: 'unidad_semana_inicio', tipo: 'input' },
+            { id: 'unidad_semana_fin', tipo: 'input' }
+        ];
+
+        // Solo validar campos de unidad si están visibles
+        const unidadVisible = document.getElementById('campos-unidad').style.display === 'block';
+
+        // Limpiar errores previos
+        campos.forEach(function(campo) {
+            const el = document.getElementById(campo.id);
+            if (el) {
+                el.classList.remove('is-invalid');
+                // Para Quill, limpiar el div.invalid-feedback después del editor
+                if (campo.tipo === 'quill') {
+                    const feedback = el.previousElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.innerText = '';
+                        feedback.style.display = 'none';
+                    }
+                    // Quitar borde rojo del editor Quill
+                    const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                        qlContainer.classList.remove('is-invalid');
+                    }
+                } else {
+                    let msg = el.parentNode.querySelector('.invalid-feedback');
+                    if (msg) {
+                        msg.innerText = '';
+                        msg.style.display = 'none';
                     }
                 }
-            });
+            }
         });
 
-        modalEl.addEventListener('hidden.bs.modal', function () {
-            // Restaurar enlaces y botones
-            document.querySelectorAll('a, button').forEach(function(el) {
-                if (!modalEl.contains(el) && el.hasAttribute('data-prev-disabled')) {
-                    el.disabled = (el.getAttribute('data-prev-disabled') === 'true');
-                    el.classList.remove('disabled');
-                    el.removeAttribute('data-prev-disabled');
-                    if (el.tagName === 'A' && el.hasAttribute('data-prev-href')) {
-                        el.setAttribute('href', el.getAttribute('data-prev-href'));
-                        el.removeAttribute('data-prev-href');
+        // Validar campos
+        campos.forEach(function(campo) {
+            if (campo.id.startsWith('unidad_') && !unidadVisible) return;
+
+            const el = document.getElementById(campo.id);
+            let valor = '';
+            if (campo.tipo === 'quill') {
+                valor = campo.quill.getText().replace(/\s/g, '');
+            } else if (campo.tipo === 'select') {
+                valor = el.value;
+            } else {
+                valor = el.value.trim();
+            }
+
+            el.classList.remove('is-invalid');
+            if (campo.tipo === 'quill') {
+                const feedback = el.previousElementSibling;
+                // El contenedor visual de Quill
+                const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                if (!valor) {
+                    valido = false;
+                    el.classList.add('is-invalid');
+                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                        qlContainer.classList.add('is-invalid');
+                    }
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.innerText = 'Llenar este campo';
+                        feedback.style.display = 'block';
+                    }
+                } else {
+                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                        qlContainer.classList.remove('is-invalid');
                     }
                 }
-            });
+            } else {
+                let msg = el.parentNode.querySelector('.invalid-feedback');
+                if (!valor) {
+                    valido = false;
+                    el.classList.add('is-invalid');
+                    if (msg) {
+                        msg.innerText = 'Llenar este campo';
+                        msg.style.display = 'block';
+                    }
+                }
+            }
         });
-        
+
+        if (!valido) {
+            e.preventDefault();
+            const primerError = document.querySelector('.is-invalid');
+            if (primerError) primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+
+        // Copiar contenido de Quill a los inputs ocultos antes de enviar
+        if (unidadVisible) {
+            document.getElementById('unidad_objetivo').value = quill_objetivo.root.innerHTML;
+            document.getElementById('unidad_metodologia').value = quill_metodologia.root.innerHTML;
+            document.getElementById('unidad_actividades').value = quill_actividades.root.innerHTML;
+            document.getElementById('unidad_recursos').value = quill_recursos.root.innerHTML;
+        }
+
+        // Envío AJAX solo si hay unidad visible
+        if (unidadVisible) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch('', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var modal = new bootstrap.Modal(document.getElementById('modalExito'));
+                        modal.show();
+                        mostrarCamposUnidad(false);
+                    } else if (data.errores) {
+                        data.errores.forEach(function(campo) {
+                            let inputId = '';
+                            switch (campo) {
+                                case 'nombre': inputId = 'unidad_nombre'; break;
+                                case 'objetivo_unidad': inputId = 'unidad_objetivo'; break;
+                                case 'metodologia': inputId = 'unidad_metodologia'; break;
+                                case 'actividades_recuperacion': inputId = 'unidad_actividades'; break;
+                                case 'recursos_didacticos': inputId = 'unidad_recursos'; break;
+                                case 'semana_inicio': inputId = 'unidad_semana_inicio'; break;
+                                case 'semana_fin': inputId = 'unidad_semana_fin'; break;
+                                case 'asignatura_codigo': inputId = 'unidad_asignatura'; break;
+                            }
+                            if (inputId) {
+                                const el = document.getElementById(inputId);
+                                el.classList.add('is-invalid');
+                                if (el.type === 'hidden') {
+                                    const feedback = el.previousElementSibling;
+                                    const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                                        qlContainer.classList.add('is-invalid');
+                                    }
+                                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                        feedback.innerText = 'Llenar este campo';
+                                        feedback.style.display = 'block';
+                                    }
+                                } else {
+                                    let msg = el.parentNode.querySelector('.invalid-feedback');
+                                    if (msg) {
+                                        msg.innerText = 'Llenar este campo';
+                                        msg.style.display = 'block';
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+        }
     });
+
+    // Quitar error al escribir/cambiar
+    [
+        'docente', 'nombre_docente', 'asignatura', 'unidad_nombre', 'unidad_asignatura',
+        'unidad_semana_inicio', 'unidad_semana_fin'
+    ].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() {
+                el.classList.remove('is-invalid');
+                let msg = el.parentNode.querySelector('.invalid-feedback');
+                if (msg) {
+                    msg.innerText = '';
+                    msg.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    // Para selects
+    ['docente', 'asignatura'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', function() {
+                el.classList.remove('is-invalid');
+                let msg = el.parentNode.querySelector('.invalid-feedback');
+                if (msg) {
+                    msg.innerText = '';
+                    msg.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    // Para Quill
+    [
+        { id: 'unidad_objetivo', quill: window.quill_objetivo },
+        { id: 'unidad_metodologia', quill: window.quill_metodologia },
+        { id: 'unidad_actividades', quill: window.quill_actividades },
+        { id: 'unidad_recursos', quill: window.quill_recursos }
+    ].forEach(function(q) {
+        if (q.quill) {
+            q.quill.on('text-change', function() {
+                const el = document.getElementById(q.id);
+                const feedback = el.previousElementSibling;
+                const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                el.classList.remove('is-invalid');
+                if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                    qlContainer.classList.remove('is-invalid');
+                }
+                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                    feedback.innerText = '';
+                    feedback.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    document.getElementById('btnAceptarModalExito').addEventListener('click', function() {
+        if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
+            const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
+            const nombre = encodeURIComponent(asignaturaSeleccionadaNombre);
+            window.location.href = `gestionarReportes.php?codigo=${codigo}&nombre=${nombre}`;
+        } else {
+            window.location.reload();
+        }
+    });
+});
 </script>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
