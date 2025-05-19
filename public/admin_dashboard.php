@@ -52,7 +52,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
             <a href="gestionUsuarios.php" target="mainFrame"><i class="fas fa-user-cog me-2"></i> Gestión de Usuarios</a>
             <a href="subirExcel.php" target="mainFrame"><i class="fas fa-chalkboard-teacher me-2"></i> Cargar Datos</a>
             <a href="Gestionplanificaciones.php" target="mainFrame"><i class="fas fa-book me-2"></i> Gestión de Planificaciones</a>
-            <a href="reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i> Generar Reportes</a>
+            <a href="planificaciones.php" target="mainFrame"><i class="fas fa-file-download me-2"></i> Planificaciones</a>
             <a href="acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i> Acerca del Sistema</a>
         </div>
         <div id="content">
