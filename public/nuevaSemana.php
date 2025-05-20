@@ -6,7 +6,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
     <div class="mb-3">
         <label class="form-label">Fecha de la Semana</label>
         <input type="text" class="form-control" name="fecha_semana" id="fecha_semana" required autocomplete="off">
-        <div id="fecha_viernes" class="form-text text-success mt-2" style="font-weight:bold;"></div>
+        <div id="info_fecha_viernes" class="form-text text-success mt-2" style="font-weight:bold;"></div>
     </div>
     <div class="mb-3">
         <label class="form-label">Actividades Previas</label>

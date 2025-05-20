@@ -5,3 +5,19 @@
             background: #fff;
             min-height: 40px;
         }
+
+        .quill-editor {
+            min-height: 90px;
+            background: #fff;
+            border-radius: .375rem;
+            border: 1px solid #ced4da;
+            margin-bottom: 10px;
+        }
+
+        .input-group-text.fw-bold {
+            font-weight: bold !important;
+        }
+
+        .form-control.fw-bold {
+            font-weight: bold !important;
+        }

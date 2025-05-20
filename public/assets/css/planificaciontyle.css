@@ -1,0 +1,38 @@
+        .asig-table td {
+            padding: 0.5rem 1.2rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .asig-table tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .asig-table strong {
+            min-width: 110px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .asig-table td {
+                display: block;
+                width: 100%;
+                border-bottom: none;
+            }
+
+            .asig-table tr {
+                display: block;
+                margin-bottom: 1rem;
+            }
+        }
+
+        #unidadesCarousel {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 8px;
+        }
+
+        #unidadesCarousel .btn {
+            min-width: 160px;
+            margin-right: 8px;
+        }
