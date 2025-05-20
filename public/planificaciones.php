@@ -110,9 +110,8 @@ if ($docente) {
                     });
             }
 // ...existing code...
-// ...existing code...
 function mostrarUnidad(id_unidad) {
-    // Convierte HTML de Quill a texto plano numerado
+    // Convierte HTML de Quill a texto plano numerado y conserva saltos de línea
     function quillHtmlToText(html) {
         if (!html) return '';
         // Maneja listas ordenadas <ol><li>...</li></ol>
@@ -146,6 +145,8 @@ function mostrarUnidad(id_unidad) {
         .then(unidad => {
             if (unidad && unidad.id_unidad) {
                 unidadCard.style.display = 'block';
+                // Convertir saltos de línea en <br> para mostrar cada punto en una línea
+                const recursosDidacticos = quillHtmlToText(unidad.recursos_didacticos).replace(/\n/g, '<br>');
                 unidadCardBody.innerHTML = `
                     <h5 class="card-title mb-3">${unidad.nombre}</h5>
                     <div class="table-responsive">
@@ -154,6 +155,11 @@ function mostrarUnidad(id_unidad) {
                             <td>
                                 <strong>Objetivo:</strong>
                                 <input type="text" class="form-control" readonly value="${quillHtmlToText(unidad.objetivo_unidad)}">
+                                <br>
+                                <strong>Recursos Didácticos:</strong>
+                                <div class="form-control bg-white" style="height:auto;min-height:48px;overflow:auto;" readonly>
+                                    ${recursosDidacticos}
+                                </div>
                             </td>
                             <td>
                                 <strong>Metodología:</strong>
@@ -162,12 +168,6 @@ function mostrarUnidad(id_unidad) {
                             <td>
                                 <strong>Actividades Recuperación:</strong>
                                 <input type="text" class="form-control" readonly value="${quillHtmlToText(unidad.actividades_recuperacion)}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <strong>Recursos Didácticos:</strong>
-                                <textarea class="form-control" rows="3" readonly style="resize:vertical;">${quillHtmlToText(unidad.recursos_didacticos)}</textarea>
                             </td>
                         </tr>
                         <tr>
@@ -182,8 +182,7 @@ function mostrarUnidad(id_unidad) {
             }
         });
 }
-// ...existing code...
-// ...existing code...        
+// ...existing code...      
             select.addEventListener('change', function () {
                 const codigo = this.value;
                 const asig = asignaturas.find(a => a.codigo === codigo);

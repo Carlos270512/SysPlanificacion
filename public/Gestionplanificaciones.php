@@ -69,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unidad']['nombre'], $
             exit;
         }
     }
-    // Si no es AJAX, puedes redirigir o mostrar mensaje
 }
 
 // 3. Mostrar formulario
@@ -314,267 +313,342 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-<!-- Modal de éxito -->
-<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
-            </div>
-            <div class="modal-body">
-                Unidad generada correctamente.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="btnAceptarModalExito" data-bs-dismiss="modal">Aceptar</button>
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
+                </div>
+                <div class="modal-body">
+                    Unidad generada correctamente.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btnAceptarModalExito" data-bs-dismiss="modal">Aceptar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar Quill
-    window.quill_objetivo = new Quill('#quill_objetivo', { theme: 'snow' });
-    window.quill_metodologia = new Quill('#quill_metodologia', { theme: 'snow' });
-    window.quill_actividades = new Quill('#quill_actividades', { theme: 'snow' });
-    window.quill_recursos = new Quill('#quill_recursos', { theme: 'snow' });
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Quill
+            window.quill_objetivo = new Quill('#quill_objetivo', {
+                theme: 'snow'
+            });
+            window.quill_metodologia = new Quill('#quill_metodologia', {
+                theme: 'snow'
+            });
+            window.quill_actividades = new Quill('#quill_actividades', {
+                theme: 'snow'
+            });
+            window.quill_recursos = new Quill('#quill_recursos', {
+                theme: 'snow'
+            });
 
-    const form = document.getElementById('formPrincipal');
-    form.addEventListener('submit', function(e) {
-        let valido = true;
+            const form = document.getElementById('formPrincipal');
+            form.addEventListener('submit', function(e) {
+                let valido = true;
 
-        // Lista de campos a validar
-        const campos = [
-            { id: 'docente', tipo: 'select' },
-            { id: 'nombre_docente', tipo: 'input' },
-            { id: 'asignatura', tipo: 'select' },
-            { id: 'unidad_nombre', tipo: 'input' },
-            { id: 'unidad_asignatura', tipo: 'input' },
-            { id: 'unidad_objetivo', tipo: 'quill', quill: window.quill_objetivo },
-            { id: 'unidad_metodologia', tipo: 'quill', quill: window.quill_metodologia },
-            { id: 'unidad_actividades', tipo: 'quill', quill: window.quill_actividades },
-            { id: 'unidad_recursos', tipo: 'quill', quill: window.quill_recursos },
-            { id: 'unidad_semana_inicio', tipo: 'input' },
-            { id: 'unidad_semana_fin', tipo: 'input' }
-        ];
-
-        // Solo validar campos de unidad si están visibles
-        const unidadVisible = document.getElementById('campos-unidad').style.display === 'block';
-
-        // Limpiar errores previos
-        campos.forEach(function(campo) {
-            const el = document.getElementById(campo.id);
-            if (el) {
-                el.classList.remove('is-invalid');
-                // Para Quill, limpiar el div.invalid-feedback después del editor
-                if (campo.tipo === 'quill') {
-                    const feedback = el.previousElementSibling;
-                    if (feedback && feedback.classList.contains('invalid-feedback')) {
-                        feedback.innerText = '';
-                        feedback.style.display = 'none';
+                // Lista de campos a validar
+                const campos = [{
+                        id: 'docente',
+                        tipo: 'select'
+                    },
+                    {
+                        id: 'nombre_docente',
+                        tipo: 'input'
+                    },
+                    {
+                        id: 'asignatura',
+                        tipo: 'select'
+                    },
+                    {
+                        id: 'unidad_nombre',
+                        tipo: 'input'
+                    },
+                    {
+                        id: 'unidad_asignatura',
+                        tipo: 'input'
+                    },
+                    {
+                        id: 'unidad_objetivo',
+                        tipo: 'quill',
+                        quill: window.quill_objetivo
+                    },
+                    {
+                        id: 'unidad_metodologia',
+                        tipo: 'quill',
+                        quill: window.quill_metodologia
+                    },
+                    {
+                        id: 'unidad_actividades',
+                        tipo: 'quill',
+                        quill: window.quill_actividades
+                    },
+                    {
+                        id: 'unidad_recursos',
+                        tipo: 'quill',
+                        quill: window.quill_recursos
+                    },
+                    {
+                        id: 'unidad_semana_inicio',
+                        tipo: 'input'
+                    },
+                    {
+                        id: 'unidad_semana_fin',
+                        tipo: 'input'
                     }
-                    // Quitar borde rojo del editor Quill
-                    const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
-                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
-                        qlContainer.classList.remove('is-invalid');
-                    }
-                } else {
-                    let msg = el.parentNode.querySelector('.invalid-feedback');
-                    if (msg) {
-                        msg.innerText = '';
-                        msg.style.display = 'none';
-                    }
-                }
-            }
-        });
+                ];
 
-        // Validar campos
-        campos.forEach(function(campo) {
-            if (campo.id.startsWith('unidad_') && !unidadVisible) return;
+                // Solo validar campos de unidad si están visibles
+                const unidadVisible = document.getElementById('campos-unidad').style.display === 'block';
 
-            const el = document.getElementById(campo.id);
-            let valor = '';
-            if (campo.tipo === 'quill') {
-                valor = campo.quill.getText().replace(/\s/g, '');
-            } else if (campo.tipo === 'select') {
-                valor = el.value;
-            } else {
-                valor = el.value.trim();
-            }
-
-            el.classList.remove('is-invalid');
-            if (campo.tipo === 'quill') {
-                const feedback = el.previousElementSibling;
-                // El contenedor visual de Quill
-                const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
-                if (!valor) {
-                    valido = false;
-                    el.classList.add('is-invalid');
-                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
-                        qlContainer.classList.add('is-invalid');
-                    }
-                    if (feedback && feedback.classList.contains('invalid-feedback')) {
-                        feedback.innerText = 'Llenar este campo';
-                        feedback.style.display = 'block';
-                    }
-                } else {
-                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
-                        qlContainer.classList.remove('is-invalid');
-                    }
-                }
-            } else {
-                let msg = el.parentNode.querySelector('.invalid-feedback');
-                if (!valor) {
-                    valido = false;
-                    el.classList.add('is-invalid');
-                    if (msg) {
-                        msg.innerText = 'Llenar este campo';
-                        msg.style.display = 'block';
-                    }
-                }
-            }
-        });
-
-        if (!valido) {
-            e.preventDefault();
-            const primerError = document.querySelector('.is-invalid');
-            if (primerError) primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return false;
-        }
-
-        // Copiar contenido de Quill a los inputs ocultos antes de enviar
-        if (unidadVisible) {
-            document.getElementById('unidad_objetivo').value = quill_objetivo.root.innerHTML;
-            document.getElementById('unidad_metodologia').value = quill_metodologia.root.innerHTML;
-            document.getElementById('unidad_actividades').value = quill_actividades.root.innerHTML;
-            document.getElementById('unidad_recursos').value = quill_recursos.root.innerHTML;
-        }
-
-        // Envío AJAX solo si hay unidad visible
-        if (unidadVisible) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            fetch('', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        var modal = new bootstrap.Modal(document.getElementById('modalExito'));
-                        modal.show();
-                        mostrarCamposUnidad(false);
-                    } else if (data.errores) {
-                        data.errores.forEach(function(campo) {
-                            let inputId = '';
-                            switch (campo) {
-                                case 'nombre': inputId = 'unidad_nombre'; break;
-                                case 'objetivo_unidad': inputId = 'unidad_objetivo'; break;
-                                case 'metodologia': inputId = 'unidad_metodologia'; break;
-                                case 'actividades_recuperacion': inputId = 'unidad_actividades'; break;
-                                case 'recursos_didacticos': inputId = 'unidad_recursos'; break;
-                                case 'semana_inicio': inputId = 'unidad_semana_inicio'; break;
-                                case 'semana_fin': inputId = 'unidad_semana_fin'; break;
-                                case 'asignatura_codigo': inputId = 'unidad_asignatura'; break;
+                // Limpiar errores previos
+                campos.forEach(function(campo) {
+                    const el = document.getElementById(campo.id);
+                    if (el) {
+                        el.classList.remove('is-invalid');
+                        // Para Quill, limpiar el div.invalid-feedback después del editor
+                        if (campo.tipo === 'quill') {
+                            const feedback = el.previousElementSibling;
+                            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                feedback.innerText = '';
+                                feedback.style.display = 'none';
                             }
-                            if (inputId) {
-                                const el = document.getElementById(inputId);
-                                el.classList.add('is-invalid');
-                                if (el.type === 'hidden') {
-                                    const feedback = el.previousElementSibling;
-                                    const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
-                                    if (qlContainer && qlContainer.classList.contains('ql-container')) {
-                                        qlContainer.classList.add('is-invalid');
-                                    }
-                                    if (feedback && feedback.classList.contains('invalid-feedback')) {
-                                        feedback.innerText = 'Llenar este campo';
-                                        feedback.style.display = 'block';
-                                    }
-                                } else {
-                                    let msg = el.parentNode.querySelector('.invalid-feedback');
-                                    if (msg) {
-                                        msg.innerText = 'Llenar este campo';
-                                        msg.style.display = 'block';
-                                    }
-                                }
+                            // Quitar borde rojo del editor Quill
+                            const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                            if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                                qlContainer.classList.remove('is-invalid');
                             }
-                        });
+                        } else {
+                            let msg = el.parentNode.querySelector('.invalid-feedback');
+                            if (msg) {
+                                msg.innerText = '';
+                                msg.style.display = 'none';
+                            }
+                        }
                     }
                 });
-        }
-    });
 
-    // Quitar error al escribir/cambiar
-    [
-        'docente', 'nombre_docente', 'asignatura', 'unidad_nombre', 'unidad_asignatura',
-        'unidad_semana_inicio', 'unidad_semana_fin'
-    ].forEach(function(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', function() {
-                el.classList.remove('is-invalid');
-                let msg = el.parentNode.querySelector('.invalid-feedback');
-                if (msg) {
-                    msg.innerText = '';
-                    msg.style.display = 'none';
+                // Validar campos
+                campos.forEach(function(campo) {
+                    if (campo.id.startsWith('unidad_') && !unidadVisible) return;
+
+                    const el = document.getElementById(campo.id);
+                    let valor = '';
+                    if (campo.tipo === 'quill') {
+                        valor = campo.quill.getText().replace(/\s/g, '');
+                    } else if (campo.tipo === 'select') {
+                        valor = el.value;
+                    } else {
+                        valor = el.value.trim();
+                    }
+
+                    el.classList.remove('is-invalid');
+                    if (campo.tipo === 'quill') {
+                        const feedback = el.previousElementSibling;
+                        // El contenedor visual de Quill
+                        const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                        if (!valor) {
+                            valido = false;
+                            el.classList.add('is-invalid');
+                            if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                                qlContainer.classList.add('is-invalid');
+                            }
+                            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                feedback.innerText = 'Llenar este campo';
+                                feedback.style.display = 'block';
+                            }
+                        } else {
+                            if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                                qlContainer.classList.remove('is-invalid');
+                            }
+                        }
+                    } else {
+                        let msg = el.parentNode.querySelector('.invalid-feedback');
+                        if (!valor) {
+                            valido = false;
+                            el.classList.add('is-invalid');
+                            if (msg) {
+                                msg.innerText = 'Llenar este campo';
+                                msg.style.display = 'block';
+                            }
+                        }
+                    }
+                });
+
+                if (!valido) {
+                    e.preventDefault();
+                    const primerError = document.querySelector('.is-invalid');
+                    if (primerError) primerError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    return false;
+                }
+
+                // Copiar contenido de Quill a los inputs ocultos antes de enviar
+                if (unidadVisible) {
+                    document.getElementById('unidad_objetivo').value = quill_objetivo.root.innerHTML;
+                    document.getElementById('unidad_metodologia').value = quill_metodologia.root.innerHTML;
+                    document.getElementById('unidad_actividades').value = quill_actividades.root.innerHTML;
+                    document.getElementById('unidad_recursos').value = quill_recursos.root.innerHTML;
+                }
+
+                // Envío AJAX solo si hay unidad visible
+                if (unidadVisible) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    fetch('', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                var modal = new bootstrap.Modal(document.getElementById('modalExito'));
+                                modal.show();
+                                mostrarCamposUnidad(false);
+                            } else if (data.errores) {
+                                data.errores.forEach(function(campo) {
+                                    let inputId = '';
+                                    switch (campo) {
+                                        case 'nombre':
+                                            inputId = 'unidad_nombre';
+                                            break;
+                                        case 'objetivo_unidad':
+                                            inputId = 'unidad_objetivo';
+                                            break;
+                                        case 'metodologia':
+                                            inputId = 'unidad_metodologia';
+                                            break;
+                                        case 'actividades_recuperacion':
+                                            inputId = 'unidad_actividades';
+                                            break;
+                                        case 'recursos_didacticos':
+                                            inputId = 'unidad_recursos';
+                                            break;
+                                        case 'semana_inicio':
+                                            inputId = 'unidad_semana_inicio';
+                                            break;
+                                        case 'semana_fin':
+                                            inputId = 'unidad_semana_fin';
+                                            break;
+                                        case 'asignatura_codigo':
+                                            inputId = 'unidad_asignatura';
+                                            break;
+                                    }
+                                    if (inputId) {
+                                        const el = document.getElementById(inputId);
+                                        el.classList.add('is-invalid');
+                                        if (el.type === 'hidden') {
+                                            const feedback = el.previousElementSibling;
+                                            const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                                            if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                                                qlContainer.classList.add('is-invalid');
+                                            }
+                                            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                                feedback.innerText = 'Llenar este campo';
+                                                feedback.style.display = 'block';
+                                            }
+                                        } else {
+                                            let msg = el.parentNode.querySelector('.invalid-feedback');
+                                            if (msg) {
+                                                msg.innerText = 'Llenar este campo';
+                                                msg.style.display = 'block';
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
                 }
             });
-        }
-    });
 
-    // Para selects
-    ['docente', 'asignatura'].forEach(function(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('change', function() {
-                el.classList.remove('is-invalid');
-                let msg = el.parentNode.querySelector('.invalid-feedback');
-                if (msg) {
-                    msg.innerText = '';
-                    msg.style.display = 'none';
+            // Quitar error al escribir/cambiar
+            [
+                'docente', 'nombre_docente', 'asignatura', 'unidad_nombre', 'unidad_asignatura',
+                'unidad_semana_inicio', 'unidad_semana_fin'
+            ].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function() {
+                        el.classList.remove('is-invalid');
+                        let msg = el.parentNode.querySelector('.invalid-feedback');
+                        if (msg) {
+                            msg.innerText = '';
+                            msg.style.display = 'none';
+                        }
+                    });
                 }
             });
-        }
-    });
 
-    // Para Quill
-    [
-        { id: 'unidad_objetivo', quill: window.quill_objetivo },
-        { id: 'unidad_metodologia', quill: window.quill_metodologia },
-        { id: 'unidad_actividades', quill: window.quill_actividades },
-        { id: 'unidad_recursos', quill: window.quill_recursos }
-    ].forEach(function(q) {
-        if (q.quill) {
-            q.quill.on('text-change', function() {
-                const el = document.getElementById(q.id);
-                const feedback = el.previousElementSibling;
-                const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
-                el.classList.remove('is-invalid');
-                if (qlContainer && qlContainer.classList.contains('ql-container')) {
-                    qlContainer.classList.remove('is-invalid');
-                }
-                if (feedback && feedback.classList.contains('invalid-feedback')) {
-                    feedback.innerText = '';
-                    feedback.style.display = 'none';
+            // Para selects
+            ['docente', 'asignatura'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', function() {
+                        el.classList.remove('is-invalid');
+                        let msg = el.parentNode.querySelector('.invalid-feedback');
+                        if (msg) {
+                            msg.innerText = '';
+                            msg.style.display = 'none';
+                        }
+                    });
                 }
             });
-        }
-    });
 
-    document.getElementById('btnAceptarModalExito').addEventListener('click', function() {
-        if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
-            const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
-            const nombre = encodeURIComponent(asignaturaSeleccionadaNombre);
-            window.location.href = `gestionarReportes.php?codigo=${codigo}&nombre=${nombre}`;
-        } else {
-            window.location.reload();
-        }
-    });
-});
-</script>
+            // Para Quill
+            [{
+                    id: 'unidad_objetivo',
+                    quill: window.quill_objetivo
+                },
+                {
+                    id: 'unidad_metodologia',
+                    quill: window.quill_metodologia
+                },
+                {
+                    id: 'unidad_actividades',
+                    quill: window.quill_actividades
+                },
+                {
+                    id: 'unidad_recursos',
+                    quill: window.quill_recursos
+                }
+            ].forEach(function(q) {
+                if (q.quill) {
+                    q.quill.on('text-change', function() {
+                        const el = document.getElementById(q.id);
+                        const feedback = el.previousElementSibling;
+                        const qlContainer = el.previousElementSibling ? el.previousElementSibling.previousElementSibling : null;
+                        el.classList.remove('is-invalid');
+                        if (qlContainer && qlContainer.classList.contains('ql-container')) {
+                            qlContainer.classList.remove('is-invalid');
+                        }
+                        if (feedback && feedback.classList.contains('invalid-feedback')) {
+                            feedback.innerText = '';
+                            feedback.style.display = 'none';
+                        }
+                    });
+                }
+            });
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            document.getElementById('btnAceptarModalExito').addEventListener('click', function() {
+                if (asignaturaSeleccionadaCodigo && asignaturaSeleccionadaNombre) {
+                    const codigo = encodeURIComponent(asignaturaSeleccionadaCodigo);
+                    const nombre = encodeURIComponent(asignaturaSeleccionadaNombre);
+                    window.location.href = `gestionarReportes.php?codigo=${codigo}&nombre=${nombre}`;
+                } else {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
