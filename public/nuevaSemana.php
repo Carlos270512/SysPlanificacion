@@ -56,8 +56,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Objetivo</label>
-                        <div id="quill_tiempo_objetivo_<?= $dia_key ?>" class="quill-editor"></div>
-                        <input type="hidden" name="tiempo_objetivo_<?= $dia_key ?>" id="input_tiempo_objetivo_<?= $dia_key ?>">
+                        <input type="number" min="0" class="form-control" name="tiempo_objetivo_<?= $dia_key ?>" id="input_tiempo_objetivo_<?= $dia_key ?>" placeholder="Poner solo numero de minutos">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Apertura</label>
@@ -66,8 +65,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Apertura</label>
-                        <div id="quill_tiempo_apertura_<?= $dia_key ?>" class="quill-editor"></div>
-                        <input type="hidden" name="tiempo_apertura_<?= $dia_key ?>" id="input_tiempo_apertura_<?= $dia_key ?>">
+                        <input type="number" min="0" class="form-control" name="tiempo_apertura_<?= $dia_key ?>" id="input_tiempo_apertura_<?= $dia_key ?>" placeholder="Poner solo numero de minutos">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Desarrollo</label>
@@ -76,8 +74,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Desarrollo</label>
-                        <div id="quill_tiempo_desarrollo_<?= $dia_key ?>" class="quill-editor"></div>
-                        <input type="hidden" name="tiempo_desarrollo_<?= $dia_key ?>" id="input_tiempo_desarrollo_<?= $dia_key ?>">
+                        <input type="number" min="0" class="form-control" name="tiempo_desarrollo_<?= $dia_key ?>" id="input_tiempo_desarrollo_<?= $dia_key ?>" placeholder="Poner solo numero de minutos">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Cierre</label>
@@ -86,8 +83,7 @@ $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : 0;
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Tiempo Cierre</label>
-                        <div id="quill_tiempo_cierre_<?= $dia_key ?>" class="quill-editor"></div>
-                        <input type="hidden" name="tiempo_cierre_<?= $dia_key ?>" id="input_tiempo_cierre_<?= $dia_key ?>">
+                        <input type="number" min="0" class="form-control" name="tiempo_cierre_<?= $dia_key ?>" id="input_tiempo_cierre_<?= $dia_key ?>" placeholder="Poner solo numero de minutos">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Trabajo Autónomo</label>
