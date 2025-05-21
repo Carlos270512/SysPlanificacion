@@ -46,6 +46,10 @@ $hayErrores = isset($_GET['errores']);
         </div>
         <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
     </form>
+    <div class="mb-3">
+        <a href="gestionUsuarios.php?estado=ACTIVO" class="btn btn-outline-success btn-sm <?= (!isset($_GET['estado']) || $_GET['estado'] === 'ACTIVO') ? 'active' : '' ?>">Mostrar Activos</a>
+        <a href="gestionUsuarios.php?estado=INACTIVO" class="btn btn-outline-secondary btn-sm <?= (isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO') ? 'active' : '' ?>">Mostrar Inactivos</a>
+    </div>
     <!-- Tabla para mostrar los usuarios -->
     <div class="table-responsive">
         <table id="usuariosTable" class="table table-striped table-bordered">
@@ -57,12 +61,16 @@ $hayErrores = isset($_GET['errores']);
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 require __DIR__ . '/../config/conexion.php';
-                $stmt = $pdo->query("SELECT codigo, carrera, titulo, nombre, correo, rol FROM docente");
+                $estadoFiltro = isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO' ? 'INACTIVO' : 'ACTIVO';
+                $stmt = $pdo->prepare("SELECT codigo, carrera, titulo, nombre, correo, rol, estado FROM docente WHERE estado = ?");
+                $stmt->execute([$estadoFiltro]);
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
                         <td><?= htmlspecialchars($row['codigo']) ?></td>
@@ -71,6 +79,20 @@ $hayErrores = isset($_GET['errores']);
                         <td><?= htmlspecialchars($row['nombre']) ?></td>
                         <td><?= htmlspecialchars($row['correo']) ?></td>
                         <td><?= htmlspecialchars($row['rol']) ?></td>
+                        <td>
+                            <span class="badge <?= $row['estado'] === 'ACTIVO' ? 'bg-success' : 'bg-secondary' ?>">
+                                <?= htmlspecialchars($row['estado']) ?>
+                            </span>
+                        </td>
+                        <td>
+                            <form action="../app/cambiarEstadoUsuario.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="codigo" value="<?= htmlspecialchars($row['codigo']) ?>">
+                                <input type="hidden" name="estado" value="<?= $row['estado'] === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO' ?>">
+                                <button type="submit" class="btn btn-sm <?= $row['estado'] === 'ACTIVO' ? 'btn-danger' : 'btn-success' ?>">
+                                    <?= $row['estado'] === 'ACTIVO' ? 'Inactivar' : 'Activar' ?>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
