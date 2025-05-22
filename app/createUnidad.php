@@ -34,7 +34,8 @@ try {
         $semana_fin,
         $asignatura_codigo
     ]);
-    echo json_encode(['success' => true]);
+    $unidad_id = $pdo->lastInsertId();
+    echo json_encode(['success' => true, 'unidad_id' => $unidad_id]);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Error al guardar: ' . $e->getMessage()]);
 }

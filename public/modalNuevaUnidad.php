@@ -37,7 +37,7 @@ if ($codigo) {
     <h5 class="modal-title" id="modalNuevaUnidadLabel">Crear Nueva Unidad</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 </div>
-<div class="modal-body">
+<div class="modal-body" id="modalUnidadBody">
     <?php if ($asignatura): ?>
     <!-- Encabezado informativo -->
     <table class="table table-bordered align-middle mb-4" style="background: #fff;">
@@ -58,10 +58,9 @@ if ($codigo) {
     </table>
 
     <!-- Formulario de ingreso de unidad -->
-    <form id="formNuevaUnidad">
+    <form id="formNuevaUnidad" autocomplete="off">
         <input type="hidden" name="asignatura_codigo" value="<?php echo htmlspecialchars($codigo); ?>">
 
-        <!-- Tabla editable para los datos de la unidad -->
         <table class="table table-bordered" style="background: #fff;">
             <tr>
                 <td colspan="4" style="text-align:center; background:#eaeaea;">
@@ -113,6 +112,12 @@ if ($codigo) {
         </table>
         <div class="text-end">
             <button type="submit" class="btn btn-primary">Guardar Unidad</button>
+            <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" disabled>
+                <i class="bi bi-calendar-plus"></i> Nueva Semana
+            </button>
+        </div>
+        <div id="unidadSuccess" class="alert alert-success mt-3" style="display:none;">
+            <i class="bi bi-check-circle-fill"></i> Unidad guardada correctamente.
         </div>
     </form>
     <?php else: ?>
@@ -128,7 +133,9 @@ if ($codigo) {
     var quill_actividades = new Quill('#editor_actividades', { theme: 'snow', placeholder: 'Describa las actividades de recuperación...' });
     var quill_recursos = new Quill('#editor_recursos', { theme: 'snow', placeholder: 'Describa los recursos didácticos...' });
 
-    // Al enviar el formulario, pasar el contenido de Quill a los inputs ocultos
+    let unidadId = null;
+    let unidadNombre = null;
+
     document.getElementById('formNuevaUnidad').addEventListener('submit', function(e) {
         e.preventDefault();
         document.getElementById('input_objetivo_unidad').value = quill_objetivo.root.innerHTML;
@@ -137,7 +144,6 @@ if ($codigo) {
         document.getElementById('input_actividades_recuperacion').value = quill_actividades.root.innerHTML;
         document.getElementById('input_recursos_didacticos').value = quill_recursos.root.innerHTML;
 
-        // Enviar por AJAX a la ruta correcta
         var formData = new FormData(this);
         fetch('/sysplanificacion/app/createUnidad.php', {
             method: 'POST',
@@ -146,8 +152,14 @@ if ($codigo) {
         .then(res => res.json())
         .then(data => {
             if(data.success){
-                alert('Unidad guardada correctamente');
-                location.reload();
+                unidadId = data.unidad_id;
+                unidadNombre = formData.get('nombre');
+                document.getElementById('unidadSuccess').style.display = 'block';
+                document.getElementById('btnNuevaSemana').disabled = false;
+                // Deshabilitar todos los campos del formulario excepto el botón Nueva Semana
+                Array.from(document.querySelectorAll('#formNuevaUnidad input, #formNuevaUnidad button')).forEach(el => {
+                    if(el.id !== 'btnNuevaSemana') el.disabled = true;
+                });
             }else{
                 alert('Error al guardar la unidad: ' + (data.message || ''));
             }
@@ -155,5 +167,14 @@ if ($codigo) {
         .catch(err => {
             alert('Error en la conexión o en el servidor.');
         });
+    });
+
+    document.getElementById('btnNuevaSemana').addEventListener('click', function() {
+        if (!unidadId) return;
+        fetch(`/sysplanificacion/public/gestionarSemana.php?unidad_id=${unidadId}&unidad_nombre=${encodeURIComponent(unidadNombre)}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('modalUnidadBody').innerHTML = html;
+            });
     });
 </script>

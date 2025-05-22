@@ -125,7 +125,7 @@ if ($docente) {
                 select.dispatchEvent(new Event('change'));
             }
 
-            // Evento para el botón "Generar Unidad" con inicialización de QuillJS después de cargar el modal
+            // Evento para el botón "Generar Unidad"
             document.getElementById('btnGenerarUnidad').addEventListener('click', function() {
                 const select = document.getElementById('asignatura');
                 const selectedOption = select.options[select.selectedIndex];
@@ -159,15 +159,29 @@ if ($docente) {
                                     document.getElementById('input_recursos_didacticos').value = quill_recursos.root.innerHTML;
 
                                     var formData = new FormData(this);
-                                    fetch('/sysplanificacion/app/createUnidad.php', { // <--- CORREGIDO AQUÍ
+                                    fetch('/sysplanificacion/app/createUnidad.php', {
                                         method: 'POST',
                                         body: formData
                                     })
                                     .then(res => res.json())
                                     .then(data => {
                                         if(data.success){
-                                            alert('Unidad guardada correctamente');
-                                            location.reload();
+                                            // Mostrar mensaje de éxito en el modal y habilitar el botón Nueva Semana
+                                            if(document.getElementById('unidadSuccess')) {
+                                                document.getElementById('unidadSuccess').style.display = 'block';
+                                            }
+                                            if(document.getElementById('btnNuevaSemana')) {
+                                                document.getElementById('btnNuevaSemana').disabled = false;
+                                            }
+                                            // Deshabilitar los campos del formulario excepto el botón Nueva Semana
+                                            if(document.getElementById('formNuevaUnidad')) {
+                                                Array.from(document.querySelectorAll('#formNuevaUnidad input, #formNuevaUnidad button')).forEach(el => {
+                                                    if(el.id !== 'btnNuevaSemana') el.disabled = true;
+                                                });
+                                            }
+                                            // Guarda el id y nombre de la unidad para el botón Nueva Semana
+                                            window.unidadId = data.unidad_id;
+                                            window.unidadNombre = document.querySelector('[name="nombre"]').value;
                                         }else{
                                             alert('Error al guardar la unidad: ' + (data.message || ''));
                                         }
@@ -175,6 +189,16 @@ if ($docente) {
                                     .catch(err => {
                                         alert('Error en la conexión o en el servidor.');
                                     });
+                                });
+
+                                // Evento para el botón Nueva Semana
+                                document.getElementById('btnNuevaSemana').addEventListener('click', function() {
+                                    if (!window.unidadId) return;
+                                    fetch(`/sysplanificacion/public/gestionarSemana.php?unidad_id=${window.unidadId}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}`)
+                                        .then(res => res.text())
+                                        .then(html => {
+                                            document.getElementById('modalUnidadBody').innerHTML = html;
+                                        });
                                 });
                             }
                         }, 300); // Espera breve para asegurar que el DOM del modal esté listo
