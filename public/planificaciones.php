@@ -92,26 +92,26 @@ if ($docente) {
                 if (asig) {
                     card.style.display = 'block';
                     cardBody.innerHTML = `
-                        <h5 class="card-title mb-3">${asig.nombre_asignatura}</h5>
-                        <div class="table-responsive">
-                        <table class="asig-table">
-                            <tr>
-                                <td><strong>Código:</strong> ${asig.codigo}</td>
-                                <td><strong>Nivel:</strong> ${asig.nivel}</td>
-                                <td><strong>Jornada:</strong> ${asig.jornada}</td>
-                                <td><strong>Modalidad:</strong> ${asig.jornada}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Aula:</strong> ${asig.aula}</td>
-                                <td><strong>Carrera:</strong> ${carrera}</td>
-                                <td><strong>Horario:</strong> ${asig.horario}</td>
-                                <td><strong>Fecha inicio:</strong> ${asig.fecha_inicio ? (new Date(asig.fecha_inicio)).toLocaleDateString() : ''}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Fecha fin:</strong> ${asig.fecha_fin ? (new Date(asig.fecha_fin)).toLocaleDateString() : ''}</td>
-                            </tr>
-                        </table>
-                        </div>
+    <h5 class="card-title mb-3">${asig.nombre_asignatura}</h5>
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <tr>
+            <td class="px-3"><strong>Código:</strong><br>${asig.codigo}</td>
+            <td class="px-3"><strong>Nivel:</strong><br>${asig.nivel}</td>
+            <td class="px-3"><strong>Jornada:</strong><br>${asig.jornada}</td>
+            <td class="px-3"><strong>Modalidad:</strong><br>${asig.jornada}</td>
+        </tr>
+        <tr>
+            <td class="px-3"><strong>Aula:</strong><br>${asig.aula}</td>
+            <td class="px-3"><strong>Carrera:</strong><br>${carrera}</td>
+            <td class="px-3"><strong>Horario:</strong><br>${asig.horario}</td>
+            <td class="px-3"><strong>Fecha inicio:</strong><br>${asig.fecha_inicio ? (new Date(asig.fecha_inicio)).toLocaleDateString() : ''}</td>
+        </tr>
+        <tr>
+            <td class="px-3"><strong>Fecha fin:</strong><br>${asig.fecha_fin ? (new Date(asig.fecha_fin)).toLocaleDateString() : ''}</td>
+        </tr>
+    </table>
+    </div>
                     `;
                     btnUnidadContainer.style.display = 'block';
                 } else {
