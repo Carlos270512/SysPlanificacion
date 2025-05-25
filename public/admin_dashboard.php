@@ -16,14 +16,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     <link rel="stylesheet" href="assets/css/adminstyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
     <nav class="navbar navbar-dark bg-dark w-100">
         <div class="container-fluid d-flex justify-content-between">
-            <!-- Botón para alternar el sidebar -->
-            <button id="toggleSidebar" class="btn btn-dark me-3">
-                <i class="fas fa-bars"></i>
-            </button>
             <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center ms-auto">
                 <img src="assets/img/logotvn.png" alt="Logo" style="height: 40px; max-width: 100%; object-fit: contain;" class="me-2">
                 <span>Panel Administrador</span>
@@ -47,32 +42,46 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
         </div>
     </nav>
 
-    <div class="d-flex">
-        <div id="sidebar">
-            <a href="gestionUsuarios.php" target="mainFrame"><i class="fas fa-user-cog me-2"></i> Gestión de Usuarios</a>
-            <a href="subirExcel.php" target="mainFrame"><i class="fas fa-chalkboard-teacher me-2"></i> Cargar Datos</a>
-            <a href="Gestionplanificaciones.php" target="mainFrame"><i class="fas fa-book me-2"></i> Gestión de Planificaciones</a>
-            <a href="planificaciones.php" target="mainFrame"><i class="fas fa-file-download me-2"></i> Planificaciones</a>
-            <a href="acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i> Acerca del Sistema</a>
+    <!-- Menú horizontal con dropdowns flotantes -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom custom-navbar">
+        <div class="container-fluid">
+            <ul class="navbar-nav mx-auto flex-row">
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-cog me-2"></i>Usuarios
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="usuariosDropdown">
+                        <li><a class="dropdown-item" href="gestionUsuarios.php" target="mainFrame">Gestión de Usuarios</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="datosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Datos
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
+                        <li><a class="dropdown-item" href="subirExcel.php" target="mainFrame">Cargar Datos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="planificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book me-2"></i>Planificaciones
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionesDropdown">
+                        <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
+                        <li><a class="dropdown-item" href="planificaciones.php" target="mainFrame">Planificaciones</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link custom-nav-link" href="acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i>Acerca del Sistema</a>
+                </li>
+            </ul>
         </div>
-        <div id="content">
-            <iframe id="mainFrame" name="mainFrame" src="" frameborder="0"></iframe>
-        </div>
+    </nav>
+
+    <div id="content" style="height:calc(100vh - 112px);">
+        <iframe id="mainFrame" name="mainFrame" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggleSidebarButton = document.getElementById("toggleSidebar");
-        const sidebar = document.getElementById("sidebar");
-        const content = document.getElementById("content");
-
-        toggleSidebarButton.addEventListener("click", function () {
-            sidebar.classList.toggle("hidden");
-            content.classList.toggle("full-width"); // Agrega o quita la clase para expandir el contenido
-        });
-    });
-</script>
 </body>
-
 </html>

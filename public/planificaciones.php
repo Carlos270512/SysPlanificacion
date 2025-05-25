@@ -33,6 +33,7 @@ if ($docente) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
 </head>
 
 <body>
@@ -77,6 +78,7 @@ if ($docente) {
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const asignaturas = <?php echo json_encode($asignaturas); ?>;
@@ -141,7 +143,7 @@ if ($docente) {
 
                         // Esperar a que el DOM del modal esté listo
                         setTimeout(function() {
-                            // Inicializar los editores Quill SOLO si existen los divs
+                            // Inicializar los editores Quill SOLO si existen los divs de unidad
                             if (document.getElementById('editor_objetivo')) {
                                 var quill_objetivo = new Quill('#editor_objetivo', { theme: 'snow', placeholder: 'Escriba el objetivo de la unidad...' });
                                 var quill_bibliografia = new Quill('#editor_bibliografia', { theme: 'snow', placeholder: 'Ingrese la bibliografía...' });
@@ -149,7 +151,6 @@ if ($docente) {
                                 var quill_actividades = new Quill('#editor_actividades', { theme: 'snow', placeholder: 'Describa las actividades de recuperación...' });
                                 var quill_recursos = new Quill('#editor_recursos', { theme: 'snow', placeholder: 'Describa los recursos didácticos...' });
 
-                                // Al enviar el formulario, pasar el contenido de Quill a los inputs ocultos
                                 document.getElementById('formNuevaUnidad').addEventListener('submit', function(e) {
                                     e.preventDefault();
                                     document.getElementById('input_objetivo_unidad').value = quill_objetivo.root.innerHTML;
@@ -166,20 +167,17 @@ if ($docente) {
                                     .then(res => res.json())
                                     .then(data => {
                                         if(data.success){
-                                            // Mostrar mensaje de éxito en el modal y habilitar el botón Nueva Semana
                                             if(document.getElementById('unidadSuccess')) {
                                                 document.getElementById('unidadSuccess').style.display = 'block';
                                             }
                                             if(document.getElementById('btnNuevaSemana')) {
                                                 document.getElementById('btnNuevaSemana').disabled = false;
                                             }
-                                            // Deshabilitar los campos del formulario excepto el botón Nueva Semana
                                             if(document.getElementById('formNuevaUnidad')) {
                                                 Array.from(document.querySelectorAll('#formNuevaUnidad input, #formNuevaUnidad button')).forEach(el => {
                                                     if(el.id !== 'btnNuevaSemana') el.disabled = true;
                                                 });
                                             }
-                                            // Guarda el id y nombre de la unidad para el botón Nueva Semana
                                             window.unidadId = data.unidad_id;
                                             window.unidadNombre = document.querySelector('[name="nombre"]').value;
                                         }else{
@@ -198,12 +196,121 @@ if ($docente) {
                                         .then(res => res.text())
                                         .then(html => {
                                             document.getElementById('modalUnidadBody').innerHTML = html;
+                                            setTimeout(function() {
+                                                inicializarPikadaySemana();
+                                                inicializarQuillSemana();
+                                            }, 200);
                                         });
                                 });
                             }
                         }, 300); // Espera breve para asegurar que el DOM del modal esté listo
                     });
             });
+
+            // Función global para inicializar Pikaday en gestionarSemana.php
+            window.inicializarPikadaySemana = function() {
+                var semana_inicio = document.getElementById('semana_inicio');
+                var semana_fin = document.getElementById('semana_fin');
+                if (!semana_inicio || !semana_fin) return;
+
+                var minDate = semana_inicio.getAttribute('data-min');
+                var maxDate = semana_inicio.getAttribute('data-max');
+                var dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+
+                new Pikaday({
+                    field: semana_inicio,
+                    format: 'YYYY-MM-DD',
+                    minDate: minDate ? new Date(minDate) : null,
+                    maxDate: maxDate ? new Date(maxDate) : null,
+                    toString(date) {
+                        return date.toISOString().slice(0,10);
+                    },
+                    disableDayFn: function(date) {
+                        return date.getDay() !== 1;
+                    },
+                    onSelect: function(date) {
+                        var viernes = new Date(date);
+                        viernes.setDate(date.getDate() + 4);
+                        var maxFin = maxDate ? new Date(maxDate) : null;
+                        if (maxFin && viernes > maxFin) {
+                            viernes = maxFin;
+                        }
+                        semana_fin.value = viernes.toISOString().slice(0,10);
+                    }
+                });
+                semana_fin.setAttribute('readonly', true);
+
+                dias.forEach(function(dia) {
+                    var input = document.querySelector("input[name='entrega_" + dia + "']");
+                    if (input) {
+                        var min = input.getAttribute('data-min');
+                        var max = input.getAttribute('data-max');
+                        new Pikaday({
+                            field: input,
+                            format: 'YYYY-MM-DD',
+                            minDate: min ? new Date(min) : null,
+                            maxDate: max ? new Date(max) : null,
+                            toString(date) {
+                                return date.toISOString().slice(0,10);
+                            }
+                        });
+                    }
+                });
+            };
+
+            // Función global para inicializar Quill en gestionarSemana.php
+            window.inicializarQuillSemana = function() {
+                if (typeof Quill === 'undefined') return;
+                if (!document.getElementById('formSemana')) return;
+
+                window.quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas a la clase...' });
+                window.quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido de la semana...' });
+
+                var dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+                window.quill_objetivo = {}; window.quill_apertura = {}; window.quill_desarrollo = {}; window.quill_cierre = {}; window.quill_trabajo = {};
+
+                dias.forEach(function(dia) {
+                    window.quill_objetivo[dia] = new Quill('#editor_objetivo_' + dia, { theme: 'snow', placeholder: 'Objetivo...' });
+                    window.quill_apertura[dia] = new Quill('#editor_apertura_' + dia, { theme: 'snow', placeholder: 'Apertura...' });
+                    window.quill_desarrollo[dia] = new Quill('#editor_desarrollo_' + dia, { theme: 'snow', placeholder: 'Desarrollo...' });
+                    window.quill_cierre[dia] = new Quill('#editor_cierre_' + dia, { theme: 'snow', placeholder: 'Cierre...' });
+                    window.quill_trabajo[dia] = new Quill('#editor_trabajo_autonomo_' + dia, { theme: 'snow', placeholder: 'Trabajo autónomo...' });
+                });
+
+                // Reasigna el submit del formulario
+                var formSemana = document.getElementById('formSemana');
+                if (formSemana) {
+                    formSemana.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        document.getElementById('input_actividades_previas').value = window.quill_actividades_previas.root.innerHTML;
+                        document.getElementById('input_contenido').value = window.quill_contenido.root.innerHTML;
+                        dias.forEach(function(dia) {
+                            document.getElementById('input_objetivo_' + dia).value = window.quill_objetivo[dia].root.innerHTML;
+                            document.getElementById('input_apertura_' + dia).value = window.quill_apertura[dia].root.innerHTML;
+                            document.getElementById('input_desarrollo_' + dia).value = window.quill_desarrollo[dia].root.innerHTML;
+                            document.getElementById('input_cierre_' + dia).value = window.quill_cierre[dia].root.innerHTML;
+                            document.getElementById('input_trabajo_autonomo_' + dia).value = window.quill_trabajo[dia].root.innerHTML;
+                        });
+
+                        var formData = new FormData(this);
+                        fetch('/sysplanificacion/app/Semana/createSemana.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.success){
+                                document.getElementById('semanaSuccess').style.display = 'block';
+                            }else{
+                                alert('Error al guardar la semana: ' + (data.message || ''));
+                            }
+                        })
+                        .catch(err => {
+                            alert('Error en la conexión o en el servidor.');
+                        });
+                    });
+                }
+            }
         });
     </script>
 </body>
