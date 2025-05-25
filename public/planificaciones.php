@@ -151,6 +151,38 @@ if ($docente) {
                                 var quill_actividades = new Quill('#editor_actividades', { theme: 'snow', placeholder: 'Describa las actividades de recuperación...' });
                                 var quill_recursos = new Quill('#editor_recursos', { theme: 'snow', placeholder: 'Describa los recursos didácticos...' });
 
+                                // --- INICIO MODIFICACIÓN: Inicializar Pikaday solo para el modal de unidad ---
+                                if (document.getElementById('semana_inicio')) {
+                                    var pickerInicio = new Pikaday({
+                                        field: document.getElementById('semana_inicio'),
+                                        format: 'YYYY-MM-DD',
+                                        disableDayFn: function(date) {
+                                            // Solo lunes
+                                            return date.getDay() !== 1;
+                                        },
+                                        toString(date, format) {
+                                            const day = ("0" + date.getDate()).slice(-2);
+                                            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                                            return date.getFullYear() + '-' + month + '-' + day;
+                                        }
+                                    });
+                                }
+                                if (document.getElementById('semana_fin')) {
+                                    var pickerFin = new Pikaday({
+                                        field: document.getElementById('semana_fin'),
+                                        format: 'YYYY-MM-DD',
+                                        disableDayFn: function(date) {
+                                            return date.getDay() !== 1;
+                                        },
+                                        toString(date, format) {
+                                            const day = ("0" + date.getDate()).slice(-2);
+                                            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                                            return date.getFullYear() + '-' + month + '-' + day;
+                                        }
+                                    });
+                                }
+                                // --- FIN MODIFICACIÓN ---
+
                                 document.getElementById('formNuevaUnidad').addEventListener('submit', function(e) {
                                     e.preventDefault();
                                     document.getElementById('input_objetivo_unidad').value = quill_objetivo.root.innerHTML;
@@ -197,7 +229,6 @@ if ($docente) {
                                         .then(html => {
                                             document.getElementById('modalUnidadBody').innerHTML = html;
                                             setTimeout(function() {
-                                                inicializarPikadaySemana();
                                                 inicializarQuillSemana();
                                             }, 200);
                                         });
@@ -207,61 +238,79 @@ if ($docente) {
                     });
             });
 
-            // Función global para inicializar Pikaday en gestionarSemana.php
-            window.inicializarPikadaySemana = function() {
-                var semana_inicio = document.getElementById('semana_inicio');
-                var semana_fin = document.getElementById('semana_fin');
-                if (!semana_inicio || !semana_fin) return;
-
-                var minDate = semana_inicio.getAttribute('data-min');
-                var maxDate = semana_inicio.getAttribute('data-max');
-                var dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-
-                new Pikaday({
-                    field: semana_inicio,
-                    format: 'YYYY-MM-DD',
-                    minDate: minDate ? new Date(minDate) : null,
-                    maxDate: maxDate ? new Date(maxDate) : null,
-                    toString(date) {
-                        return date.toISOString().slice(0,10);
-                    },
-                    disableDayFn: function(date) {
-                        return date.getDay() !== 1;
-                    },
-                    onSelect: function(date) {
-                        var viernes = new Date(date);
-                        viernes.setDate(date.getDate() + 4);
-                        var maxFin = maxDate ? new Date(maxDate) : null;
-                        if (maxFin && viernes > maxFin) {
-                            viernes = maxFin;
-                        }
-                        semana_fin.value = viernes.toISOString().slice(0,10);
-                    }
-                });
-                semana_fin.setAttribute('readonly', true);
-
-                dias.forEach(function(dia) {
-                    var input = document.querySelector("input[name='entrega_" + dia + "']");
-                    if (input) {
-                        var min = input.getAttribute('data-min');
-                        var max = input.getAttribute('data-max');
-                        new Pikaday({
-                            field: input,
-                            format: 'YYYY-MM-DD',
-                            minDate: min ? new Date(min) : null,
-                            maxDate: max ? new Date(max) : null,
-                            toString(date) {
-                                return date.toISOString().slice(0,10);
-                            }
-                        });
-                    }
-                });
-            };
-
             // Función global para inicializar Quill en gestionarSemana.php
             window.inicializarQuillSemana = function() {
                 if (typeof Quill === 'undefined') return;
                 if (!document.getElementById('formSemana')) return;
+
+                // --- INICIO MODIFICACIÓN: Inicializar Pikaday para los campos de fecha de semana ---
+                var semanaInicioInput = document.getElementById('semana_inicio');
+                var semanaFinInput = document.getElementById('semana_fin');
+                var minDate = semanaInicioInput && semanaInicioInput.dataset.min ? new Date(semanaInicioInput.dataset.min) : null;
+                var maxDateRaw = semanaInicioInput && semanaInicioInput.dataset.max ? new Date(semanaInicioInput.dataset.max) : null;
+                var maxDate = maxDateRaw;
+
+                // Calcular el último lunes válido para semana_inicio
+                if (minDate && maxDateRaw) {
+                    var lastMonday = new Date(maxDateRaw);
+                    lastMonday.setDate(lastMonday.getDate() - ((lastMonday.getDay() + 6) % 7));
+                    var fridayOfThatWeek = new Date(lastMonday);
+                    fridayOfThatWeek.setDate(lastMonday.getDate() + 4);
+                    if (fridayOfThatWeek > maxDateRaw) {
+                        lastMonday.setDate(lastMonday.getDate() - 7);
+                    }
+                    maxDate = lastMonday;
+                }
+
+                if (semanaInicioInput) {
+                    var pickerSemanaInicio = new Pikaday({
+                        field: semanaInicioInput,
+                        format: 'YYYY-MM-DD',
+                        minDate: minDate,
+                        maxDate: maxDate,
+                        disableDayFn: function(date) {
+                            // Solo lunes
+                            return date.getDay() !== 1;
+                        },
+                        toString(date, format) {
+                            const day = ("0" + date.getDate()).slice(-2);
+                            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                            return date.getFullYear() + '-' + month + '-' + day;
+                        },
+                        onSelect: function(date) {
+                            // Calcular viernes de esa semana
+                            var viernes = new Date(date);
+                            viernes.setDate(date.getDate() + 4);
+                            // Validar rango
+                            if (minDate && viernes < minDate) return;
+                            if (maxDateRaw && viernes > maxDateRaw) return;
+                            const day = ("0" + viernes.getDate()).slice(-2);
+                            const month = ("0" + (viernes.getMonth() + 1)).slice(-2);
+                            const viernesStr = viernes.getFullYear() + '-' + month + '-' + day;
+                            semanaFinInput.value = viernesStr;
+                        }
+                    });
+                }
+                if (semanaFinInput) {
+                    var minDateFin = semanaFinInput.dataset.min ? new Date(semanaFinInput.dataset.min) : null;
+                    var maxDateFin = semanaFinInput.dataset.max ? new Date(semanaFinInput.dataset.max) : null;
+                    var pickerSemanaFin = new Pikaday({
+                        field: semanaFinInput,
+                        format: 'YYYY-MM-DD',
+                        minDate: minDateFin,
+                        maxDate: maxDateFin,
+                        disableDayFn: function(date) {
+                            // Solo viernes
+                            return date.getDay() !== 5;
+                        },
+                        toString(date, format) {
+                            const day = ("0" + date.getDate()).slice(-2);
+                            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                            return date.getFullYear() + '-' + month + '-' + day;
+                        }
+                    });
+                }
+                // --- FIN MODIFICACIÓN ---
 
                 window.quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas a la clase...' });
                 window.quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido de la semana...' });

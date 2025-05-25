@@ -21,6 +21,7 @@ if ($codigo) {
 }
 ?>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
 <style>
     .quill-editor {
         min-height: 90px;
@@ -103,10 +104,10 @@ if ($codigo) {
             <tr>
                 <td colspan="4">
                     <strong>Semana Inicio:</strong>
-                    <input type="date" name="semana_inicio" required>
+                    <input type="text" name="semana_inicio" id="semana_inicio" required autocomplete="off">
                     &nbsp;&nbsp;
                     <strong>Semana Fin:</strong>
-                    <input type="date" name="semana_fin" required>
+                    <input type="text" name="semana_fin" id="semana_fin" required autocomplete="off">
                 </td>
             </tr>
         </table>
@@ -125,6 +126,7 @@ if ($codigo) {
     <?php endif; ?>
 </div>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
     // Inicializar los editores Quill
     var quill_objetivo = new Quill('#editor_objetivo', { theme: 'snow', placeholder: 'Escriba el objetivo de la unidad...' });
@@ -132,6 +134,34 @@ if ($codigo) {
     var quill_metodologia = new Quill('#editor_metodologia', { theme: 'snow', placeholder: 'Describa la metodología...' });
     var quill_actividades = new Quill('#editor_actividades', { theme: 'snow', placeholder: 'Describa las actividades de recuperación...' });
     var quill_recursos = new Quill('#editor_recursos', { theme: 'snow', placeholder: 'Describa los recursos didácticos...' });
+
+    // Solo permitir seleccionar lunes en los campos de fecha
+    var pickerInicio = new Pikaday({
+        field: document.getElementById('semana_inicio'),
+        format: 'YYYY-MM-DD',
+        disableDayFn: function(date) {
+            // 1 = lunes (getDay: 0=domingo, 1=lunes, ...)
+            return date.getDay() !== 1;
+        },
+        toString(date, format) {
+            // Formato para mostrar en el input
+            const day = ("0" + date.getDate()).slice(-2);
+            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+            return date.getFullYear() + '-' + month + '-' + day;
+        }
+    });
+    var pickerFin = new Pikaday({
+        field: document.getElementById('semana_fin'),
+        format: 'YYYY-MM-DD',
+        disableDayFn: function(date) {
+            return date.getDay() !== 1;
+        },
+        toString(date, format) {
+            const day = ("0" + date.getDate()).slice(-2);
+            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+            return date.getFullYear() + '-' + month + '-' + day;
+        }
+    });
 
     let unidadId = null;
     let unidadNombre = null;
