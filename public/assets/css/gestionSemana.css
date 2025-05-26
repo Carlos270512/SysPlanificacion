@@ -1,0 +1,33 @@
+    .quill-editor {
+        min-height: 90px;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+
+    textarea.form-control {
+        min-height: 90px;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        resize: vertical;
+    }
+    .custom-carousel-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(0,0,0,0.3) !important;
+    border-radius: 50%;
+    border: none;
+    opacity: 1 !important;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.custom-carousel-btn:focus {
+    outline: none;
+    box-shadow: none;
+}

@@ -181,25 +181,6 @@ dias.forEach(dia => {
 var quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido...' });
 var quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas...' });
 </script>
-<style>
-.custom-carousel-btn {
-    width: 44px;
-    height: 44px;
-    background: rgba(0,0,0,0.3) !important;
-    border-radius: 50%;
-    border: none;
-    opacity: 1 !important;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
-.custom-carousel-btn:focus {
-    outline: none;
-    box-shadow: none;
-}
-</style>
 
 
 
