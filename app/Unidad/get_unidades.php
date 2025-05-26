@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-$pdo = require_once __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 // Si viene id_unidad, devuelve los datos de la unidad
 if (isset($_GET['id_unidad'])) {

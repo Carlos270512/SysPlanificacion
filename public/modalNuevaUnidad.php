@@ -169,7 +169,7 @@ if ($codigo) {
         document.getElementById('input_recursos_didacticos').value = quill_recursos.root.innerHTML;
 
         var formData = new FormData(this);
-        fetch('/sysplanificacion/app/createUnidad.php', {
+        fetch('/sysplanificacion/app/Unidad/createUnidad.php', {
             method: 'POST',
             body: formData
         })

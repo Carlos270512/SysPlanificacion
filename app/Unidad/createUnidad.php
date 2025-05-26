@@ -1,8 +1,7 @@
 <?php
 
 header('Content-Type: application/json');
-require_once __DIR__ . '/../config/conexion.php';
-
+require_once __DIR__ . '/../../config/conexion.php';
 // Recoger datos del formulario
 $asignatura_codigo = isset($_POST['asignatura_codigo']) ? trim($_POST['asignatura_codigo']) : '';
 $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
