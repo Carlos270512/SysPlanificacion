@@ -15,7 +15,7 @@ $semana_inicio = isset($_POST['semana_inicio']) ? $_POST['semana_inicio'] : null
 $semana_fin = isset($_POST['semana_fin']) ? $_POST['semana_fin'] : null;
 
 // Validaciones básicas
-if (!$asignatura_codigo || !$nombre || !$semana_inicio || !$semana_fin) {
+if (!$asignatura_codigo || !$nombre) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios.']);
     exit;
 }

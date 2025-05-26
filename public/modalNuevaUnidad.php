@@ -102,13 +102,7 @@ if ($codigo) {
                 </td>
             </tr>
             <tr>
-                <td colspan="4">
-                    <strong>Semana Inicio:</strong>
-                    <input type="text" name="semana_inicio" id="semana_inicio" required autocomplete="off">
-                    &nbsp;&nbsp;
-                    <strong>Semana Fin:</strong>
-                    <input type="text" name="semana_fin" id="semana_fin" required autocomplete="off">
-                </td>
+
             </tr>
         </table>
         <div class="text-end">

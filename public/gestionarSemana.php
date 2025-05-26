@@ -19,24 +19,8 @@ if ($unidad_id) {
 ?>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-<style>
-    .quill-editor {
-        min-height: 90px;
-        background: #fff;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        margin-bottom: 8px;
-    }
+<link rel = "stylesheet" href="../public/assets/css/gestionSemana.css ">
 
-    textarea.form-control {
-        min-height: 90px;
-        background: #fff;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        margin-bottom: 8px;
-        resize: vertical;
-    }
-</style>
 <div class="alert alert-info">
     <strong>Nombre Unidad:</strong> <?php echo htmlspecialchars($unidad_nombre); ?>
 </div>
@@ -170,4 +154,3 @@ if ($unidad_id) {
 </form>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-<!-- No inicialices Pikaday aquí, se hace desde planificaciones.php -->
