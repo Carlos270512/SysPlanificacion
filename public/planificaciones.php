@@ -230,6 +230,7 @@ if ($docente) {
                                             document.getElementById('modalUnidadBody').innerHTML = html;
                                             setTimeout(function() {
                                                 inicializarQuillSemana();
+                                                if (window.inicializarPikadayEntrega) window.inicializarPikadayEntrega();
                                             }, 200);
                                         });
                                 });
@@ -360,6 +361,27 @@ if ($docente) {
                     });
                 }
             }
+
+            // --- INICIO: Inicializar Pikaday para cada campo de fecha de entrega (gestionarSemana) ---
+            window.inicializarPikadayEntrega = function() {
+                if (typeof Pikaday === 'undefined') return;
+                document.querySelectorAll('.fecha-entrega').forEach(function(input) {
+                    if (!input._pikaday) { // Evita inicializar dos veces
+                        input._pikaday = new Pikaday({
+                            field: input,
+                            format: 'YYYY-MM-DD',
+                            minDate: input.dataset.min ? new Date(input.dataset.min) : null,
+                            maxDate: input.dataset.max ? new Date(input.dataset.max) : null,
+                            toString(date, format) {
+                                const day = ("0" + date.getDate()).slice(-2);
+                                const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                                return date.getFullYear() + '-' + month + '-' + day;
+                            }
+                        });
+                    }
+                });
+            };
+            // --- FIN ---
         });
     </script>
 </body>
