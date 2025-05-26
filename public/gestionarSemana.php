@@ -180,6 +180,22 @@ dias.forEach(dia => {
 });
 var quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido...' });
 var quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas...' });
+
+// --- INICIO: Inicializar Pikaday para cada campo de fecha de entrega ---
+document.querySelectorAll('.fecha-entrega').forEach(function(input) {
+    new Pikaday({
+        field: input,
+        format: 'YYYY-MM-DD',
+        minDate: input.dataset.min ? new Date(input.dataset.min) : null,
+        maxDate: input.dataset.max ? new Date(input.dataset.max) : null,
+        toString(date, format) {
+            const day = ("0" + date.getDate()).slice(-2);
+            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+            return date.getFullYear() + '-' + month + '-' + day;
+        }
+    });
+});
+// --- FIN ---
 </script>
 
 
