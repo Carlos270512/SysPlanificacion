@@ -378,10 +378,12 @@ if ($docente) {
                                             alert('Faltan datos para generar el PDF.');
                                             return;
                                         }
-                                        window.open(
-                                            `/sysplanificacion/app/GestionPDF/generarPdf.php?semana_id=${encodeURIComponent(window.semanaId)}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}&semana_inicio=${encodeURIComponent(window.semanaInicio)}&semana_fin=${encodeURIComponent(window.semanaFin)}`,
-                                            '_blank'
-                                        );
+                                        // --- MODIFICACIÓN: Cargar PDF en el mismo modal ---
+                                        fetch(`/sysplanificacion/app/GestionPDF/generarPdf.php?semana_id=${encodeURIComponent(window.semanaId)}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}&semana_inicio=${encodeURIComponent(window.semanaInicio)}&semana_fin=${encodeURIComponent(window.semanaFin)}`)
+                                            .then(res => res.text())
+                                            .then(html => {
+                                                document.getElementById('modalUnidadBody').innerHTML = html;
+                                            });
                                     });
                                     btnPDF.dataset.pdfReady = "1";
                                 }

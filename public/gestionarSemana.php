@@ -172,9 +172,8 @@ if ($unidad_id) {
     <div id="semanaSuccess" class="alert alert-success mt-3" style="display:none;">
         <i class="bi bi-check-circle-fill"></i> Semana guardada correctamente.
     </div>
-    // ...existing code...
     <script>
-        // ...existing code...
+        
 
         // Activar el botón Visualizar PDF cuando se muestre el mensaje de éxito
         document.getElementById('semanaSuccess').addEventListener('DOMSubtreeModified', function() {
