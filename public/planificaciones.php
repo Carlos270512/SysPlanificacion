@@ -63,6 +63,31 @@ if ($docente) {
                 <button class="btn btn-success" id="btnGenerarUnidad">
                     <i class="bi bi-plus-circle"></i> Generar Unidad
                 </button>
+                <div id="btnUnidadContainer" class="mb-3" style="display:none;">
+                    <button class="btn btn-success" id="btnGenerarUnidad">
+                        <i class="bi bi-plus-circle"></i> Generar Unidad
+                    </button>
+                </div>
+
+                <!-- Carrusel de Unidades Generadas -->
+                <div id="carruselUnidadesContainer" class="mb-4" style="display:none;">
+                    <h5>Unidades Generadas</h5>
+                    <div id="carruselUnidades" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner" id="carruselUnidadesInner"></div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselUnidades" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carruselUnidades" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Modal para ver/editar unidad -->
+                <div class="modal fade" id="modalEditarUnidad" tabindex="-1" aria-labelledby="modalEditarUnidadLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content" id="modalEditarUnidadContent"></div>
+                    </div>
+                </div>
             </div>
             <!-- Modal grande para Nueva Unidad -->
             <div class="modal fade" id="modalNuevaUnidad" tabindex="-1" aria-labelledby="modalNuevaUnidadLabel" aria-hidden="true">
@@ -145,11 +170,26 @@ if ($docente) {
                         setTimeout(function() {
                             // Inicializar los editores Quill SOLO si existen los divs de unidad
                             if (document.getElementById('editor_objetivo')) {
-                                var quill_objetivo = new Quill('#editor_objetivo', { theme: 'snow', placeholder: 'Escriba el objetivo de la unidad...' });
-                                var quill_bibliografia = new Quill('#editor_bibliografia', { theme: 'snow', placeholder: 'Ingrese la bibliografía...' });
-                                var quill_metodologia = new Quill('#editor_metodologia', { theme: 'snow', placeholder: 'Describa la metodología...' });
-                                var quill_actividades = new Quill('#editor_actividades', { theme: 'snow', placeholder: 'Describa las actividades de recuperación...' });
-                                var quill_recursos = new Quill('#editor_recursos', { theme: 'snow', placeholder: 'Describa los recursos didácticos...' });
+                                var quill_objetivo = new Quill('#editor_objetivo', {
+                                    theme: 'snow',
+                                    placeholder: 'Escriba el objetivo de la unidad...'
+                                });
+                                var quill_bibliografia = new Quill('#editor_bibliografia', {
+                                    theme: 'snow',
+                                    placeholder: 'Ingrese la bibliografía...'
+                                });
+                                var quill_metodologia = new Quill('#editor_metodologia', {
+                                    theme: 'snow',
+                                    placeholder: 'Describa la metodología...'
+                                });
+                                var quill_actividades = new Quill('#editor_actividades', {
+                                    theme: 'snow',
+                                    placeholder: 'Describa las actividades de recuperación...'
+                                });
+                                var quill_recursos = new Quill('#editor_recursos', {
+                                    theme: 'snow',
+                                    placeholder: 'Describa los recursos didácticos...'
+                                });
 
                                 // --- INICIO MODIFICACIÓN: Inicializar Pikaday solo para el modal de unidad ---
                                 if (document.getElementById('semana_inicio')) {
@@ -193,32 +233,32 @@ if ($docente) {
 
                                     var formData = new FormData(this);
                                     fetch('/sysplanificacion/app/Unidad/createUnidad.php', {
-                                        method: 'POST',
-                                        body: formData
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if(data.success){
-                                            if(document.getElementById('unidadSuccess')) {
-                                                document.getElementById('unidadSuccess').style.display = 'block';
+                                            method: 'POST',
+                                            body: formData
+                                        })
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                if (document.getElementById('unidadSuccess')) {
+                                                    document.getElementById('unidadSuccess').style.display = 'block';
+                                                }
+                                                if (document.getElementById('btnNuevaSemana')) {
+                                                    document.getElementById('btnNuevaSemana').disabled = false;
+                                                }
+                                                if (document.getElementById('formNuevaUnidad')) {
+                                                    Array.from(document.querySelectorAll('#formNuevaUnidad input, #formNuevaUnidad button')).forEach(el => {
+                                                        if (el.id !== 'btnNuevaSemana') el.disabled = true;
+                                                    });
+                                                }
+                                                window.unidadId = data.unidad_id;
+                                                window.unidadNombre = document.querySelector('[name="nombre"]').value;
+                                            } else {
+                                                alert('Error al guardar la unidad: ' + (data.message || ''));
                                             }
-                                            if(document.getElementById('btnNuevaSemana')) {
-                                                document.getElementById('btnNuevaSemana').disabled = false;
-                                            }
-                                            if(document.getElementById('formNuevaUnidad')) {
-                                                Array.from(document.querySelectorAll('#formNuevaUnidad input, #formNuevaUnidad button')).forEach(el => {
-                                                    if(el.id !== 'btnNuevaSemana') el.disabled = true;
-                                                });
-                                            }
-                                            window.unidadId = data.unidad_id;
-                                            window.unidadNombre = document.querySelector('[name="nombre"]').value;
-                                        }else{
-                                            alert('Error al guardar la unidad: ' + (data.message || ''));
-                                        }
-                                    })
-                                    .catch(err => {
-                                        alert('Error en la conexión o en el servidor.');
-                                    });
+                                        })
+                                        .catch(err => {
+                                            alert('Error en la conexión o en el servidor.');
+                                        });
                                 });
 
                                 // Evento para el botón Nueva Semana
@@ -313,18 +353,43 @@ if ($docente) {
                 }
                 // --- FIN MODIFICACIÓN ---
 
-                window.quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas a la clase...' });
-                window.quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido de la semana...' });
+                window.quill_actividades_previas = new Quill('#editor_actividades_previas', {
+                    theme: 'snow',
+                    placeholder: 'Describa las actividades previas a la clase...'
+                });
+                window.quill_contenido = new Quill('#editor_contenido', {
+                    theme: 'snow',
+                    placeholder: 'Describa el contenido de la semana...'
+                });
 
                 var dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-                window.quill_objetivo = {}; window.quill_apertura = {}; window.quill_desarrollo = {}; window.quill_cierre = {}; window.quill_trabajo = {};
+                window.quill_objetivo = {};
+                window.quill_apertura = {};
+                window.quill_desarrollo = {};
+                window.quill_cierre = {};
+                window.quill_trabajo = {};
 
                 dias.forEach(function(dia) {
-                    window.quill_objetivo[dia] = new Quill('#editor_objetivo_' + dia, { theme: 'snow', placeholder: 'Objetivo...' });
-                    window.quill_apertura[dia] = new Quill('#editor_apertura_' + dia, { theme: 'snow', placeholder: 'Apertura...' });
-                    window.quill_desarrollo[dia] = new Quill('#editor_desarrollo_' + dia, { theme: 'snow', placeholder: 'Desarrollo...' });
-                    window.quill_cierre[dia] = new Quill('#editor_cierre_' + dia, { theme: 'snow', placeholder: 'Cierre...' });
-                    window.quill_trabajo[dia] = new Quill('#editor_trabajo_autonomo_' + dia, { theme: 'snow', placeholder: 'Trabajo autónomo...' });
+                    window.quill_objetivo[dia] = new Quill('#editor_objetivo_' + dia, {
+                        theme: 'snow',
+                        placeholder: 'Objetivo...'
+                    });
+                    window.quill_apertura[dia] = new Quill('#editor_apertura_' + dia, {
+                        theme: 'snow',
+                        placeholder: 'Apertura...'
+                    });
+                    window.quill_desarrollo[dia] = new Quill('#editor_desarrollo_' + dia, {
+                        theme: 'snow',
+                        placeholder: 'Desarrollo...'
+                    });
+                    window.quill_cierre[dia] = new Quill('#editor_cierre_' + dia, {
+                        theme: 'snow',
+                        placeholder: 'Cierre...'
+                    });
+                    window.quill_trabajo[dia] = new Quill('#editor_trabajo_autonomo_' + dia, {
+                        theme: 'snow',
+                        placeholder: 'Trabajo autónomo...'
+                    });
                 });
 
                 // Reasigna el submit del formulario
@@ -344,56 +409,56 @@ if ($docente) {
 
                         var formData = new FormData(this);
                         fetch('/sysplanificacion/app/Semana/createSemana.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if(data.success){
-                                document.getElementById('semanaSuccess').style.display = 'block';
-                                var btnPDF = document.getElementById('btnVisualizarPDF');
-                                if(btnPDF) btnPDF.disabled = false;
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.getElementById('semanaSuccess').style.display = 'block';
+                                    var btnPDF = document.getElementById('btnVisualizarPDF');
+                                    if (btnPDF) btnPDF.disabled = false;
 
-                                // Guardar datos para el PDF
-                                window.semanaId = data.semana_id;
-                                window.semanaInicio = document.getElementById('semana_inicio').value;
-                                window.semanaFin = document.getElementById('semana_fin').value;
-                                // Obtener el nombre de la unidad desde el DOM
-                                var unidadNombreDiv = document.querySelector('.alert-info');
-                                if (unidadNombreDiv) {
-                                    var strong = unidadNombreDiv.querySelector('strong');
-                                    if (strong && strong.nextSibling) {
-                                        window.unidadNombre = strong.nextSibling.textContent.trim();
+                                    // Guardar datos para el PDF
+                                    window.semanaId = data.semana_id;
+                                    window.semanaInicio = document.getElementById('semana_inicio').value;
+                                    window.semanaFin = document.getElementById('semana_fin').value;
+                                    // Obtener el nombre de la unidad desde el DOM
+                                    var unidadNombreDiv = document.querySelector('.alert-info');
+                                    if (unidadNombreDiv) {
+                                        var strong = unidadNombreDiv.querySelector('strong');
+                                        if (strong && strong.nextSibling) {
+                                            window.unidadNombre = strong.nextSibling.textContent.trim();
+                                        } else {
+                                            window.unidadNombre = '';
+                                        }
                                     } else {
                                         window.unidadNombre = '';
                                     }
-                                } else {
-                                    window.unidadNombre = '';
-                                }
 
-                                // Asignar evento al botón PDF (solo una vez)
-                                if (btnPDF && !btnPDF.dataset.pdfReady) {
-                                    btnPDF.addEventListener('click', function() {
-                                        if (!window.semanaId || !window.semanaInicio || !window.semanaFin || !window.unidadNombre) {
-                                            alert('Faltan datos para generar el PDF.');
-                                            return;
-                                        }
-                                        // --- MODIFICACIÓN: Cargar PDF en el mismo modal ---
-                                        fetch(`/sysplanificacion/app/GestionPDF/generarPdf.php?semana_id=${encodeURIComponent(window.semanaId)}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}&semana_inicio=${encodeURIComponent(window.semanaInicio)}&semana_fin=${encodeURIComponent(window.semanaFin)}`)
-                                            .then(res => res.text())
-                                            .then(html => {
-                                                document.getElementById('modalUnidadBody').innerHTML = html;
-                                            });
-                                    });
-                                    btnPDF.dataset.pdfReady = "1";
+                                    // Asignar evento al botón PDF (solo una vez)
+                                    if (btnPDF && !btnPDF.dataset.pdfReady) {
+                                        btnPDF.addEventListener('click', function() {
+                                            if (!window.semanaId || !window.semanaInicio || !window.semanaFin || !window.unidadNombre) {
+                                                alert('Faltan datos para generar el PDF.');
+                                                return;
+                                            }
+                                            // --- MODIFICACIÓN: Cargar PDF en el mismo modal ---
+                                            fetch(`/sysplanificacion/app/GestionPDF/generarPdf.php?semana_id=${encodeURIComponent(window.semanaId)}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}&semana_inicio=${encodeURIComponent(window.semanaInicio)}&semana_fin=${encodeURIComponent(window.semanaFin)}`)
+                                                .then(res => res.text())
+                                                .then(html => {
+                                                    document.getElementById('modalUnidadBody').innerHTML = html;
+                                                });
+                                        });
+                                        btnPDF.dataset.pdfReady = "1";
+                                    }
+                                } else {
+                                    alert('Error al guardar la semana: ' + (data.message || ''));
                                 }
-                            }else{
-                                alert('Error al guardar la semana: ' + (data.message || ''));
-                            }
-                        })
-                        .catch(err => {
-                            alert('Error en la conexión o en el servidor.');
-                        });
+                            })
+                            .catch(err => {
+                                alert('Error en la conexión o en el servidor.');
+                            });
                     });
                 }
             }
@@ -420,5 +485,101 @@ if ($docente) {
             // --- FIN ---
         });
     </script>
+    <script>
+        function cargarUnidades(asignatura_codigo) {
+            if (!asignatura_codigo) {
+                document.getElementById('carruselUnidadesContainer').style.display = 'none';
+                document.getElementById('carruselUnidadesInner').innerHTML = '';
+                return;
+            }
+            fetch('/sysplanificacion/app/Unidad/get_unidades.php?asignatura_codigo=' + encodeURIComponent(asignatura_codigo))
+                .then(res => res.json())
+                .then(unidades => {
+                    const container = document.getElementById('carruselUnidadesContainer');
+                    const inner = document.getElementById('carruselUnidadesInner');
+                    if (!unidades || unidades.length === 0) {
+                        container.style.display = 'none';
+                        inner.innerHTML = '';
+                        return;
+                    }
+                    container.style.display = 'block';
+                    inner.innerHTML = '';
+                    unidades.forEach((unidad, idx) => {
+                        const active = idx === 0 ? 'active' : '';
+                        inner.innerHTML += `
+                    <div class="carousel-item ${active}">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h6 class="card-title">${unidad.nombre}</h6>
+                                <button class="btn btn-primary btn-sm" onclick="verUnidad(${unidad.id_unidad})">
+                                    <i class="bi bi-eye"></i> Ver/Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    });
+                });
+        }
+
+        // Llama a cargarUnidades cuando cambie la asignatura
+        document.getElementById('asignatura').addEventListener('change', function() {
+            cargarUnidades(this.value);
+        });
+
+        // Llama a cargarUnidades después de guardar una unidad (dentro del .then de tu fetch POST)
+        function recargarCarruselDespuesDeGuardarUnidad(asignatura_codigo) {
+            cargarUnidades(asignatura_codigo);
+        }
+
+        // Modal para ver/editar unidad
+        function verUnidad(id_unidad) {
+            fetch('/sysplanificacion/app/Unidad/get_unidades.php?id_unidad=' + id_unidad)
+                .then(res => res.json())
+                .then(unidad => {
+                    document.getElementById('modalEditarUnidadContent').innerHTML = `
+                <form id="formEditarUnidad">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Editar Unidad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_unidad" value="${unidad.id_unidad}">
+                        <div class="mb-3">
+                            <label>Nombre Unidad</label>
+                            <input type="text" name="nombre" class="form-control" value="${unidad.nombre || ''}" required>
+                        </div>
+                        <!-- Agrega aquí los campos que quieras editar -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            `;
+                    var modal = new bootstrap.Modal(document.getElementById('modalEditarUnidad'));
+                    modal.show();
+
+                    document.getElementById('formEditarUnidad').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        var formData = new FormData(this);
+                        fetch('/sysplanificacion/app/Unidad/updateUnidad.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    modal.hide();
+                                    cargarUnidades(document.getElementById('asignatura').value);
+                                } else {
+                                    alert('Error al actualizar: ' + (data.message || ''));
+                                }
+                            });
+                    });
+                });
+        }
+    </script>
 </body>
+
 </html>
