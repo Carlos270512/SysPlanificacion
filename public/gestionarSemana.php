@@ -77,127 +77,152 @@ if ($unidad_id) {
                     $dias_keys = array_keys($dias);
                     $i = 0;
                     foreach ($dias as $diaKey => $diaNombre): ?>
-                    <div class="carousel-item<?php echo $i === 0 ? ' active' : ''; ?>">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-primary text-white position-relative p-0" style="height:60px;">
-                                <div class="d-flex h-100 align-items-center justify-content-between">
-                                    <!-- Botón izquierda -->
-                                    <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
-                                        <?php if ($i > 0): ?>
-                                        <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
-                                            <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
-                                        </button>
-                                        <?php elseif ($i === 0): // Lunes, mostrar volver a viernes ?>
-                                        <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
-                                            <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
-                                        </button>
-                                        <?php endif; ?>
-                                    </div>
-                                    <!-- Día centrado -->
-                                    <div class="flex-grow-1 text-center">
-                                        <strong style="font-size:1.3rem;"><?php echo $diaNombre; ?></strong>
-                                    </div>
-                                    <!-- Botón derecha -->
-                                    <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
-                                        <?php if ($i < count($dias) - 1): ?>
-                                        <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
-                                            <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
-                                        </button>
-                                        <?php elseif ($i === count($dias) - 1): // Viernes, mostrar ir a lunes ?>
-                                        <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
-                                            <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
-                                        </button>
-                                        <?php endif; ?>
+                        <div class="carousel-item<?php echo $i === 0 ? ' active' : ''; ?>">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-primary text-white position-relative p-0" style="height:60px;">
+                                    <div class="d-flex h-100 align-items-center justify-content-between">
+                                        <!-- Botón izquierda -->
+                                        <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
+                                            <?php if ($i > 0): ?>
+                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
+                                                    <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
+                                                </button>
+                                            <?php elseif ($i === 0): // Lunes, mostrar volver a viernes 
+                                            ?>
+                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
+                                                    <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                        <!-- Día centrado -->
+                                        <div class="flex-grow-1 text-center">
+                                            <strong style="font-size:1.3rem;"><?php echo $diaNombre; ?></strong>
+                                        </div>
+                                        <!-- Botón derecha -->
+                                        <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
+                                            <?php if ($i < count($dias) - 1): ?>
+                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
+                                                    <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
+                                                </button>
+                                            <?php elseif ($i === count($dias) - 1): // Viernes, mostrar ir a lunes 
+                                            ?>
+                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
+                                                    <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <strong>Objetivo:</strong>
-                                    <div id="editor_objetivo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                    <input type="hidden" name="objetivo_<?php echo $diaKey; ?>" id="input_objetivo_<?php echo $diaKey; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Apertura:</strong>
-                                    <div class="mb-1">
-                                        <strong>Tiempo:</strong>
-                                        <input type="number" class="form-control" name="tiempo_apertura_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <strong>Objetivo:</strong>
+                                        <div id="editor_objetivo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
+                                        <input type="hidden" name="objetivo_<?php echo $diaKey; ?>" id="input_objetivo_<?php echo $diaKey; ?>">
                                     </div>
-                                    <div id="editor_apertura_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                    <input type="hidden" name="apertura_<?php echo $diaKey; ?>" id="input_apertura_<?php echo $diaKey; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Desarrollo:</strong>
-                                    <div class="mb-1">
-                                        <strong>Tiempo:</strong>
-                                        <input type="number" class="form-control" name="tiempo_desarrollo_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                    <div class="mb-2">
+                                        <strong>Apertura:</strong>
+                                        <div class="mb-1">
+                                            <strong>Tiempo:</strong>
+                                            <input type="number" class="form-control" name="tiempo_apertura_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                        </div>
+                                        <div id="editor_apertura_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
+                                        <input type="hidden" name="apertura_<?php echo $diaKey; ?>" id="input_apertura_<?php echo $diaKey; ?>">
                                     </div>
-                                    <div id="editor_desarrollo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                    <input type="hidden" name="desarrollo_<?php echo $diaKey; ?>" id="input_desarrollo_<?php echo $diaKey; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Cierre:</strong>
-                                    <div class="mb-1">
-                                        <strong>Tiempo:</strong>
-                                        <input type="number" class="form-control" name="tiempo_cierre_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                    <div class="mb-2">
+                                        <strong>Desarrollo:</strong>
+                                        <div class="mb-1">
+                                            <strong>Tiempo:</strong>
+                                            <input type="number" class="form-control" name="tiempo_desarrollo_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                        </div>
+                                        <div id="editor_desarrollo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
+                                        <input type="hidden" name="desarrollo_<?php echo $diaKey; ?>" id="input_desarrollo_<?php echo $diaKey; ?>">
                                     </div>
-                                    <div id="editor_cierre_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                    <input type="hidden" name="cierre_<?php echo $diaKey; ?>" id="input_cierre_<?php echo $diaKey; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Trabajo autónomo:</strong>
-                                    <div id="editor_trabajo_autonomo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                    <input type="hidden" name="trabajo_autonomo_<?php echo $diaKey; ?>" id="input_trabajo_autonomo_<?php echo $diaKey; ?>">
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Fecha de entrega:</strong>
-                                    <input type="text" class="form-control fecha-entrega" name="entrega_<?php echo $diaKey; ?>" autocomplete="off"
-                                        data-min="<?php echo htmlspecialchars($fecha_inicio_unidad); ?>"
-                                        data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>">
+                                    <div class="mb-2">
+                                        <strong>Cierre:</strong>
+                                        <div class="mb-1">
+                                            <strong>Tiempo:</strong>
+                                            <input type="number" class="form-control" name="tiempo_cierre_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                        </div>
+                                        <div id="editor_cierre_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
+                                        <input type="hidden" name="cierre_<?php echo $diaKey; ?>" id="input_cierre_<?php echo $diaKey; ?>">
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Trabajo autónomo:</strong>
+                                        <div id="editor_trabajo_autonomo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
+                                        <input type="hidden" name="trabajo_autonomo_<?php echo $diaKey; ?>" id="input_trabajo_autonomo_<?php echo $diaKey; ?>">
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Fecha de entrega:</strong>
+                                        <input type="text" class="form-control fecha-entrega" name="entrega_<?php echo $diaKey; ?>" autocomplete="off"
+                                            data-min="<?php echo htmlspecialchars($fecha_inicio_unidad); ?>"
+                                            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <?php $i++; endforeach; ?>
+                    <?php $i++;
+                    endforeach; ?>
                 </div>
             </div>
         </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar Semana</button>
+    <button type="button" class="btn btn-secondary ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
     <div id="semanaSuccess" class="alert alert-success mt-3" style="display:none;">
         <i class="bi bi-check-circle-fill"></i> Semana guardada correctamente.
     </div>
+    // ...existing code...
+    <script>
+        // ...existing code...
+
+        // Activar el botón Visualizar PDF cuando se muestre el mensaje de éxito
+        document.getElementById('semanaSuccess').addEventListener('DOMSubtreeModified', function() {
+            if (this.style.display !== 'none') {
+                document.getElementById('btnVisualizarPDF').disabled = false;
+            }
+        });
+
+        // Si ya tienes lógica para mostrar el mensaje, puedes activar el botón ahí también
+        // Por ejemplo, si usas JS para mostrar el mensaje:
+        // document.getElementById('semanaSuccess').style.display = 'block';
+        // document.getElementById('btnVisualizarPDF').disabled = false;
+    </script>
 </form>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
-const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-dias.forEach(dia => {
-    ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(tipo => {
-        new Quill(`#editor_${tipo}_${dia}`, { theme: 'snow', placeholder: `Escriba ${tipo.replace('_', ' ')}...` });
+    const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+    dias.forEach(dia => {
+        ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(tipo => {
+            new Quill(`#editor_${tipo}_${dia}`, {
+                theme: 'snow',
+                placeholder: `Escriba ${tipo.replace('_', ' ')}...`
+            });
+        });
     });
-});
-var quill_contenido = new Quill('#editor_contenido', { theme: 'snow', placeholder: 'Describa el contenido...' });
-var quill_actividades_previas = new Quill('#editor_actividades_previas', { theme: 'snow', placeholder: 'Describa las actividades previas...' });
+    var quill_contenido = new Quill('#editor_contenido', {
+        theme: 'snow',
+        placeholder: 'Describa el contenido...'
+    });
+    var quill_actividades_previas = new Quill('#editor_actividades_previas', {
+        theme: 'snow',
+        placeholder: 'Describa las actividades previas...'
+    });
 
-// --- INICIO: Inicializar Pikaday para cada campo de fecha de entrega ---
-document.querySelectorAll('.fecha-entrega').forEach(function(input) {
-    new Pikaday({
-        field: input,
-        format: 'YYYY-MM-DD',
-        minDate: input.dataset.min ? new Date(input.dataset.min) : null,
-        maxDate: input.dataset.max ? new Date(input.dataset.max) : null,
-        toString(date, format) {
-            const day = ("0" + date.getDate()).slice(-2);
-            const month = ("0" + (date.getMonth() + 1)).slice(-2);
-            return date.getFullYear() + '-' + month + '-' + day;
-        }
+    // --- INICIO: Inicializar Pikaday para cada campo de fecha de entrega ---
+    document.querySelectorAll('.fecha-entrega').forEach(function(input) {
+        new Pikaday({
+            field: input,
+            format: 'YYYY-MM-DD',
+            minDate: input.dataset.min ? new Date(input.dataset.min) : null,
+            maxDate: input.dataset.max ? new Date(input.dataset.max) : null,
+            toString(date, format) {
+                const day = ("0" + date.getDate()).slice(-2);
+                const month = ("0" + (date.getMonth() + 1)).slice(-2);
+                return date.getFullYear() + '-' + month + '-' + day;
+            }
+        });
     });
-});
-// --- FIN ---
+    // --- FIN ---
 </script>
-
-
-
-

@@ -351,6 +351,40 @@ if ($docente) {
                         .then(data => {
                             if(data.success){
                                 document.getElementById('semanaSuccess').style.display = 'block';
+                                var btnPDF = document.getElementById('btnVisualizarPDF');
+                                if(btnPDF) btnPDF.disabled = false;
+
+                                // Guardar datos para el PDF
+                                window.semanaId = data.semana_id;
+                                window.semanaInicio = document.getElementById('semana_inicio').value;
+                                window.semanaFin = document.getElementById('semana_fin').value;
+                                // Obtener el nombre de la unidad desde el DOM
+                                var unidadNombreDiv = document.querySelector('.alert-info');
+                                if (unidadNombreDiv) {
+                                    var strong = unidadNombreDiv.querySelector('strong');
+                                    if (strong && strong.nextSibling) {
+                                        window.unidadNombre = strong.nextSibling.textContent.trim();
+                                    } else {
+                                        window.unidadNombre = '';
+                                    }
+                                } else {
+                                    window.unidadNombre = '';
+                                }
+
+                                // Asignar evento al botón PDF (solo una vez)
+                                if (btnPDF && !btnPDF.dataset.pdfReady) {
+                                    btnPDF.addEventListener('click', function() {
+                                        if (!window.semanaId || !window.semanaInicio || !window.semanaFin || !window.unidadNombre) {
+                                            alert('Faltan datos para generar el PDF.');
+                                            return;
+                                        }
+                                        window.open(
+                                            `/sysplanificacion/app/GestionPDF/generarPdf.php?semana_id=${encodeURIComponent(window.semanaId)}&unidad_nombre=${encodeURIComponent(window.unidadNombre)}&semana_inicio=${encodeURIComponent(window.semanaInicio)}&semana_fin=${encodeURIComponent(window.semanaFin)}`,
+                                            '_blank'
+                                        );
+                                    });
+                                    btnPDF.dataset.pdfReady = "1";
+                                }
                             }else{
                                 alert('Error al guardar la semana: ' + (data.message || ''));
                             }

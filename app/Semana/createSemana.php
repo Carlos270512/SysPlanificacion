@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
 
         $id_unidad = $_POST['unidad_id'] ?? null;
-        $semana_numero = $_POST['semana_numero'] ?? null;
+        // $semana_numero solo es informativo, no se guarda
         $fecha_semana = nullIfEmpty($_POST['semana_inicio'] ?? null); // ahora se llama semana_inicio
         $actividades_previas = $_POST['actividades_previas'] ?? null;
         $tiempo_previas = $_POST['tiempo_previas'] ?? null;
@@ -129,8 +129,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->execute($params);
 
+        // Obtener el ID de la semana recién insertada
+        $semana_id = $pdo->lastInsertId();
+
         $pdo->commit();
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'semana_id' => $semana_id]);
     } catch (Exception $e) {
         $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
