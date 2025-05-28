@@ -1,9 +1,9 @@
 <?php
-
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../config/conexion.php';
 // Recoger datos del formulario
 $asignatura_codigo = isset($_POST['asignatura_codigo']) ? trim($_POST['asignatura_codigo']) : '';
+$numero_unidad = isset($_POST['numero_unidad']) ? intval($_POST['numero_unidad']) : null;
 $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
 $objetivo_unidad = isset($_POST['objetivo_unidad']) ? $_POST['objetivo_unidad'] : '';
 $bibliografia = isset($_POST['bibliografia']) ? $_POST['bibliografia'] : '';
@@ -14,16 +14,17 @@ $semana_inicio = isset($_POST['semana_inicio']) ? $_POST['semana_inicio'] : null
 $semana_fin = isset($_POST['semana_fin']) ? $_POST['semana_fin'] : null;
 
 // Validaciones básicas
-if (!$asignatura_codigo || !$nombre) {
+if (!$asignatura_codigo || !$nombre || !$numero_unidad) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios.']);
     exit;
 }
 
 try {
     $stmt = $pdo->prepare("INSERT INTO unidad 
-        (nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        (numero_unidad, nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, semana_inicio, semana_fin, asignatura_codigo) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
+        $numero_unidad,
         $nombre,
         $objetivo_unidad . '<br><strong>Bibliografía:</strong><br>' . $bibliografia,
         $metodologia,
