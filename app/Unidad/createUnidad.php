@@ -26,7 +26,7 @@ try {
     $stmt->execute([
         $numero_unidad,
         $nombre,
-        $objetivo_unidad . '<br><strong>Bibliografía:</strong><br>' . $bibliografia,
+        $objetivo_unidad,
         $metodologia,
         $actividades_recuperacion,
         $recursos_didacticos,

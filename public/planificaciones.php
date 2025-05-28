@@ -68,21 +68,21 @@ if ($docente) {
                         <i class="bi bi-plus-circle"></i> Generar Unidad
                     </button>
                 </div>
-<!-- Carrusel de Unidades Generadas -->
-<div id="carruselUnidadesContainer" class="mb-4" style="display:none;">
-    <h5>Unidades Generadas</h5>
-    <div style="display: flex; align-items: center;">
-        <button id="btnCarruselIzq" class="btn btn-light btn-sm me-2" style="height: 60px; width: 40px; display: none;">
-            <i class="bi bi-chevron-left fs-3"></i>
-        </button>
-        <div id="carruselUnidades" style="overflow: hidden; width: 100%;">
-            <div id="carruselUnidadesInner" style="display: flex; gap: 24px; transition: transform 0.3s;"></div>
-        </div>
-        <button id="btnCarruselDer" class="btn btn-light btn-sm ms-2" style="height: 60px; width: 40px; display: none;">
-            <i class="bi bi-chevron-right fs-3"></i>
-        </button>
-    </div>
-</div>
+                <!-- Carrusel de Unidades Generadas -->
+                <div id="carruselUnidadesContainer" class="mb-4" style="display:none;">
+                    <h5>Unidades Generadas</h5>
+                    <div style="display: flex; align-items: center;">
+                        <button id="btnCarruselIzq" class="btn btn-light btn-sm me-2" style="height: 60px; width: 40px; display: none;">
+                            <i class="bi bi-chevron-left fs-3"></i>
+                        </button>
+                        <div id="carruselUnidades" style="overflow: hidden; width: 100%;">
+                            <div id="carruselUnidadesInner" style="display: flex; gap: 24px; transition: transform 0.3s;"></div>
+                        </div>
+                        <button id="btnCarruselDer" class="btn btn-light btn-sm ms-2" style="height: 60px; width: 40px; display: none;">
+                            <i class="bi bi-chevron-right fs-3"></i>
+                        </button>
+                    </div>
+                </div>
                 <!-- Modal para ver/editar unidad -->
                 <div class="modal fade" id="modalEditarUnidad" tabindex="-1" aria-labelledby="modalEditarUnidadLabel" aria-hidden="true">
                     <div class="modal-dialog modal-xl">
@@ -487,93 +487,96 @@ if ($docente) {
         });
     </script>
     <script>
-let carruselIndex = 0;
-const tarjetasPorVista = 3; // Cambia este valor según el tamaño de tus tarjetas
+        let carruselIndex = 0;
+        const tarjetasPorVista = 3; // Cambia este valor según el tamaño de tus tarjetas
 
-function cargarUnidades(asignatura_codigo) {
-    if (!asignatura_codigo) {
-        document.getElementById('carruselUnidadesContainer').style.display = 'none';
-        document.getElementById('carruselUnidadesInner').innerHTML = '';
-        return;
-    }
-    fetch('/sysplanificacion/app/Unidad/get_unidades.php?asignatura_codigo=' + encodeURIComponent(asignatura_codigo))
-        .then(res => res.json())
-        .then(unidades => {
-            const container = document.getElementById('carruselUnidadesContainer');
+        function cargarUnidades(asignatura_codigo) {
+            if (!asignatura_codigo) {
+                document.getElementById('carruselUnidadesContainer').style.display = 'none';
+                document.getElementById('carruselUnidadesInner').innerHTML = '';
+                return;
+            }
+            fetch('/sysplanificacion/app/Unidad/get_unidades.php?asignatura_codigo=' + encodeURIComponent(asignatura_codigo))
+                .then(res => res.json())
+                .then(unidades => {
+                    const container = document.getElementById('carruselUnidadesContainer');
+                    const inner = document.getElementById('carruselUnidadesInner');
+                    const btnIzq = document.getElementById('btnCarruselIzq');
+                    const btnDer = document.getElementById('btnCarruselDer');
+                    if (!unidades || unidades.length === 0) {
+                        container.style.display = 'none';
+                        inner.innerHTML = '';
+                        btnIzq.style.display = 'none';
+                        btnDer.style.display = 'none';
+                        return;
+                    }
+                    container.style.display = 'block';
+                    inner.innerHTML = '';
+                    carruselIndex = 0;
+
+                    unidades.forEach(unidad => {
+                        const card = document.createElement('div');
+                        card.style.display = 'flex';
+                        card.style.flexDirection = 'column';
+                        card.style.alignItems = 'center';
+                        card.style.justifyContent = 'center';
+                        card.style.background = '#fff';
+                        card.style.border = '1px solid #ddd';
+                        card.style.borderRadius = '8px';
+                        card.style.padding = '18px 28px';
+                        card.style.minWidth = '160px';
+                        card.style.maxWidth = '180px';
+                        card.style.boxShadow = '0 2px 6px #0001';
+                        card.style.textAlign = 'center';
+
+                        const nombre = document.createElement('div');
+                        nombre.style.fontWeight = 'bold';
+                        nombre.style.marginBottom = '12px';
+                        nombre.textContent = unidad.nombre;
+
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-primary btn-sm';
+                        btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
+                        btn.onclick = function() {
+                            verUnidad(unidad.id_unidad);
+                        };
+
+                        card.appendChild(nombre);
+                        card.appendChild(btn);
+                        inner.appendChild(card);
+                    });
+
+                    actualizarCarrusel(unidades.length);
+
+                    btnIzq.onclick = function() {
+                        if (carruselIndex > 0) {
+                            carruselIndex--;
+                            actualizarCarrusel(unidades.length);
+                        }
+                    };
+                    btnDer.onclick = function() {
+                        if (carruselIndex < unidades.length - tarjetasPorVista) {
+                            carruselIndex++;
+                            actualizarCarrusel(unidades.length);
+                        }
+                    };
+                });
+        }
+
+        function actualizarCarrusel(total) {
             const inner = document.getElementById('carruselUnidadesInner');
             const btnIzq = document.getElementById('btnCarruselIzq');
             const btnDer = document.getElementById('btnCarruselDer');
-            if (!unidades || unidades.length === 0) {
-                container.style.display = 'none';
-                inner.innerHTML = '';
-                btnIzq.style.display = 'none';
-                btnDer.style.display = 'none';
-                return;
-            }
-            container.style.display = 'block';
-            inner.innerHTML = '';
-            carruselIndex = 0;
+            const anchoTarjeta = 204; // minWidth + gap (160+24 aprox)
+            inner.style.transform = `translateX(-${carruselIndex * anchoTarjeta}px)`;
+            btnIzq.style.display = carruselIndex > 0 ? 'inline-block' : 'none';
+            btnDer.style.display = (carruselIndex < total - tarjetasPorVista) ? 'inline-block' : 'none';
+        }
 
-            unidades.forEach(unidad => {
-                const card = document.createElement('div');
-                card.style.display = 'flex';
-                card.style.flexDirection = 'column';
-                card.style.alignItems = 'center';
-                card.style.justifyContent = 'center';
-                card.style.background = '#fff';
-                card.style.border = '1px solid #ddd';
-                card.style.borderRadius = '8px';
-                card.style.padding = '18px 28px';
-                card.style.minWidth = '160px';
-                card.style.maxWidth = '180px';
-                card.style.boxShadow = '0 2px 6px #0001';
-                card.style.textAlign = 'center';
-
-                const nombre = document.createElement('div');
-                nombre.style.fontWeight = 'bold';
-                nombre.style.marginBottom = '12px';
-                nombre.textContent = unidad.nombre;
-
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-primary btn-sm';
-                btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
-                btn.onclick = function() { verUnidad(unidad.id_unidad); };
-
-                card.appendChild(nombre);
-                card.appendChild(btn);
-                inner.appendChild(card);
-            });
-
-            actualizarCarrusel(unidades.length);
-
-            btnIzq.onclick = function() {
-                if (carruselIndex > 0) {
-                    carruselIndex--;
-                    actualizarCarrusel(unidades.length);
-                }
-            };
-            btnDer.onclick = function() {
-                if (carruselIndex < unidades.length - tarjetasPorVista) {
-                    carruselIndex++;
-                    actualizarCarrusel(unidades.length);
-                }
-            };
+        // Llama a cargarUnidades cuando cambie la asignatura
+        document.getElementById('asignatura').addEventListener('change', function() {
+            cargarUnidades(this.value);
         });
-}
-function actualizarCarrusel(total) {
-    const inner = document.getElementById('carruselUnidadesInner');
-    const btnIzq = document.getElementById('btnCarruselIzq');
-    const btnDer = document.getElementById('btnCarruselDer');
-    const anchoTarjeta = 204; // minWidth + gap (160+24 aprox)
-    inner.style.transform = `translateX(-${carruselIndex * anchoTarjeta}px)`;
-    btnIzq.style.display = carruselIndex > 0 ? 'inline-block' : 'none';
-    btnDer.style.display = (carruselIndex < total - tarjetasPorVista) ? 'inline-block' : 'none';
-}
-
-// Llama a cargarUnidades cuando cambie la asignatura
-document.getElementById('asignatura').addEventListener('change', function() {
-    cargarUnidades(this.value);
-});
         // Llama a cargarUnidades cuando cambie la asignatura
         document.getElementById('asignatura').addEventListener('change', function() {
             cargarUnidades(this.value);
@@ -585,12 +588,12 @@ document.getElementById('asignatura').addEventListener('change', function() {
         }
 
         // Modal para ver/editar unidad
-function verUnidad(id_unidad) {
-    fetch('/sysplanificacion/app/Unidad/get_unidades.php?id_unidad=' + id_unidad)
-        .then(res => res.json())
-        .then(unidad => {
-// ...dentro de la función verUnidad...
-document.getElementById('modalEditarUnidadContent').innerHTML = `
+        function verUnidad(id_unidad) {
+            fetch('/sysplanificacion/app/Unidad/get_unidades.php?id_unidad=' + id_unidad)
+                .then(res => res.json())
+                .then(unidad => {
+                    // ...dentro de la función verUnidad...
+                    document.getElementById('modalEditarUnidadContent').innerHTML = `
     <div class="modal-header">
         <h5 class="modal-title" id="modalEditarUnidadLabel">Editar Unidad</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -608,15 +611,15 @@ document.getElementById('modalEditarUnidadContent').innerHTML = `
                 </tr>
                 <tr>
                     <!-- Objetivo de la unidad -->
-                    <td style="width:30%; vertical-align:top;">
-                        <strong>Objetivo de la unidad:</strong>
-                        <div id="editor_objetivo_editar" class="quill-editor"></div>
-                        <input type="hidden" name="objetivo_unidad" id="input_objetivo_unidad_editar">
-                        <br>
-                        <strong>Bibliografía:</strong>
-                        <div id="editor_bibliografia_editar" class="quill-editor"></div>
-                        <input type="hidden" name="bibliografia" id="input_bibliografia_editar">
-                    </td>
+<td style="width:30%; vertical-align:top;">
+    <strong>Objetivo de la unidad:</strong>
+    <div id="editor_objetivo_editar" class="quill-editor"></div>
+    <input type="hidden" name="objetivo_unidad" id="input_objetivo_unidad_editar">
+    <br>
+    <strong>Bibliografía:</strong>
+    <div id="editor_bibliografia_editar" class="quill-editor"></div>
+    <input type="hidden" name="bibliografia" id="input_bibliografia_editar">
+</td>
                     <!-- Metodología -->
                     <td style="width:20%; vertical-align:top;">
                         <strong>Metodologías de evaluación de la unidad:</strong>
@@ -644,67 +647,67 @@ document.getElementById('modalEditarUnidadContent').innerHTML = `
         </form>
     </div>
 `;
-// ...luego sigue igual la inicialización de Quill y el submit...
-            var modal = new bootstrap.Modal(document.getElementById('modalEditarUnidad'));
-            modal.show();
+                    // ...luego sigue igual la inicialización de Quill y el submit...
+                    var modal = new bootstrap.Modal(document.getElementById('modalEditarUnidad'));
+                    modal.show();
 
-            // Inicializar Quill y cargar datos existentes
-            // ...después de insertar el HTML...
-setTimeout(function() {
-    var quill_objetivo = new Quill('#editor_objetivo_editar', {
-        theme: 'snow',
-        placeholder: 'Escriba el objetivo de la unidad...'
-    });
-    var quill_bibliografia = new Quill('#editor_bibliografia_editar', {
-        theme: 'snow',
-        placeholder: 'Ingrese la bibliografía...'
-    });
-    var quill_metodologia = new Quill('#editor_metodologia_editar', {
-        theme: 'snow',
-        placeholder: 'Describa la metodología...'
-    });
-    var quill_actividades = new Quill('#editor_actividades_editar', {
-        theme: 'snow',
-        placeholder: 'Describa las actividades de recuperación...'
-    });
-    var quill_recursos = new Quill('#editor_recursos_editar', {
-        theme: 'snow',
-        placeholder: 'Describa los recursos didácticos...'
-    });
+                    // Inicializar Quill y cargar datos existentes
+                    // ...después de insertar el HTML...
+                    setTimeout(function() {
+                        var quill_objetivo = new Quill('#editor_objetivo_editar', {
+                            theme: 'snow',
+                            placeholder: 'Escriba el objetivo de la unidad...'
+                        });
+                        var quill_bibliografia = new Quill('#editor_bibliografia_editar', {
+                            theme: 'snow',
+                            placeholder: 'Ingrese la bibliografía...'
+                        });
+                        var quill_metodologia = new Quill('#editor_metodologia_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa la metodología...'
+                        });
+                        var quill_actividades = new Quill('#editor_actividades_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa las actividades de recuperación...'
+                        });
+                        var quill_recursos = new Quill('#editor_recursos_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa los recursos didácticos...'
+                        });
 
-    // Cargar datos existentes en Quill
-    quill_objetivo.root.innerHTML = unidad.objetivo_unidad || '';
-    quill_bibliografia.root.innerHTML = unidad.bibliografia || '';
-    quill_metodologia.root.innerHTML = unidad.metodologia || '';
-    quill_actividades.root.innerHTML = unidad.actividades_recuperacion || '';
-    quill_recursos.root.innerHTML = unidad.recursos_didacticos || '';
+                        // Cargar datos existentes en Quill
+                        quill_objetivo.root.innerHTML = unidad.objetivo_unidad || '';
+                        quill_bibliografia.root.innerHTML = unidad.bibliografia || '';
+                        quill_metodologia.root.innerHTML = unidad.metodologia || '';
+                        quill_actividades.root.innerHTML = unidad.actividades_recuperacion || '';
+                        quill_recursos.root.innerHTML = unidad.recursos_didacticos || '';
 
-    document.getElementById('formEditarUnidad').addEventListener('submit', function(e) {
-        e.preventDefault();
-        document.getElementById('input_objetivo_unidad_editar').value = quill_objetivo.root.innerHTML;
-        document.getElementById('input_bibliografia_editar').value = quill_bibliografia.root.innerHTML;
-        document.getElementById('input_metodologia_editar').value = quill_metodologia.root.innerHTML;
-        document.getElementById('input_actividades_editar').value = quill_actividades.root.innerHTML;
-        document.getElementById('input_recursos_editar').value = quill_recursos.root.innerHTML;
+                        document.getElementById('formEditarUnidad').addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            document.getElementById('input_objetivo_unidad_editar').value = quill_objetivo.root.innerHTML;
+                            document.getElementById('input_bibliografia_editar').value = quill_bibliografia.root.innerHTML;
+                            document.getElementById('input_metodologia_editar').value = quill_metodologia.root.innerHTML;
+                            document.getElementById('input_actividades_editar').value = quill_actividades.root.innerHTML;
+                            document.getElementById('input_recursos_editar').value = quill_recursos.root.innerHTML;
 
-        var formData = new FormData(this);
-        fetch('/sysplanificacion/app/Unidad/updateUnidad.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    modal.hide();
-                    cargarUnidades(document.getElementById('asignatura').value);
-                } else {
-                    alert('Error al actualizar: ' + (data.message || ''));
-                }
-            });
-    });
-}, 300);
-        });
-}
+                            var formData = new FormData(this);
+                            fetch('/sysplanificacion/app/Unidad/updateUnidad.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        modal.hide();
+                                        cargarUnidades(document.getElementById('asignatura').value);
+                                    } else {
+                                        alert('Error al actualizar: ' + (data.message || ''));
+                                    }
+                                });
+                        });
+                    }, 300);
+                });
+        }
     </script>
 </body>
 
