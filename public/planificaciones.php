@@ -747,73 +747,83 @@ if ($docente) {
             });
     }
 
-    function mostrarUnidadesFiltradas(filtro) {
-        let unidades = todasLasUnidades;
-        if (filtro && fuse) {
-            unidades = fuse.search(filtro).map(res => res.item);
-        }
-        const container = document.getElementById('carruselUnidadesContainer');
-        const inner = document.getElementById('carruselUnidadesInner');
-        const btnIzq = document.getElementById('btnCarruselIzq');
-        const btnDer = document.getElementById('btnCarruselDer');
-        if (!unidades || unidades.length === 0) {
-            container.style.display = 'none';
-            inner.innerHTML = '';
-            btnIzq.style.display = 'none';
-            btnDer.style.display = 'none';
-            return;
-        }
-        container.style.display = 'block';
-        inner.innerHTML = '';
-        carruselIndex = 0;
-
-        unidades.forEach(unidad => {
-            const card = document.createElement('div');
-            card.style.display = 'flex';
-            card.style.flexDirection = 'column';
-            card.style.alignItems = 'center';
-            card.style.justifyContent = 'center';
-            card.style.background = '#fff';
-            card.style.border = '1px solid #ddd';
-            card.style.borderRadius = '8px';
-            card.style.padding = '18px 28px';
-            card.style.minWidth = '160px';
-            card.style.maxWidth = '180px';
-            card.style.boxShadow = '0 2px 6px #0001';
-            card.style.textAlign = 'center';
-
-            const nombre = document.createElement('div');
-            nombre.style.fontWeight = 'bold';
-            nombre.style.marginBottom = '12px';
-            nombre.textContent = unidad.nombre;
-
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-primary btn-sm';
-            btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
-            btn.onclick = function() {
-                verUnidad(unidad.id_unidad);
-            };
-
-            card.appendChild(nombre);
-            card.appendChild(btn);
-            inner.appendChild(card);
-        });
-
-        actualizarCarrusel(unidades.length);
-
-        btnIzq.onclick = function() {
-            if (carruselIndex > 0) {
-                carruselIndex--;
-                actualizarCarrusel(unidades.length);
-            }
-        };
-        btnDer.onclick = function() {
-            if (carruselIndex < unidades.length - tarjetasPorVista) {
-                carruselIndex++;
-                actualizarCarrusel(unidades.length);
-            }
-        };
+function mostrarUnidadesFiltradas(filtro) {
+    let unidades = todasLasUnidades;
+    if (filtro && fuse) {
+        unidades = fuse.search(filtro).map(res => res.item);
     }
+    const container = document.getElementById('carruselUnidadesContainer');
+    const inner = document.getElementById('carruselUnidadesInner');
+    const btnIzq = document.getElementById('btnCarruselIzq');
+    const btnDer = document.getElementById('btnCarruselDer');
+    const buscadorContainer = document.getElementById('buscadorCarruselContainer');
+
+    // Siempre mostrar el buscador y el contenedor del carrusel
+    buscadorContainer.style.display = 'block';
+    container.style.display = 'block';
+    inner.innerHTML = '';
+    btnIzq.style.display = 'none';
+    btnDer.style.display = 'none';
+
+    if (!unidades || unidades.length === 0) {
+        // Mostrar mensaje si no hay resultados
+        inner.innerHTML = `
+            <div class="alert alert-warning w-100 text-center my-4">
+                No existe ese nombre de unidad.
+            </div>
+        `;
+        return;
+    }
+
+    carruselIndex = 0;
+
+    unidades.forEach(unidad => {
+        const card = document.createElement('div');
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.alignItems = 'center';
+        card.style.justifyContent = 'center';
+        card.style.background = '#fff';
+        card.style.border = '1px solid #ddd';
+        card.style.borderRadius = '8px';
+        card.style.padding = '18px 28px';
+        card.style.minWidth = '160px';
+        card.style.maxWidth = '180px';
+        card.style.boxShadow = '0 2px 6px #0001';
+        card.style.textAlign = 'center';
+
+        const nombre = document.createElement('div');
+        nombre.style.fontWeight = 'bold';
+        nombre.style.marginBottom = '12px';
+        nombre.textContent = unidad.nombre;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-primary btn-sm';
+        btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
+        btn.onclick = function() {
+            verUnidad(unidad.id_unidad);
+        };
+
+        card.appendChild(nombre);
+        card.appendChild(btn);
+        inner.appendChild(card);
+    });
+
+    actualizarCarrusel(unidades.length);
+
+    btnIzq.onclick = function() {
+        if (carruselIndex > 0) {
+            carruselIndex--;
+            actualizarCarrusel(unidades.length);
+        }
+    };
+    btnDer.onclick = function() {
+        if (carruselIndex < unidades.length - tarjetasPorVista) {
+            carruselIndex++;
+            actualizarCarrusel(unidades.length);
+        }
+    };
+}
 
     // Evento para el input de búsqueda
     document.addEventListener('DOMContentLoaded', function() {
