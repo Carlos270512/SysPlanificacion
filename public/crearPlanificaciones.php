@@ -82,11 +82,22 @@ switch ($jornada) {
             display: inline-block;
             min-width: 80px;
         }
+
+        .is-valid {
+            border: 2px solid #28a745 !important;
+            background-color: #eaffea !important;
+        }
+
+        .is-invalid {
+            border: 2px solid #dc3545 !important;
+            background-color: #ffeaea !important;
+        }
     </style>
 </head>
 
 <body>
     <div class="container mt-4">
+        <!-- Cabecera de la planificación -->
         <table class="tabla-planificacion">
             <tr>
                 <th colspan="6" style="text-align:center;">PLANIFICACION DE CLASE</th>
@@ -109,25 +120,57 @@ switch ($jornada) {
             </tr>
         </table>
         <br>
-        <table class="tabla-planificacion">
-            <tr>
-                <td colspan="6" style="text-align:left;">
-                    <span class="resaltado">Unidad N°</span>
-                    <span class="subrayado">&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="6">
-                    <span class="resaltado">Nombre:</span>
-                    <span class="subrayado" style="min-width:200px;">&nbsp;</span>
-                </td>
-            </tr>
-        </table>
-    </div>
+        <!-- Mensajes del formulario -->
+        <div id="msgUnidad"></div>
+        <!-- Formulario para crear unidad -->
+        <form id="formUnidad" class="mt-4" method="post" action="/SysPlanificacion/app/Unidad/createUnidad.php">
+            <input type="hidden" name="asignatura_codigo" value="<?php echo htmlspecialchars($asig['codigo']); ?>">
+            <table class="tabla-planificacion">
+                <tr>
+                    <td colspan="6" style="text-align:left;">
+                        <span class="resaltado">Unidad N°</span>
+                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <span class="resaltado">Nombre:</span>
+                        <input type="text" name="nombre" required class="subrayado ms-2" style="min-width:200px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="vertical-align:top;">
+                        <div class="resaltado">Objetivo de la unidad:</div>
+                        <textarea name="objetivo_unidad" class="form-control" rows="4" required></textarea>
+                        <div class="resaltado mt-2">Bibliografía:</div>
+                        <textarea name="bibliografia" class="form-control" rows="3"></textarea>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <div class="resaltado">Metodologías de<br>evaluación de la unidad:</div>
+                        <textarea name="metodologia" class="form-control" rows="7"></textarea>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <div class="resaltado">Actividades de<br>recuperación de la unidad:</div>
+                        <textarea name="actividades_recuperacion" class="form-control" rows="7"></textarea>
+                    </td>
+                    <td colspan="2" style="vertical-align:top;">
+                        <div class="resaltado">Equipo/Herramienta/<br>Recursos didácticos de la unidad:</div>
+                        <textarea name="recursos_didacticos" class="form-control" rows="7"></textarea>
+                    </td>
 
-    <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#modalConfirmarAtras">
-        &larr; Atrás
-    </button>
+                    <input type="hidden" name="id_unidad" id="id_unidad" value="">
+                </tr>
+            </table>
+            <div class="mt-3 text-end">
+                <button type="submit" class="btn btn-primary">Guardar Unidad</button>
+                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" disabled>Nueva semana</button>
+            </div>
+        </form>
+        <!-- Botón Atrás -->
+        <button type="button" class="btn btn-secondary mt-4" data-bs-toggle="modal" data-bs-target="#modalConfirmarAtras">
+            &larr; Atrás
+        </button>
+    </div>
 
     <!-- Modal de confirmación -->
     <div class="modal fade" id="modalConfirmarAtras" tabindex="-1" aria-labelledby="modalConfirmarAtrasLabel" aria-hidden="true">
@@ -148,7 +191,7 @@ switch ($jornada) {
         </div>
     </div>
 
-    <!-- Bootstrap JS para el modal -->
+    <script src="/SysPlanificacion/public/assets/js/crearUnidad.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
