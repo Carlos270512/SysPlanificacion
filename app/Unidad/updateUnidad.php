@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../config/conexion.php';
-// Recoger datos del formulario
-$asignatura_codigo = isset($_POST['asignatura_codigo']) ? trim($_POST['asignatura_codigo']) : '';
+
+$id_unidad = isset($_POST['id_unidad']) ? intval($_POST['id_unidad']) : null;
 $numero_unidad = isset($_POST['numero_unidad']) ? intval($_POST['numero_unidad']) : null;
 $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
 $objetivo_unidad = isset($_POST['objetivo_unidad']) ? $_POST['objetivo_unidad'] : '';
@@ -10,35 +10,34 @@ $bibliografia = isset($_POST['bibliografia']) ? $_POST['bibliografia'] : '';
 $metodologia = isset($_POST['metodologia']) ? $_POST['metodologia'] : '';
 $actividades_recuperacion = isset($_POST['actividades_recuperacion']) ? $_POST['actividades_recuperacion'] : '';
 $recursos_didacticos = isset($_POST['recursos_didacticos']) ? $_POST['recursos_didacticos'] : '';
-$semana_inicio = isset($_POST['semana_inicio']) ? $_POST['semana_inicio'] : null;
-$semana_fin = isset($_POST['semana_fin']) ? $_POST['semana_fin'] : null;
 
-// Validaciones básicas
-
-// Validaciones básicas
-if (!$asignatura_codigo || !$nombre || !$numero_unidad) {
+// Validación básica
+if (!$id_unidad || !$nombre || !$numero_unidad) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios.']);
     exit;
 }
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO unidad 
-        (numero_unidad, nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, bibliografia, semana_inicio, semana_fin, asignatura_codigo) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("UPDATE unidad SET 
+        numero_unidad = ?, 
+        nombre = ?, 
+        objetivo_unidad = ?, 
+        bibliografia = ?, 
+        metodologia = ?, 
+        actividades_recuperacion = ?, 
+        recursos_didacticos = ?
+        WHERE id_unidad = ?");
     $stmt->execute([
         $numero_unidad,
         $nombre,
         $objetivo_unidad,
+        $bibliografia,
         $metodologia,
         $actividades_recuperacion,
         $recursos_didacticos,
-        $bibliografia,
-        $semana_inicio,
-        $semana_fin,
-        $asignatura_codigo
+        $id_unidad
     ]);
-    $unidad_id = $pdo->lastInsertId();
-    echo json_encode(['success' => true, 'unidad_id' => $unidad_id]);
+    echo json_encode(['success' => true]);
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Error al guardar: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $e->getMessage()]);
 }

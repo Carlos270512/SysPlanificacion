@@ -15,7 +15,7 @@ if (isset($_GET['id_unidad'])) {
 // Si viene asignatura_codigo, devuelve las unidades de esa asignatura
 if (isset($_GET['asignatura_codigo'])) {
     $codigo = $_GET['asignatura_codigo'];
-    $stmt = $pdo->prepare("SELECT id_unidad, nombre FROM unidad WHERE asignatura_codigo = ?");
+    $stmt = $pdo->prepare("SELECT id_unidad, nombre, numero_unidad FROM unidad WHERE asignatura_codigo = ?");
     $stmt->execute([$codigo]);
     $unidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($unidades);
