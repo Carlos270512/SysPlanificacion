@@ -67,7 +67,7 @@ class CrearUnidadForm {
                 // Solo si ya existe id_unidad (ya fue creada la unidad)
                 const idUnidad = document.getElementById('id_unidad').value;
                 if (!idUnidad) return;
-                // Prepara los datos para actualizar todos los campos (puedes optimizar para solo el campo editado si lo deseas)
+                // Prepara los datos para actualizar todos los campos
                 const formData = new FormData();
                 formData.append('id_unidad', idUnidad);
                 const allFields = this.form.querySelectorAll('input[name], textarea[name]');
@@ -80,17 +80,34 @@ class CrearUnidadForm {
                         body: formData
                     });
                     const data = await resp.json();
+                    // Feedback visual: si es Quill, pinta el div, si no, el input
+                    const quillDiv = document.getElementById('editor_' + field.name);
                     if (data.success) {
-                        // Marca el campo en verde
-                        field.classList.add('is-valid');
-                        setTimeout(() => field.classList.remove('is-valid'), 1500);
+                        if (quillDiv) {
+                            quillDiv.classList.add('quill-valid');
+                            setTimeout(() => quillDiv.classList.remove('quill-valid'), 1500);
+                        } else {
+                            field.classList.add('is-valid');
+                            setTimeout(() => field.classList.remove('is-valid'), 1500);
+                        }
+                    } else {
+                        if (quillDiv) {
+                            quillDiv.classList.add('quill-invalid');
+                            setTimeout(() => quillDiv.classList.remove('quill-invalid'), 1500);
+                        } else {
+                            field.classList.add('is-invalid');
+                            setTimeout(() => field.classList.remove('is-invalid'), 1500);
+                        }
+                    }
+                } catch (err) {
+                    const quillDiv = document.getElementById('editor_' + field.name);
+                    if (quillDiv) {
+                        quillDiv.classList.add('quill-invalid');
+                        setTimeout(() => quillDiv.classList.remove('quill-invalid'), 1500);
                     } else {
                         field.classList.add('is-invalid');
                         setTimeout(() => field.classList.remove('is-invalid'), 1500);
                     }
-                } catch (err) {
-                    field.classList.add('is-invalid');
-                    setTimeout(() => field.classList.remove('is-invalid'), 1500);
                 }
             });
         });

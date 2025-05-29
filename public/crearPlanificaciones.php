@@ -54,41 +54,50 @@ switch ($jornada) {
     <meta charset="UTF-8">
     <title>Planificación de Clase</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <style>
         .tabla-planificacion td,
         .tabla-planificacion th {
             border: 1px solid #000;
             padding: 4px 8px;
         }
-
         .tabla-planificacion th {
             background: #ffff99;
             color: #000;
         }
-
         .tabla-planificacion {
             width: 90%;
             margin: 0 auto;
             border-collapse: collapse;
         }
-
         .resaltado {
             background: #ffff99;
             font-weight: bold;
         }
-
         .subrayado {
             border-bottom: 2px solid #888;
             display: inline-block;
             min-width: 80px;
         }
-
         .is-valid {
             border: 2px solid #28a745 !important;
             background-color: #eaffea !important;
         }
-
         .is-invalid {
+            border: 2px solid #dc3545 !important;
+            background-color: #ffeaea !important;
+        }
+        .quill-editor {
+            background: #fff;
+            min-height: 100px;
+            border-radius: 0.375rem;
+            margin-bottom: 8px;
+        }
+        .quill-valid {
+            border: 2px solid #28a745 !important;
+            background-color: #eaffea !important;
+        }
+        .quill-invalid {
             border: 2px solid #dc3545 !important;
             background-color: #ffeaea !important;
         }
@@ -141,23 +150,27 @@ switch ($jornada) {
                 <tr>
                     <td colspan="2" style="vertical-align:top;">
                         <div class="resaltado">Objetivo de la unidad:</div>
-                        <textarea name="objetivo_unidad" class="form-control" rows="4" required></textarea>
+                        <div id="editor_objetivo_unidad" class="quill-editor"></div>
+                        <textarea name="objetivo_unidad" id="objetivo_unidad" class="d-none"></textarea>
                         <div class="resaltado mt-2">Bibliografía:</div>
-                        <textarea name="bibliografia" class="form-control" rows="3"></textarea>
+                        <div id="editor_bibliografia" class="quill-editor"></div>
+                        <textarea name="bibliografia" id="bibliografia" class="d-none"></textarea>
                     </td>
                     <td style="vertical-align:top;">
                         <div class="resaltado">Metodologías de<br>evaluación de la unidad:</div>
-                        <textarea name="metodologia" class="form-control" rows="7"></textarea>
+                        <div id="editor_metodologia" class="quill-editor"></div>
+                        <textarea name="metodologia" id="metodologia" class="d-none"></textarea>
                     </td>
                     <td style="vertical-align:top;">
                         <div class="resaltado">Actividades de<br>recuperación de la unidad:</div>
-                        <textarea name="actividades_recuperacion" class="form-control" rows="7"></textarea>
+                        <div id="editor_actividades_recuperacion" class="quill-editor"></div>
+                        <textarea name="actividades_recuperacion" id="actividades_recuperacion" class="d-none"></textarea>
                     </td>
                     <td colspan="2" style="vertical-align:top;">
                         <div class="resaltado">Equipo/Herramienta/<br>Recursos didácticos de la unidad:</div>
-                        <textarea name="recursos_didacticos" class="form-control" rows="7"></textarea>
+                        <div id="editor_recursos_didacticos" class="quill-editor"></div>
+                        <textarea name="recursos_didacticos" id="recursos_didacticos" class="d-none"></textarea>
                     </td>
-
                     <input type="hidden" name="id_unidad" id="id_unidad" value="">
                 </tr>
             </table>
@@ -191,8 +204,39 @@ switch ($jornada) {
         </div>
     </div>
 
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+    // Inicializa Quill en los campos requeridos y sincroniza con los textarea ocultos
+    const quillFields = [
+        { id: 'editor_objetivo_unidad', name: 'objetivo_unidad' },
+        { id: 'editor_bibliografia', name: 'bibliografia' },
+        { id: 'editor_metodologia', name: 'metodologia' },
+        { id: 'editor_actividades_recuperacion', name: 'actividades_recuperacion' },
+        { id: 'editor_recursos_didacticos', name: 'recursos_didacticos' }
+    ];
+    const quillEditors = {};
+
+    quillFields.forEach(field => {
+        const quill = new Quill('#' + field.id, {
+            theme: 'snow',
+            placeholder: 'Escribe aquí...',
+            modules: { toolbar: [ ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link'], ['clean'] ] }
+        });
+        quillEditors[field.name] = quill;
+
+        // Sincroniza el contenido con el textarea oculto
+        quill.on('text-change', function() {
+            document.getElementById(field.name).value = quill.root.innerHTML;
+        });
+
+        // Autosave al perder foco
+        quill.root.addEventListener('blur', function() {
+            document.getElementById(field.name).dispatchEvent(new Event('blur'));
+        });
+    });
+    </script>
     <script src="/SysPlanificacion/public/assets/js/crearUnidad.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
