@@ -606,94 +606,116 @@ if ($docente) {
         fetch('/sysplanificacion/app/Unidad/get_unidades.php?id_unidad=' + id_unidad)
             .then(res => res.json())
             .then(unidad => {
-                // ...dentro de la función verUnidad...
                 document.getElementById('modalEditarUnidadContent').innerHTML = `
-    <div class="modal-header">
-        <h5 class="modal-title" id="modalEditarUnidadLabel">Editar Unidad</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<div class="modal-header">
+    <h5 class="modal-title" id="modalEditarUnidadLabel">Editar Unidad</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body" id="modalUnidadBodyEditar">
+    <!-- Mensaje de éxito oculto -->
+    <div id="mensajeExitoUnidad" class="alert alert-success text-center" style="display:none;">
+        ¡Cambios guardados correctamente!
     </div>
-    <div class="modal-body" id="modalUnidadBodyEditar">
-        <form id="formEditarUnidad" autocomplete="off">
-            <input type="hidden" name="id_unidad" value="${unidad.id_unidad}">
-            <table class="table table-bordered" style="background: #fff;">
-                <tr>
-                    <td colspan="4" style="text-align:center; background:#eaeaea;">
-                        <strong>Unidad N°</strong>
-                        <input type="number" name="numero_unidad" min="1" style="width:60px; display:inline-block;" value="${unidad.numero_unidad !== null && unidad.numero_unidad !== undefined ? unidad.numero_unidad : ''}" required>
-                        &nbsp;&nbsp;<strong>Nombre:</strong>
-                        <input type="text" name="nombre" style="width:40%;" value="${unidad.nombre || ''}" required>
-                    </td>
-                </tr>
-                <tr>
-                    <!-- Objetivo de la unidad -->
-                    <td style="width:30%; vertical-align:top;">
-                        <strong>Objetivo de la unidad:</strong>
-                        <div id="editor_objetivo_editar" class="quill-editor"></div>
-                        <input type="hidden" name="objetivo_unidad" id="input_objetivo_unidad_editar">
-                        <br>
-                        <strong>Bibliografía:</strong>
-                        <div id="editor_bibliografia_editar" class="quill-editor"></div>
-                        <input type="hidden" name="bibliografia" id="input_bibliografia_editar">
-                    </td>
-                    <!-- Metodología -->
-                    <td style="width:20%; vertical-align:top;">
-                        <strong>Metodologías de evaluación de la unidad:</strong>
-                        <div id="editor_metodologia_editar" class="quill-editor"></div>
-                        <input type="hidden" name="metodologia" id="input_metodologia_editar">
-                    </td>
-                    <!-- Actividades de recuperación -->
-                    <td style="width:20%; vertical-align:top;">
-                        <strong>Actividades de recuperación de la unidad:</strong>
-                        <div id="editor_actividades_editar" class="quill-editor"></div>
-                        <input type="hidden" name="actividades_recuperacion" id="input_actividades_editar">
-                    </td>
-                    <!-- Recursos didácticos -->
-                    <td style="width:30%; vertical-align:top;">
-                        <strong>Equipo/Herramienta/Recursos didácticos de la unidad:</strong>
-                        <div id="editor_recursos_editar" class="quill-editor"></div>
-                        <input type="hidden" name="recursos_didacticos" id="input_recursos_editar">
-                    </td>
-                </tr>
-            </table>
-            <div class="text-end">
-                <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </form>
-    </div>
+    <form id="formEditarUnidad" autocomplete="off">
+        <input type="hidden" name="id_unidad" value="${unidad.id_unidad}">
+        <table class="table table-bordered" style="background: #fff;">
+            <tr>
+                <td colspan="4" style="text-align:center; background:#eaeaea;">
+                    <strong>Unidad N°</strong>
+                    <input type="number" name="numero_unidad" min="1" style="width:60px; display:inline-block;" value="${unidad.numero_unidad !== null && unidad.numero_unidad !== undefined ? unidad.numero_unidad : ''}" required>
+                    &nbsp;&nbsp;<strong>Nombre:</strong>
+                    <input type="text" name="nombre" style="width:40%;" value="${unidad.nombre || ''}" required>
+                </td>
+            </tr>
+            <tr>
+                <!-- Objetivo de la unidad -->
+                <td style="width:30%; vertical-align:top;">
+                    <strong>Objetivo de la unidad:</strong>
+                    <div id="editor_objetivo_editar" class="quill-editor"></div>
+                    <input type="hidden" name="objetivo_unidad" id="input_objetivo_unidad_editar">
+                    <br>
+                    <strong>Bibliografía:</strong>
+                    <div id="editor_bibliografia_editar" class="quill-editor"></div>
+                    <input type="hidden" name="bibliografia" id="input_bibliografia_editar">
+                </td>
+                <!-- Metodología -->
+                <td style="width:20%; vertical-align:top;">
+                    <strong>Metodologías de evaluación de la unidad:</strong>
+                    <div id="editor_metodologia_editar" class="quill-editor"></div>
+                    <input type="hidden" name="metodologia" id="input_metodologia_editar">
+                </td>
+                <!-- Actividades de recuperación -->
+                <td style="width:20%; vertical-align:top;">
+                    <strong>Actividades de recuperación de la unidad:</strong>
+                    <div id="editor_actividades_editar" class="quill-editor"></div>
+                    <input type="hidden" name="actividades_recuperacion" id="input_actividades_editar">
+                </td>
+                <!-- Recursos didácticos -->
+                <td style="width:30%; vertical-align:top;">
+                    <strong>Equipo/Herramienta/Recursos didácticos de la unidad:</strong>
+                    <div id="editor_recursos_editar" class="quill-editor"></div>
+                    <input type="hidden" name="recursos_didacticos" id="input_recursos_editar">
+                </td>
+            </tr>
+        </table>
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            <button type="button" class="btn btn-info ms-2" id="btnVerSemanasUnidad">
+                <i class="bi bi-calendar-week"></i> Ver Semanas
+            </button>
+            <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+        <div id="semanasUnidadContainer" class="mt-3" style="display:none;"></div>
+    </form>
+</div>
 `;
-                // ...luego sigue igual la inicialización de Quill y el submit...
+
                 var modal = new bootstrap.Modal(document.getElementById('modalEditarUnidad'));
                 modal.show();
 
                 setTimeout(function() {
-                    var quill_objetivo = new Quill('#editor_objetivo_editar', {
-                        theme: 'snow',
-                        placeholder: 'Escriba el objetivo de la unidad...'
-                    });
-                    var quill_bibliografia = new Quill('#editor_bibliografia_editar', {
-                        theme: 'snow',
-                        placeholder: 'Ingrese la bibliografía...'
-                    });
-                    var quill_metodologia = new Quill('#editor_metodologia_editar', {
-                        theme: 'snow',
-                        placeholder: 'Describa la metodología...'
-                    });
-                    var quill_actividades = new Quill('#editor_actividades_editar', {
-                        theme: 'snow',
-                        placeholder: 'Describa las actividades de recuperación...'
-                    });
-                    var quill_recursos = new Quill('#editor_recursos_editar', {
-                        theme: 'snow',
-                        placeholder: 'Describa los recursos didácticos...'
-                    });
+                    var quill_objetivo = null,
+                        quill_bibliografia = null,
+                        quill_metodologia = null,
+                        quill_actividades = null,
+                        quill_recursos = null;
+                    if (document.getElementById('editor_objetivo_editar')) {
+                        quill_objetivo = new Quill('#editor_objetivo_editar', {
+                            theme: 'snow',
+                            placeholder: 'Escriba el objetivo de la unidad...'
+                        });
+                    }
+                    if (document.getElementById('editor_bibliografia_editar')) {
+                        quill_bibliografia = new Quill('#editor_bibliografia_editar', {
+                            theme: 'snow',
+                            placeholder: 'Ingrese la bibliografía...'
+                        });
+                    }
+                    if (document.getElementById('editor_metodologia_editar')) {
+                        quill_metodologia = new Quill('#editor_metodologia_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa la metodología...'
+                        });
+                    }
+                    if (document.getElementById('editor_actividades_editar')) {
+                        quill_actividades = new Quill('#editor_actividades_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa las actividades de recuperación...'
+                        });
+                    }
+                    if (document.getElementById('editor_recursos_editar')) {
+                        quill_recursos = new Quill('#editor_recursos_editar', {
+                            theme: 'snow',
+                            placeholder: 'Describa los recursos didácticos...'
+                        });
+                    }
 
                     // Cargar datos existentes en Quill
-                    quill_objetivo.root.innerHTML = unidad.objetivo_unidad || '';
-                    quill_bibliografia.root.innerHTML = unidad.bibliografia || '';
-                    quill_metodologia.root.innerHTML = unidad.metodologia || '';
-                    quill_actividades.root.innerHTML = unidad.actividades_recuperacion || '';
-                    quill_recursos.root.innerHTML = unidad.recursos_didacticos || '';
+                    if (quill_objetivo) quill_objetivo.root.innerHTML = unidad.objetivo_unidad || '';
+                    if (quill_bibliografia) quill_bibliografia.root.innerHTML = unidad.bibliografia || '';
+                    if (quill_metodologia) quill_metodologia.root.innerHTML = unidad.metodologia || '';
+                    if (quill_actividades) quill_actividades.root.innerHTML = unidad.actividades_recuperacion || '';
+                    if (quill_recursos) quill_recursos.root.innerHTML = unidad.recursos_didacticos || '';
 
                     document.getElementById('formEditarUnidad').addEventListener('submit', function(e) {
                         e.preventDefault();
@@ -711,13 +733,69 @@ if ($docente) {
                             .then(res => res.json())
                             .then(data => {
                                 if (data.success) {
-                                    modal.hide();
-                                    cargarUnidades(document.getElementById('asignatura').value);
+                                    document.getElementById('mensajeExitoUnidad').style.display = 'block';
+                                    setTimeout(function() {
+                                        document.getElementById('mensajeExitoUnidad').style.display = 'none';
+                                        // Solo cerrar el modal si el contenedor de semanas está oculto
+                                        const contenedorSemanas = document.getElementById('semanasUnidadContainer');
+                                        if (!contenedorSemanas || contenedorSemanas.style.display === 'none' || contenedorSemanas.style.display === '') {
+                                            modal.hide();
+                                            cargarUnidades(document.getElementById('asignatura').value);
+                                        }
+                                        // Si el contenedor de semanas está visible, NO cierres el modal
+                                    }, 2000);
                                 } else {
                                     alert('Error al actualizar: ' + (data.message || ''));
                                 }
                             });
                     });
+                    // Botón Ver Semanas (con edición)
+                    document.getElementById('btnVerSemanasUnidad').addEventListener('click', function() {
+                        const contenedor = document.getElementById('semanasUnidadContainer');
+                        if (contenedor.style.display === 'none' || contenedor.style.display === '') {
+                            fetch('/sysplanificacion/app/Semana/get_semanas.php?id_unidad=' + encodeURIComponent(unidad.id_unidad))
+                                .then(res => res.json())
+                                .then(semanas => {
+                                    if (semanas.length === 0) {
+                                        contenedor.innerHTML = `<div class="alert alert-warning text-center">No hay semanas registradas para esta unidad.</div>`;
+                                    } else {
+                                        contenedor.innerHTML = `
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <strong>Semanas de la Unidad</strong>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                ${semanas.map(s =>
+                                                    `<li class="list-group-item">
+                                                        <strong>Semana:</strong> ${s.fecha_semana ? s.fecha_semana : '(sin fecha)'}
+                                                        ${s.actividades_previas ? `<br><strong>Actividades previas:</strong> <span>${s.actividades_previas.replace(/<[^>]+>/g, '').slice(0, 60)}...</span>` : ''}
+                                                        <button class="btn btn-warning btn-sm ms-2 btnEditarSemana" data-id="${s.id_semana}">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                    </li>`
+                                                ).join('')}
+                                            </ul>
+                                        </div>
+                                    `;
+                                    }
+                                    // Aquí agregamos el evento para editar semana
+                                    contenedor.querySelectorAll('.btnEditarSemana').forEach(btn => {
+                                        btn.addEventListener('click', function() {
+                                            const idSemana = this.getAttribute('data-id');
+                                            // Cargar el formulario de edición de semana en el mismo contenedor
+                                            
+                                        });
+                                    });
+
+                                    contenedor.style.display = 'block';
+                                    this.textContent = 'Ocultar Semanas';
+                                });
+                        } else {
+                            contenedor.style.display = 'none';
+                            this.innerHTML = '<i class="bi bi-calendar-week"></i> Ver Semanas';
+                        }
+                    });
+
                 }, 300);
             });
     }
