@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../config/conexion.php';
 
 $unidad_id = isset($_GET['unidad_id']) ? $_GET['unidad_id'] : '';
 $unidad_nombre = isset($_GET['unidad_nombre']) ? $_GET['unidad_nombre'] : '';
-
-require_once __DIR__ . '/../config/conexion.php';
+$editar = isset($_GET['editar']) ? intval($_GET['editar']) : 0;
+$id_semana = isset($_GET['id_semana']) ? intval($_GET['id_semana']) : 0;
 
 // Obtener fechas de la unidad para limitar el rango
 $fecha_inicio_unidad = '';
@@ -17,6 +18,38 @@ if ($unidad_id) {
         $fecha_fin_unidad = $unidad['semana_fin'];
     }
 }
+
+// Si es edición, obtener los datos de la semana
+$semana = [
+    'semana_numero' => '',
+    'semana_inicio' => '',
+    'semana_fin' => '',
+    'actividades_previas' => '',
+    'tiempo_previas' => '',
+    'contenido' => ''
+];
+$dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+foreach ($dias as $dia) {
+    $semana["objetivo_$dia"] = '';
+    $semana["apertura_$dia"] = '';
+    $semana["tiempo_apertura_$dia"] = '';
+    $semana["desarrollo_$dia"] = '';
+    $semana["tiempo_desarrollo_$dia"] = '';
+    $semana["cierre_$dia"] = '';
+    $semana["tiempo_cierre_$dia"] = '';
+    $semana["trabajo_autonomo_$dia"] = '';
+    $semana["entrega_$dia"] = '';
+}
+
+if ($editar && $id_semana) {
+    $stmt = $pdo->prepare("SELECT * FROM semana WHERE id_semana = ?");
+    $stmt->execute([$id_semana]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $semana = array_merge($semana, $row);
+    }
+}
+
 ?>
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
@@ -29,30 +62,35 @@ if ($unidad_id) {
 
 <form id="formSemana" action="#" method="post" autocomplete="off">
     <input type="hidden" name="unidad_id" value="<?php echo htmlspecialchars($unidad_id); ?>">
+    <?php if ($editar && $id_semana): ?>
+        <input type="hidden" name="id_semana" value="<?php echo htmlspecialchars($id_semana); ?>">
+    <?php endif; ?>
     <div class="mb-3">
         <label class="form-label"><strong>Semana:</strong></label>
-        <input type="number" class="form-control" name="semana_numero" min="1" required style="width:100px;display:inline-block;">
+        <input type="number" class="form-control" name="semana_numero" min="1" required style="width:100px;display:inline-block;" value="<?php echo htmlspecialchars($semana['semana_numero']); ?>">
     </div>
     <div class="mb-3">
         <label class="form-label"><strong>Del</strong></label>
         <input type="text" class="form-control" id="semana_inicio" name="semana_inicio"
             required style="width:180px;display:inline-block;" autocomplete="off"
             data-min="<?php echo htmlspecialchars($fecha_inicio_unidad); ?>"
-            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>">
+            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>"
+            value="<?php echo htmlspecialchars($semana['semana_inicio']); ?>">
         <label class="form-label ms-2"><strong>al</strong></label>
         <input type="text" class="form-control" id="semana_fin" name="semana_fin"
             required style="width:180px;display:inline-block;" readonly autocomplete="off"
             data-min="<?php echo htmlspecialchars($fecha_inicio_unidad); ?>"
-            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>">
+            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>"
+            value="<?php echo htmlspecialchars($semana['semana_fin']); ?>">
     </div>
     <div class="mb-3">
         <label class="form-label"><strong>Actividades previas a la clase:</strong></label>
         <div id="editor_actividades_previas" class="quill-editor"></div>
-        <input type="hidden" name="actividades_previas" id="input_actividades_previas">
+        <input type="hidden" name="actividades_previas" id="input_actividades_previas" value="<?php echo htmlspecialchars($semana['actividades_previas']); ?>">
     </div>
     <div class="mb-3">
         <label class="form-label"><strong>Tiempo (min):</strong></label>
-        <input type="number" class="form-control" name="tiempo_previas" min="1" required style="width:120px;display:inline-block;">
+        <input type="number" class="form-control" name="tiempo_previas" min="1" required style="width:120px;display:inline-block;" value="<?php echo htmlspecialchars($semana['tiempo_previas']); ?>">
     </div>
 
     <!-- Carrusel de actividades de la clase por día -->
@@ -60,7 +98,7 @@ if ($unidad_id) {
         <div class="col-12 col-md-4">
             <label class="form-label"><strong>Contenido:</strong></label>
             <div id="editor_contenido" class="quill-editor" style="height:350px;"></div>
-            <input type="hidden" name="contenido" id="input_contenido">
+            <input type="hidden" name="contenido" id="input_contenido" value="<?php echo htmlspecialchars($semana['contenido']); ?>">
         </div>
         <div class="col-12 col-md-8">
             <label class="form-label"><strong>Actividades de la clase (por día):</strong></label>
@@ -83,16 +121,9 @@ if ($unidad_id) {
                                     <div class="d-flex h-100 align-items-center justify-content-between">
                                         <!-- Botón izquierda -->
                                         <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
-                                            <?php if ($i > 0): ?>
-                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
-                                                    <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
-                                                </button>
-                                            <?php elseif ($i === 0): // Lunes, mostrar volver a viernes 
-                                            ?>
-                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
-                                                    <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
-                                                </button>
-                                            <?php endif; ?>
+                                            <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="prev">
+                                                <span class="bi bi-arrow-left-circle-fill fs-2 text-white"></span>
+                                            </button>
                                         </div>
                                         <!-- Día centrado -->
                                         <div class="flex-grow-1 text-center">
@@ -100,16 +131,9 @@ if ($unidad_id) {
                                         </div>
                                         <!-- Botón derecha -->
                                         <div style="width:60px;" class="h-100 d-flex align-items-center justify-content-center">
-                                            <?php if ($i < count($dias) - 1): ?>
-                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
-                                                    <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
-                                                </button>
-                                            <?php elseif ($i === count($dias) - 1): // Viernes, mostrar ir a lunes 
-                                            ?>
-                                                <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
-                                                    <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
-                                                </button>
-                                            <?php endif; ?>
+                                            <button class="btn custom-carousel-btn" type="button" data-bs-target="#carouselDias" data-bs-slide="next">
+                                                <span class="bi bi-arrow-right-circle-fill fs-2 text-white"></span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -117,45 +141,46 @@ if ($unidad_id) {
                                     <div class="mb-2">
                                         <strong>Objetivo:</strong>
                                         <div id="editor_objetivo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                        <input type="hidden" name="objetivo_<?php echo $diaKey; ?>" id="input_objetivo_<?php echo $diaKey; ?>">
+                                        <input type="hidden" name="objetivo_<?php echo $diaKey; ?>" id="input_objetivo_<?php echo $diaKey; ?>" value="<?php echo htmlspecialchars($semana["objetivo_$diaKey"]); ?>">
                                     </div>
                                     <div class="mb-2">
                                         <strong>Apertura:</strong>
                                         <div class="mb-1">
                                             <strong>Tiempo:</strong>
-                                            <input type="number" class="form-control" name="tiempo_apertura_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                            <input type="number" class="form-control" name="tiempo_apertura_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min" value="<?php echo htmlspecialchars($semana["tiempo_apertura_$diaKey"]); ?>">
                                         </div>
                                         <div id="editor_apertura_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                        <input type="hidden" name="apertura_<?php echo $diaKey; ?>" id="input_apertura_<?php echo $diaKey; ?>">
+                                        <input type="hidden" name="apertura_<?php echo $diaKey; ?>" id="input_apertura_<?php echo $diaKey; ?>" value="<?php echo htmlspecialchars($semana["apertura_$diaKey"]); ?>">
                                     </div>
                                     <div class="mb-2">
                                         <strong>Desarrollo:</strong>
                                         <div class="mb-1">
                                             <strong>Tiempo:</strong>
-                                            <input type="number" class="form-control" name="tiempo_desarrollo_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                            <input type="number" class="form-control" name="tiempo_desarrollo_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min" value="<?php echo htmlspecialchars($semana["tiempo_desarrollo_$diaKey"]); ?>">
                                         </div>
                                         <div id="editor_desarrollo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                        <input type="hidden" name="desarrollo_<?php echo $diaKey; ?>" id="input_desarrollo_<?php echo $diaKey; ?>">
+                                        <input type="hidden" name="desarrollo_<?php echo $diaKey; ?>" id="input_desarrollo_<?php echo $diaKey; ?>" value="<?php echo htmlspecialchars($semana["desarrollo_$diaKey"]); ?>">
                                     </div>
                                     <div class="mb-2">
                                         <strong>Cierre:</strong>
                                         <div class="mb-1">
                                             <strong>Tiempo:</strong>
-                                            <input type="number" class="form-control" name="tiempo_cierre_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min">
+                                            <input type="number" class="form-control" name="tiempo_cierre_<?php echo $diaKey; ?>" min="1" style="width:90px;display:inline-block;" placeholder="min" value="<?php echo htmlspecialchars($semana["tiempo_cierre_$diaKey"]); ?>">
                                         </div>
                                         <div id="editor_cierre_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                        <input type="hidden" name="cierre_<?php echo $diaKey; ?>" id="input_cierre_<?php echo $diaKey; ?>">
+                                        <input type="hidden" name="cierre_<?php echo $diaKey; ?>" id="input_cierre_<?php echo $diaKey; ?>" value="<?php echo htmlspecialchars($semana["cierre_$diaKey"]); ?>">
                                     </div>
                                     <div class="mb-2">
                                         <strong>Trabajo autónomo:</strong>
                                         <div id="editor_trabajo_autonomo_<?php echo $diaKey; ?>" class="quill-editor" style="height:60px;"></div>
-                                        <input type="hidden" name="trabajo_autonomo_<?php echo $diaKey; ?>" id="input_trabajo_autonomo_<?php echo $diaKey; ?>">
+                                        <input type="hidden" name="trabajo_autonomo_<?php echo $diaKey; ?>" id="input_trabajo_autonomo_<?php echo $diaKey; ?>" value="<?php echo htmlspecialchars($semana["trabajo_autonomo_$diaKey"]); ?>">
                                     </div>
                                     <div class="mb-2">
                                         <strong>Fecha de entrega:</strong>
                                         <input type="text" class="form-control fecha-entrega" name="entrega_<?php echo $diaKey; ?>" autocomplete="off"
                                             data-min="<?php echo htmlspecialchars($fecha_inicio_unidad); ?>"
-                                            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>">
+                                            data-max="<?php echo htmlspecialchars($fecha_fin_unidad); ?>"
+                                            value="<?php echo htmlspecialchars($semana["entrega_$diaKey"]); ?>">
                                     </div>
                                 </div>
                             </div>
@@ -167,37 +192,32 @@ if ($unidad_id) {
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Semana</button>
+    <button type="submit" class="btn btn-primary"><?php echo $editar ? 'Guardar Cambios' : 'Guardar Semana'; ?></button>
     <button type="button" class="btn btn-secondary ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
     <div id="semanaSuccess" class="alert alert-success mt-3" style="display:none;">
         <i class="bi bi-check-circle-fill"></i> Semana guardada correctamente.
     </div>
     <script>
-        
-
-        // Activar el botón Visualizar PDF cuando se muestre el mensaje de éxito
         document.getElementById('semanaSuccess').addEventListener('DOMSubtreeModified', function() {
             if (this.style.display !== 'none') {
                 document.getElementById('btnVisualizarPDF').disabled = false;
             }
         });
-
-        // Si ya tienes lógica para mostrar el mensaje, puedes activar el botón ahí también
-        // Por ejemplo, si usas JS para mostrar el mensaje:
-        // document.getElementById('semanaSuccess').style.display = 'block';
-        // document.getElementById('btnVisualizarPDF').disabled = false;
     </script>
 </form>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
+    // Inicializar Quill y setear valores si existen
     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
     dias.forEach(dia => {
         ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(tipo => {
-            new Quill(`#editor_${tipo}_${dia}`, {
+            var quill = new Quill(`#editor_${tipo}_${dia}`, {
                 theme: 'snow',
                 placeholder: `Escriba ${tipo.replace('_', ' ')}...`
             });
+            var hidden = document.getElementById(`input_${tipo}_${dia}`);
+            if (hidden && hidden.value) quill.root.innerHTML = hidden.value;
         });
     });
     var quill_contenido = new Quill('#editor_contenido', {
@@ -208,8 +228,10 @@ if ($unidad_id) {
         theme: 'snow',
         placeholder: 'Describa las actividades previas...'
     });
+    if(document.getElementById('input_contenido')) quill_contenido.root.innerHTML = document.getElementById('input_contenido').value;
+    if(document.getElementById('input_actividades_previas')) quill_actividades_previas.root.innerHTML = document.getElementById('input_actividades_previas').value;
 
-    // --- INICIO: Inicializar Pikaday para cada campo de fecha de entrega ---
+    // Inicializar Pikaday para cada campo de fecha de entrega
     document.querySelectorAll('.fecha-entrega').forEach(function(input) {
         new Pikaday({
             field: input,
@@ -223,5 +245,4 @@ if ($unidad_id) {
             }
         });
     });
-    // --- FIN ---
 </script>

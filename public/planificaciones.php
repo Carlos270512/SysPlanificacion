@@ -62,14 +62,9 @@ if ($docente) {
             </div>
             <!-- Botón verde "Generar Unidad" debajo de los datos de la asignatura -->
             <div id="btnUnidadContainer" class="mb-3" style="display:none;">
-                <button class="btn btn-success" id="btnGenerarUnidad">
+                <button class="btn btn-cafe" id="btnGenerarUnidad">
                     <i class="bi bi-plus-circle"></i> Generar Unidad
                 </button>
-                <div id="btnUnidadContainer" class="mb-3" style="display:none;">
-                    <button class="btn btn-success" id="btnGenerarUnidad">
-                        <i class="bi bi-plus-circle"></i> Generar Unidad
-                    </button>
-                </div>
             </div>
             <!-- Carrusel de Unidades Generadas -->
             <div id="carruselUnidadesContainer" class="mb-4" style="display:none;">
@@ -549,7 +544,7 @@ if ($docente) {
                     nombre.textContent = unidad.nombre;
 
                     const btn = document.createElement('button');
-                    btn.className = 'btn btn-primary btn-sm';
+                    btn.className = 'btn btn-cafe btn-sm';
                     btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
                     btn.onclick = function() {
                         verUnidad(unidad.id_unidad);
@@ -783,7 +778,18 @@ if ($docente) {
                                         btn.addEventListener('click', function() {
                                             const idSemana = this.getAttribute('data-id');
                                             // Cargar el formulario de edición de semana en el mismo contenedor
-                                            
+                                            const cardSemana = this.closest('.card'); // O el contenedor de la semana
+                                            cardSemana.innerHTML = '<div class="text-center my-3"><div class="spinner-border"></div> Cargando formulario...</div>';
+                                            fetch('/sysplanificacion/public/gestionarSemana.php?editar=1&id_semana=' + encodeURIComponent(idSemana))
+                                                .then(res => res.text())
+                                                .then(html => {
+                                                    cardSemana.innerHTML = html;
+                                                    // Inicializar Quill y Pikaday en el formulario cargado
+                                                    setTimeout(function() {
+                                                        if (window.inicializarQuillSemana) window.inicializarQuillSemana();
+                                                        if (window.inicializarPikadayEntrega) window.inicializarPikadayEntrega();
+                                                    }, 200);
+                                                });
                                         });
                                     });
 
@@ -875,7 +881,7 @@ if ($docente) {
             nombre.textContent = unidad.nombre;
 
             const btn = document.createElement('button');
-            btn.className = 'btn btn-primary btn-sm';
+            btn.className = 'btn btn-cafe btn-sm';
             btn.innerHTML = '<i class="bi bi-eye"></i> Ver/Editar';
             btn.onclick = function() {
                 verUnidad(unidad.id_unidad);

@@ -32,6 +32,8 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="assets/css/gestionUsuariosSytles.css">
+
 </head>
 <body>
 <div class="container-fluid mt-5">
@@ -44,11 +46,10 @@ $hayErrores = isset($_GET['errores']);
             <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
             <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
         </div>
-        <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
-    </form>
+<button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>    </form>
     <div class="mb-3">
-        <a href="gestionUsuarios.php?estado=ACTIVO" class="btn btn-outline-success btn-sm <?= (!isset($_GET['estado']) || $_GET['estado'] === 'ACTIVO') ? 'active' : '' ?>">Mostrar Activos</a>
-        <a href="gestionUsuarios.php?estado=INACTIVO" class="btn btn-outline-secondary btn-sm <?= (isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO') ? 'active' : '' ?>">Mostrar Inactivos</a>
+       <a href="gestionUsuarios.php?estado=ACTIVO" class="btn btn-cafe btn-sm <?= (!isset($_GET['estado']) || $_GET['estado'] === 'ACTIVO') ? 'active' : '' ?>">Mostrar Activos</a>
+<a href="gestionUsuarios.php?estado=INACTIVO" class="btn btn-outline-secondary btn-sm <?= (isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO') ? 'active' : '' ?>">Mostrar Inactivos</a>
     </div>
     <!-- Tabla para mostrar los usuarios -->
     <div class="table-responsive">

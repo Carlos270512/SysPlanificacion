@@ -41,3 +41,16 @@
   min-width: 120px;
   display: inline-block;
 }
+/* Botón café para Generar Unidad y Ver/Editar */
+.btn-cafe {
+  background-color: #8B5C2A !important;
+  color: #fff !important;
+  border: none;
+  transition: background 0.18s;
+}
+
+.btn-cafe:hover,
+.btn-cafe:focus {
+  background-color: #6b421e !important;
+  color: #fff !important;
+}

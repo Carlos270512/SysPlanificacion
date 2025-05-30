@@ -25,6 +25,7 @@ $hayErrores = isset($_GET['errores']);
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Subir Excel</title>
@@ -34,7 +35,9 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="assets/css/subirExcelstyles.css">
 </head>
+
 <body>
     <div class="container mt-5">
         <h2 class="mb-4">Subir archivo Excel</h2>
@@ -44,9 +47,10 @@ $hayErrores = isset($_GET['errores']);
         <form action="../app/procesarExcel.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
-                <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
+                <input class="form-control" type="file" name="archivo_excel"  id="archivo_excel" accept=".xlsx, .xls" required>
             </div>
-            <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
+            <button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>
+        </form>
         </form>
 
         <!-- Tabla para mostrar los datos subidos -->
@@ -87,80 +91,81 @@ $hayErrores = isset($_GET['errores']);
         </div>
     </div>
 
-<?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
-<div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <p>Algunos registros no se pudieron procesar porque tienen campos vacíos o inválidos. Revisa los detalles:</p>
-                <div class="table-responsive">
-                    <table id="tablaErroresExcel" class="table table-bordered table-sm">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Asignatura</th>
-                                <th>Horario</th>
-                                <th>Jornada</th>
-                                <th>Aula</th>
-                                <th>Nivel</th>
-                                <th>Fecha Inicio</th>
-                                <th>Fecha Fin</th>
-                                <th>Profesor</th>
-                                <th>Errores</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($_SESSION['errores_excel'] as $err): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($err['codigo']) ?></td>
-                                    <td><?= htmlspecialchars($err['asignatura']) ?></td>
-                                    <td><?= htmlspecialchars($err['horario']) ?></td>
-                                    <td><?= htmlspecialchars($err['jornada']) ?></td>
-                                    <td><?= htmlspecialchars($err['aula']) ?></td>
-                                    <td><?= htmlspecialchars($err['nivel']) ?></td>
-                                    <td><?= htmlspecialchars($err['fecha_inicio']) ?></td>
-                                    <td><?= htmlspecialchars($err['fecha_fin']) ?></td>
-                                    <td><?= htmlspecialchars($err['profesor']) ?></td>
-                                    <td class="text-danger"><?= htmlspecialchars($err['errores']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+    <?php if ($hayErrores && isset($_SESSION['errores_excel']) && !empty($_SESSION['errores_excel'])): ?>
+        <div class="modal fade" id="erroresModal" tabindex="-1" aria-labelledby="erroresModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="erroresModalLabel">Errores encontrados</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Algunos registros no se pudieron procesar porque tienen campos vacíos o inválidos. Revisa los detalles:</p>
+                        <div class="table-responsive">
+                            <table id="tablaErroresExcel" class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Asignatura</th>
+                                        <th>Horario</th>
+                                        <th>Jornada</th>
+                                        <th>Aula</th>
+                                        <th>Nivel</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Profesor</th>
+                                        <th>Errores</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($_SESSION['errores_excel'] as $err): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($err['codigo']) ?></td>
+                                            <td><?= htmlspecialchars($err['asignatura']) ?></td>
+                                            <td><?= htmlspecialchars($err['horario']) ?></td>
+                                            <td><?= htmlspecialchars($err['jornada']) ?></td>
+                                            <td><?= htmlspecialchars($err['aula']) ?></td>
+                                            <td><?= htmlspecialchars($err['nivel']) ?></td>
+                                            <td><?= htmlspecialchars($err['fecha_inicio']) ?></td>
+                                            <td><?= htmlspecialchars($err['fecha_fin']) ?></td>
+                                            <td><?= htmlspecialchars($err['profesor']) ?></td>
+                                            <td class="text-danger"><?= htmlspecialchars($err['errores']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
         </div>
-    </div>
-</div>
-<script>
-    $(document).ready(function () {
-        $('#tablaErroresExcel').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-            },
-            pageLength: 5
-        });
-        var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
-        erroresModal.show();
-    });
-</script>
-<?php unset($_SESSION['errores_excel']); ?>
-<?php endif; ?>
+        <script>
+            $(document).ready(function() {
+                $('#tablaErroresExcel').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                    },
+                    pageLength: 5
+                });
+                var erroresModal = new bootstrap.Modal(document.getElementById('erroresModal'));
+                erroresModal.show();
+            });
+        </script>
+        <?php unset($_SESSION['errores_excel']); ?>
+    <?php endif; ?>
 
-<script>
-    $(document).ready(function () {
-        $('#asignaturasTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-            }
+    <script>
+        $(document).ready(function() {
+            $('#asignaturasTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
+
 </html>
