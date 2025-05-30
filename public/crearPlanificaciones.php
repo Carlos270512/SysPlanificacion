@@ -61,42 +61,51 @@ switch ($jornada) {
             border: 1px solid #000;
             padding: 4px 8px;
         }
+
         .tabla-planificacion th {
             background: #ffff99;
             color: #000;
         }
+
         .tabla-planificacion {
             width: 90%;
             margin: 0 auto;
             border-collapse: collapse;
         }
+
         .resaltado {
             background: #ffff99;
             font-weight: bold;
         }
+
         .subrayado {
             border-bottom: 2px solid #888;
             display: inline-block;
             min-width: 80px;
         }
+
         .is-valid {
             border: 2px solid #28a745 !important;
             background-color: #eaffea !important;
         }
+
         .is-invalid {
             border: 2px solid #dc3545 !important;
             background-color: #ffeaea !important;
         }
+
         .quill-editor {
             background: #fff;
             min-height: 100px;
             border-radius: 0.375rem;
             margin-bottom: 8px;
         }
+
         .quill-valid {
             border: 2px solid #28a745 !important;
             background-color: #eaffea !important;
         }
+
         .quill-invalid {
             border: 2px solid #dc3545 !important;
             background-color: #ffeaea !important;
@@ -175,7 +184,7 @@ switch ($jornada) {
                 </tr>
             </table>
             <div class="mt-3 text-end">
-                <button type="submit" class="btn btn-primary">Guardar Unidad</button>
+                <button type="submit" id="btnGuardarSemana" class="btn btn-primary">Guardar Semana</button>
                 <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" disabled>Nueva semana</button>
             </div>
         </form>
@@ -207,36 +216,75 @@ switch ($jornada) {
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script>
-    // Inicializa Quill en los campos requeridos y sincroniza con los textarea ocultos
-    const quillFields = [
-        { id: 'editor_objetivo_unidad', name: 'objetivo_unidad' },
-        { id: 'editor_bibliografia', name: 'bibliografia' },
-        { id: 'editor_metodologia', name: 'metodologia' },
-        { id: 'editor_actividades_recuperacion', name: 'actividades_recuperacion' },
-        { id: 'editor_recursos_didacticos', name: 'recursos_didacticos' }
-    ];
-    const quillEditors = {};
+        // Inicializa Quill en los campos requeridos y sincroniza con los textarea ocultos
+        const quillFields = [{
+                id: 'editor_objetivo_unidad',
+                name: 'objetivo_unidad'
+            },
+            {
+                id: 'editor_bibliografia',
+                name: 'bibliografia'
+            },
+            {
+                id: 'editor_metodologia',
+                name: 'metodologia'
+            },
+            {
+                id: 'editor_actividades_recuperacion',
+                name: 'actividades_recuperacion'
+            },
+            {
+                id: 'editor_recursos_didacticos',
+                name: 'recursos_didacticos'
+            }
+        ];
+        const quillEditors = {};
 
-    quillFields.forEach(field => {
-        const quill = new Quill('#' + field.id, {
-            theme: 'snow',
-            placeholder: 'Escribe aquí...',
-            modules: { toolbar: [ ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link'], ['clean'] ] }
-        });
-        quillEditors[field.name] = quill;
+        quillFields.forEach(field => {
+            const quill = new Quill('#' + field.id, {
+                theme: 'snow',
+                placeholder: 'Escribe aquí...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{
+                            'list': 'ordered'
+                        }, {
+                            'list': 'bullet'
+                        }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+            quillEditors[field.name] = quill;
 
-        // Sincroniza el contenido con el textarea oculto
-        quill.on('text-change', function() {
-            document.getElementById(field.name).value = quill.root.innerHTML;
-        });
+            // Sincroniza el contenido con el textarea oculto
+            quill.on('text-change', function() {
+                document.getElementById(field.name).value = quill.root.innerHTML;
+            });
 
-        // Autosave al perder foco
-        quill.root.addEventListener('blur', function() {
-            document.getElementById(field.name).dispatchEvent(new Event('blur'));
+            // Autosave al perder foco
+            quill.root.addEventListener('blur', function() {
+                document.getElementById(field.name).dispatchEvent(new Event('blur'));
+            });
         });
-    });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('formUnidad');
+            const btnGuardarSemana = document.getElementById('btnGuardarSemana');
+            if (form && btnGuardarSemana) {
+                form.addEventListener('submit', function() {
+                    btnGuardarSemana.disabled = true;
+                    // Si quieres ocultarlo en vez de deshabilitarlo, usa:
+                    // btnGuardarSemana.style.display = 'none';
+                });
+            }
+        });
     </script>
     <script src="/SysPlanificacion/public/assets/js/crearUnidad.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
