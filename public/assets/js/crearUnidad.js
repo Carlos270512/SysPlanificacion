@@ -52,10 +52,12 @@ class CrearUnidadForm {
     }
 
     handleNuevaSemana() {
-        if (this.unidadId) {
-            window.location.href = `crearSemanaPlanificacion.php?id_unidad=${encodeURIComponent(this.unidadId)}`;
-        }
+    if (this.unidadId) {
+        // Obtén el código de la asignatura del input oculto
+        const codigo = document.querySelector('input[name="asignatura_codigo"]').value;
+        window.location.href = `crearSemanaPlanificacion.php?id_unidad=${encodeURIComponent(this.unidadId)}&codigo=${encodeURIComponent(codigo)}`;
     }
+}
 
     initAutoSave() {
         // Selecciona todos los campos editables

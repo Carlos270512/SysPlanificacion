@@ -52,6 +52,15 @@ switch ($jornada) {
         $modalidad = 'NO DEFINIDA';
         break;
 }
+
+// --- NUEVO: Cargar datos de la unidad si viene id_unidad ---
+$id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : null;
+$unidad = null;
+if ($id_unidad) {
+    $stmtUnidadData = $pdo->prepare("SELECT * FROM unidad WHERE id_unidad = ?");
+    $stmtUnidadData->execute([$id_unidad]);
+    $unidad = $stmtUnidadData->fetch(PDO::FETCH_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -153,45 +162,49 @@ switch ($jornada) {
                 <tr>
                     <td colspan="6" style="text-align:left;">
                         <span class="resaltado">Unidad N°</span>
-                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4" value="<?php echo $siguiente_numero_unidad; ?>">
+                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4"
+                            value="<?php echo $unidad ? htmlspecialchars($unidad['numero_unidad']) : $siguiente_numero_unidad; ?>">
                     </td>
                 </tr>
                 <tr>
                     <td colspan="6">
                         <span class="resaltado">Nombre:</span>
-                        <input type="text" name="nombre" required class="subrayado ms-2" style="min-width:200px;">
+                        <input type="text" name="nombre" required class="subrayado ms-2" style="min-width:200px;"
+                            value="<?php echo $unidad ? htmlspecialchars($unidad['nombre']) : ''; ?>">
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2" style="vertical-align:top;">
                         <div class="resaltado">Objetivo de la unidad:</div>
                         <div id="editor_objetivo_unidad" class="quill-editor"></div>
-                        <textarea name="objetivo_unidad" id="objetivo_unidad" class="d-none"></textarea>
+                        <textarea name="objetivo_unidad" id="objetivo_unidad" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['objetivo_unidad']) : ''; ?></textarea>
                         <div class="resaltado mt-2">Bibliografía:</div>
                         <div id="editor_bibliografia" class="quill-editor"></div>
-                        <textarea name="bibliografia" id="bibliografia" class="d-none"></textarea>
+                        <textarea name="bibliografia" id="bibliografia" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['bibliografia']) : ''; ?></textarea>
                     </td>
                     <td style="vertical-align:top;">
                         <div class="resaltado">Metodologías de<br>evaluación de la unidad:</div>
                         <div id="editor_metodologia" class="quill-editor"></div>
-                        <textarea name="metodologia" id="metodologia" class="d-none"></textarea>
+                        <textarea name="metodologia" id="metodologia" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['metodologia']) : ''; ?></textarea>
                     </td>
                     <td style="vertical-align:top;">
                         <div class="resaltado">Actividades de<br>recuperación de la unidad:</div>
                         <div id="editor_actividades_recuperacion" class="quill-editor"></div>
-                        <textarea name="actividades_recuperacion" id="actividades_recuperacion" class="d-none"></textarea>
+                        <textarea name="actividades_recuperacion" id="actividades_recuperacion" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['actividades_recuperacion']) : ''; ?></textarea>
                     </td>
                     <td colspan="2" style="vertical-align:top;">
                         <div class="resaltado">Equipo/Herramienta/<br>Recursos didácticos de la unidad:</div>
                         <div id="editor_recursos_didacticos" class="quill-editor"></div>
-                        <textarea name="recursos_didacticos" id="recursos_didacticos" class="d-none"></textarea>
+                        <textarea name="recursos_didacticos" id="recursos_didacticos" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['recursos_didacticos']) : ''; ?></textarea>
                     </td>
-                    <input type="hidden" name="id_unidad" id="id_unidad" value="">
+                    <input type="hidden" name="id_unidad" id="id_unidad" value="<?php echo $unidad ? htmlspecialchars($unidad['id_unidad']) : ''; ?>">
                 </tr>
             </table>
             <div class="mt-3 text-end">
-                <button type="submit" id="btnGuardarSemana" class="btn btn-primary">Guardar Semana</button>
-                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" disabled>Nueva semana</button>
+                <button type="submit" id="btnGuardarSemana" class="btn btn-primary" <?php if (isset($_GET['volver']) && $_GET['volver'] == 1) echo ' disabled'; ?>>
+                    Guardar Semana
+                </button>
+                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" <?php echo ($unidad ? '' : 'disabled'); ?>>Nueva semana</button>
             </div>
         </form>
         <!-- Botón Atrás -->
@@ -274,6 +287,12 @@ switch ($jornada) {
             quill.root.addEventListener('blur', function() {
                 document.getElementById(field.name).dispatchEvent(new Event('blur'));
             });
+
+            // --- NUEVO: Cargar datos en Quill si existen valores en los textarea ---
+            const textarea = document.getElementById(field.name);
+            if (textarea && textarea.value) {
+                quill.root.innerHTML = textarea.value;
+            }
         });
     </script>
     <script>
