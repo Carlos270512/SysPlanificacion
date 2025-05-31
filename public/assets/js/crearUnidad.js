@@ -3,8 +3,7 @@ class CrearUnidadForm {
         this.form = document.getElementById(formId);
         this.msgDivId = msgDivId;
         this.btnNuevaSemana = document.getElementById('btnNuevaSemana');
-        this.unidadId = null;
-        this.updateUrl = '/SysPlanificacion/app/Unidad/updateUnidad.php';
+        this.unidadId = document.getElementById('id_unidad')?.value || null;        this.updateUrl = '/SysPlanificacion/app/Unidad/updateUnidad.php';
         if (this.form) {
             this.form.addEventListener('submit', this.handleSubmit.bind(this));
             this.initAutoSave();
