@@ -25,6 +25,12 @@ if (!$asig) {
     exit();
 }
 
+// Calcular el siguiente número de unidad
+$stmtUnidad = $pdo->prepare("SELECT COUNT(*) as total FROM unidad WHERE asignatura_codigo = ?");
+$stmtUnidad->execute([$codigo]);
+$rowUnidad = $stmtUnidad->fetch(PDO::FETCH_ASSOC);
+$siguiente_numero_unidad = intval($rowUnidad['total']) + 1;
+
 // Lógica de modalidad según jornada
 $jornada = strtoupper($asig['jornada']);
 switch ($jornada) {
@@ -147,7 +153,7 @@ switch ($jornada) {
                 <tr>
                     <td colspan="6" style="text-align:left;">
                         <span class="resaltado">Unidad N°</span>
-                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4">
+                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4" value="<?php echo $siguiente_numero_unidad; ?>">
                     </td>
                 </tr>
                 <tr>
