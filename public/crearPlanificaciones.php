@@ -202,7 +202,7 @@ if ($id_unidad) {
             </table>
             <div class="mt-3 text-end">
                 <button type="submit" id="btnGuardarSemana" class="btn btn-primary" <?php if (isset($_GET['volver']) && $_GET['volver'] == 1) echo ' disabled'; ?>>
-                    Guardar Semana
+                    Guardar Unidad
                 </button>
                 <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" <?php echo ($unidad ? '' : 'disabled'); ?>>Nueva semana</button>
             </div>
