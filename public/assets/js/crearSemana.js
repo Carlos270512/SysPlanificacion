@@ -109,17 +109,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await resp.json();
                 if (data.success) {
                     msgDiv.innerHTML = '<div class="alert alert-success">¡Semana guardada correctamente!</div>';
-                    form.reset();
-                    // Limpia encabezados y fechas
-                    dias.forEach(dia => {
-                        const th = document.getElementById('th_' + dia);
-                        if (th) th.textContent = th.dataset.nombre;
-                        let input = document.querySelector('input[name="fecha_' + dia + '"]');
-                        if (input) input.value = '';
-                    });
-                    semanaFin.value = '';
+                    const btnGuardar = document.getElementById('btnGuardarSemana');
+                    const btnPDF = document.getElementById('btnVisualizarPDF');
+                    if (btnGuardar) btnGuardar.disabled = true;
+                    if (btnPDF) btnPDF.disabled = false;
                     // Limpia los editores Quill
-                    Object.values(quill_editors).forEach(editor => editor.setContents([]));
                 } else {
                     msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
                 }
