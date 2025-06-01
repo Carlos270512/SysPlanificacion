@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (btnGuardar) btnGuardar.disabled = true;
                     if (btnPDF) btnPDF.disabled = false;
                     idSemanaGuardada = data.semana_id; // <-- Guardamos el id correcto del backend
+                    window.idSemanaGuardada = idSemanaGuardada; // Para acceso global
                 } else {
                     msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
                 }
@@ -146,4 +147,65 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    // --- AUTO-SAVE Y PINTADO EN VERDE ---
+
+    // Función para pintar de verde temporalmente
+    function pintarVerde(element) {
+        const original = element.style.backgroundColor;
+        element.style.backgroundColor = '#b6fcb6';
+        setTimeout(() => { element.style.backgroundColor = original; }, 1200);
+    }
+
+    // Auto-save para inputs de texto y fecha
+    document.querySelectorAll('input[type="text"], input[type="date"]').forEach(input => {
+        input.addEventListener('blur', async function () {
+            const semanaId = window.idSemanaGuardada || idSemanaGuardada;
+            if (!semanaId) return;
+            let campo = input.name;
+            const valor = input.value;
+            // No guardar campos que no existen en la tabla
+            if (campo === 'semana_inicio' || campo === 'semana_fin' || campo === 'unidad_id') return;
+            // Ajuste para campos de tiempo previas
+            if (campo === 'tiempo_previas') campo = 'tiempo_actividades_previas';
+            // Ajuste para campos de fecha de entrega
+            if (campo.startsWith('entrega_')) {
+                campo = 'fecha_entrega_' + campo.split('_')[1];
+            }
+            const resp = await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    semana_id: semanaId,
+                    campo: campo,
+                    valor: valor
+                })
+            });
+            const data = await resp.json();
+            if (data.success) pintarVerde(input);
+        });
+    });
+
+    // Auto-save para campos Quill
+    Object.keys(quill_editors).forEach(key => {
+        const quill = quill_editors[key];
+        quill.on('selection-change', async function(range, oldRange, source) {
+            if (oldRange && !range) { // blur
+                const semanaId = window.idSemanaGuardada || idSemanaGuardada;
+                if (!semanaId) return;
+                const valor = quill.root.innerHTML;
+                // Ajuste para campos de tiempo previas
+                const campoDB = key === 'tiempo_previas' ? 'tiempo_actividades_previas' : key;
+                const resp = await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        semana_id: semanaId,
+                        campo: campoDB,
+                        valor: valor
+                    })
+                });
+                const data = await resp.json();
+                if (data.success) pintarVerde(quill.root);
+            }
+        });
+    });
 });
