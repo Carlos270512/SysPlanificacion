@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const month = ("0" + (date.getMonth() + 1)).slice(-2);
                 return date.getFullYear() + '-' + month + '-' + day;
             },
-            disableDayFn: function(date) {
+            disableDayFn: function (date) {
                 return date.getDay() !== 1;
             }
         });
@@ -57,16 +57,27 @@ document.addEventListener('DOMContentLoaded', function () {
         [{ 'list': 'ordered' }, { 'list': 'bullet' }]
     ];
 
-    const quill_editors = {};
+    // Inicialización de Quill para todos los campos
+    window.quill_editors = {};
 
     // Campos principales
-    quill_editors['actividades_previas'] = new Quill('#editor_actividades_previas', { 
+    window.quill_editors['actividades_previas'] = new Quill('#editor_actividades_previas', {
         theme: 'snow',
         modules: { toolbar: quillToolbar }
     });
-    quill_editors['contenido'] = new Quill('#editor_contenido', { 
+    window.quill_editors['contenido'] = new Quill('#editor_contenido', {
         theme: 'snow',
         modules: { toolbar: quillToolbar }
+    });
+
+    // Sincronización automática con input hidden
+    window.quill_editors['actividades_previas'].on('text-change', function () {
+        const input = document.querySelector('input[name="actividades_previas"]');
+        if (input) input.value = window.quill_editors['actividades_previas'].root.innerHTML;
+    });
+    window.quill_editors['contenido'].on('text-change', function () {
+        const input = document.querySelector('input[name="contenido"]');
+        if (input) input.value = window.quill_editors['contenido'].root.innerHTML;
     });
 
     // Campos de la tabla (por día y tipo)
@@ -76,9 +87,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = `#editor_${campo}_${dia}`;
             const el = document.querySelector(id);
             if (el) {
-                quill_editors[`${campo}_${dia}`] = new Quill(id, { 
+                window.quill_editors[`${campo}_${dia}`] = new Quill(id, {
                     theme: 'snow',
                     modules: { toolbar: quillToolbar }
+                });
+                // Sincroniza con input hidden
+                window.quill_editors[`${campo}_${dia}`].on('text-change', function () {
+                    const input = document.querySelector(`input[name="${campo}_${dia}"]`);
+                    if (input) input.value = window.quill_editors[`${campo}_${dia}`].root.innerHTML;
                 });
             }
         });
@@ -92,10 +108,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', async function (e) {
             // Copia el contenido de cada Quill al input hidden correspondiente
-            Object.keys(quill_editors).forEach(key => {
+            Object.keys(window.quill_editors).forEach(key => {
                 const input = document.querySelector(`input[name="${key}"]`);
                 if (input) {
-                    input.value = quill_editors[key].root.innerHTML;
+                    input.value = window.quill_editors[key].root.innerHTML;
                 }
             });
 
@@ -140,11 +156,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 body: new URLSearchParams({ semana_id: idSemanaGuardada, unidad_id: idUnidad })
             })
-            .then(response => response.blob())
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                pdfWindow.location.href = url;
-            });
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    pdfWindow.location.href = url;
+                });
         });
     }
 
@@ -172,6 +188,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (campo.startsWith('entrega_')) {
                 campo = 'fecha_entrega_' + campo.split('_')[1];
             }
+            // Ajuste para campos de fecha de los días (si usas fecha_lunes, etc.)
+            if (campo.startsWith('fecha_') && !['fecha_semana', 'fecha_entrega_lunes', 'fecha_entrega_martes', 'fecha_entrega_miercoles', 'fecha_entrega_jueves', 'fecha_entrega_viernes'].includes(campo)) {
+                // Se guarda como fecha_lunes, fecha_martes, etc.
+                campo = campo;
+            }
             const resp = await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
                 method: 'POST',
                 body: new URLSearchParams({
@@ -186,15 +207,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Auto-save para campos Quill
-    Object.keys(quill_editors).forEach(key => {
-        const quill = quill_editors[key];
-        quill.on('selection-change', async function(range, oldRange, source) {
+    Object.keys(window.quill_editors).forEach(key => {
+        const quill = window.quill_editors[key];
+        quill.on('selection-change', async function (range, oldRange, source) {
             if (oldRange && !range) { // blur
                 const semanaId = window.idSemanaGuardada || idSemanaGuardada;
                 if (!semanaId) return;
                 const valor = quill.root.innerHTML;
-                // Ajuste para campos de tiempo previas
-                const campoDB = key === 'tiempo_previas' ? 'tiempo_actividades_previas' : key;
+                // Sincroniza el input hidden
+                const input = document.querySelector(`input[name="${key}"]`);
+                if (input) input.value = valor;
+                let campoDB = key;
+                if (campoDB === 'tiempo_previas') campoDB = 'tiempo_actividades_previas';
                 const resp = await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
                     method: 'POST',
                     body: new URLSearchParams({

@@ -201,10 +201,15 @@ if ($id_unidad) {
                 </tr>
             </table>
             <div class="mt-3 text-end">
-                <button type="submit" id="btnGuardarSemana" class="btn btn-primary" <?php if (isset($_GET['volver']) && $_GET['volver'] == 1) echo ' disabled'; ?>>
-                    Guardar Unidad
+                <?php if (!$unidad): ?>
+                    <button type="submit" id="btnGuardarSemana" class="btn btn-primary">
+                        Guardar Unidad
+                    </button>
+                <?php endif; ?>
+                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" <?php echo ($unidad ? '' : 'disabled'); ?>>
+                    Nueva semana
                 </button>
-                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" <?php echo ($unidad ? '' : 'disabled'); ?>>Nueva semana</button>
+
             </div>
         </form>
         <!-- Botón Atrás -->
@@ -234,6 +239,13 @@ if ($id_unidad) {
 
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        document.getElementById('btnNuevaSemana')?.addEventListener('click', function() {
+            const idUnidad = document.getElementById('id_unidad').value;
+            const codigo = "<?php echo htmlspecialchars($asig['codigo']); ?>";
+            window.location.href = `crearSemanaPlanificacion.php?id_unidad=${idUnidad}&codigo=${codigo}`;
+        });
+    </script>
     <script>
         // Inicializa Quill en los campos requeridos y sincroniza con los textarea ocultos
         const quillFields = [{
@@ -308,6 +320,7 @@ if ($id_unidad) {
             }
         });
     </script>
+
     <script src="/SysPlanificacion/public/assets/js/crearUnidad.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
