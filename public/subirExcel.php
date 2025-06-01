@@ -28,6 +28,7 @@ $hayErrores = isset($_GET['errores']);
 <head>
     <meta charset="UTF-8">
     <title>Subir Excel</title>
+    <link rel="stylesheet" href="assets/css/subirExcelstyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -46,7 +47,7 @@ $hayErrores = isset($_GET['errores']);
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
                 <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
             </div>
-            <button class="btn btn-primary mb-4" type="submit" name="submit">Subir</button>
+            <button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>
         </form>
 
         <!-- Tabla para mostrar los datos subidos -->
