@@ -153,6 +153,7 @@ if ($id_unidad) {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script src="/SysPlanificacion/public/assets/js/pdfBuilder.js"></script>
     <script src="/SysPlanificacion/public/assets/js/crearSemana.js"></script>
 </body>
 

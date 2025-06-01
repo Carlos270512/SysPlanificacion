@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
-    // Barra de herramientas personalizada: B, I, U, lista numerada y viñetas
     const quillToolbar = [
         ['bold', 'italic', 'underline'],
         [{ 'list': 'ordered' }, { 'list': 'bullet' }]
@@ -88,6 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Manejo del formulario por AJAX (original) ---
     const form = document.getElementById('formSemana');
     const msgDiv = document.getElementById('msgSemana');
+    let idSemanaGuardada = null; // Aquí guardamos el id de la semana
+
     if (form) {
         form.addEventListener('submit', async function (e) {
             // Copia el contenido de cada Quill al input hidden correspondiente
@@ -113,13 +114,36 @@ document.addEventListener('DOMContentLoaded', function () {
                     const btnPDF = document.getElementById('btnVisualizarPDF');
                     if (btnGuardar) btnGuardar.disabled = true;
                     if (btnPDF) btnPDF.disabled = false;
-                    // Limpia los editores Quill
+                    idSemanaGuardada = data.semana_id; // <-- Guardamos el id correcto del backend
                 } else {
                     msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
                 }
             } catch (err) {
                 msgDiv.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
             }
+        });
+    }
+
+    // --- Evento para el botón Visualizar PDF ---
+    const btnPDF = document.getElementById('btnVisualizarPDF');
+    if (btnPDF) {
+        btnPDF.addEventListener('click', function () {
+            // Solo enviamos los IDs al backend
+            const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
+            if (!idSemanaGuardada) {
+                alert('Primero debe guardar la semana.');
+                return;
+            }
+            const pdfWindow = window.open('', '_blank');
+            fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
+                method: 'POST',
+                body: new URLSearchParams({ semana_id: idSemanaGuardada, unidad_id: idUnidad })
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                pdfWindow.location.href = url;
+            });
         });
     }
 });
