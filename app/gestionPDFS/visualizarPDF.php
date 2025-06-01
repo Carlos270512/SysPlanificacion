@@ -90,31 +90,27 @@ if ($semana) {
         return $fecha ? date('d-m-Y', strtotime($fecha)) : '';
     }
 
-    $dias = [
-        'lunes' => 'Lunes',
-        'martes' => 'Martes',
-        'miercoles' => 'Miércoles',
-        'jueves' => 'Jueves',
-        'viernes' => 'Viernes'
-    ];
-
     $htmlSemana = "
     <div style='font-size:14px; font-weight:bold; margin-bottom:4px;'>Semana: Del " . fecha_es($semana['fecha_semana']) . "</div>
+    <div style='font-size:12px'>
     <table border='1' cellpadding='4' cellspacing='0' width='100%'>
-        <tr style='background:#f5f5f5; font-weight:bold;'>
+        <tr style='background:#FFF9C4; font-weight:bold;'>
             <td colspan='6'>Actividades previas a la clase</td>
         </tr>
         <tr>
             <td colspan='6'>" . $semana['actividades_previas'] . "</td>
         </tr>
+        <tr style='background:#FFF9C4; font-weight:bold;'>
+            <td colspan='6'>Contenido:</td>
+        </tr>
         <tr>
-            <td colspan='6'><strong>Contenido:</strong> " . $semana['contenido'] . "</td>
+            <td colspan='6'>" . $semana['contenido'] . "</td>
         </tr>
     </table>
     <br>
     <table border='1' cellpadding='4' cellspacing='0' width='100%'>
-        <tr style='background:#B3E5FC; text-align:center; font-weight:bold;'>
-            <td width='16%'> </td>
+        <tr style='background:#FFF9C4; text-align:center; font-weight:bold; font-size:12px;'>
+            <td width='16%'></td>
             <td width='16%'>Lunes</td>
             <td width='16%'>Martes</td>
             <td width='16%'>Miércoles</td>
@@ -162,6 +158,7 @@ if ($semana) {
             <td>" . $semana['trabajo_autonomo_viernes'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_viernes']) . "</small></td>
         </tr>
     </table>
+    </div>
     ";
     $mpdf->WriteHTML($htmlSemana);
 }
