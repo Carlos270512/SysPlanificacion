@@ -82,4 +82,89 @@ $html .= "
 ";
 
 $mpdf->WriteHTML($html);
+// --- NUEVA HOJA: PLANIFICACIÓN SEMANAL ---
+if ($semana) {
+    $mpdf->AddPage();
+
+    function fecha_es($fecha) {
+        return $fecha ? date('d-m-Y', strtotime($fecha)) : '';
+    }
+
+    $dias = [
+        'lunes' => 'Lunes',
+        'martes' => 'Martes',
+        'miercoles' => 'Miércoles',
+        'jueves' => 'Jueves',
+        'viernes' => 'Viernes'
+    ];
+
+    $htmlSemana = "
+    <div style='font-size:14px; font-weight:bold; margin-bottom:4px;'>Semana: Del " . fecha_es($semana['fecha_semana']) . "</div>
+    <table border='1' cellpadding='4' cellspacing='0' width='100%'>
+        <tr style='background:#f5f5f5; font-weight:bold;'>
+            <td colspan='6'>Actividades previas a la clase</td>
+        </tr>
+        <tr>
+            <td colspan='6'>" . $semana['actividades_previas'] . "</td>
+        </tr>
+        <tr>
+            <td colspan='6'><strong>Contenido:</strong> " . $semana['contenido'] . "</td>
+        </tr>
+    </table>
+    <br>
+    <table border='1' cellpadding='4' cellspacing='0' width='100%'>
+        <tr style='background:#B3E5FC; text-align:center; font-weight:bold;'>
+            <td width='16%'> </td>
+            <td width='16%'>Lunes</td>
+            <td width='16%'>Martes</td>
+            <td width='16%'>Miércoles</td>
+            <td width='16%'>Jueves</td>
+            <td width='16%'>Viernes</td>
+        </tr>
+        <tr>
+            <td style='font-weight:bold;'>Objetivo</td>
+            <td>" . $semana['objetivo_lunes'] . "</td>
+            <td>" . $semana['objetivo_martes'] . "</td>
+            <td>" . $semana['objetivo_miercoles'] . "</td>
+            <td>" . $semana['objetivo_jueves'] . "</td>
+            <td>" . $semana['objetivo_viernes'] . "</td>
+        </tr>
+        <tr>
+            <td style='font-weight:bold;'>Apertura</td>
+            <td>" . $semana['apertura_lunes'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_lunes'] . "</small></td>
+            <td>" . $semana['apertura_martes'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_martes'] . "</small></td>
+            <td>" . $semana['apertura_miercoles'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_miercoles'] . "</small></td>
+            <td>" . $semana['apertura_jueves'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_jueves'] . "</small></td>
+            <td>" . $semana['apertura_viernes'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_viernes'] . "</small></td>
+        </tr>
+        <tr>
+            <td style='font-weight:bold;'>Desarrollo</td>
+            <td>" . $semana['desarrollo_lunes'] . "<br><small>Tiempo: " . $semana['tiempo_desarrollo_lunes'] . "</small></td>
+            <td>" . $semana['desarrollo_martes'] . "<br><small>Tiempo: " . $semana['tiempo_desarrollo_martes'] . "</small></td>
+            <td>" . $semana['desarrollo_miercoles'] . "<br><small>Tiempo: " . $semana['tiempo_desarrollo_miercoles'] . "</small></td>
+            <td>" . $semana['desarrollo_jueves'] . "<br><small>Tiempo: " . $semana['tiempo_desarrollo_jueves'] . "</small></td>
+            <td>" . $semana['desarrollo_viernes'] . "<br><small>Tiempo: " . $semana['tiempo_desarrollo_viernes'] . "</small></td>
+        </tr>
+        <tr>
+            <td style='font-weight:bold;'>Cierre</td>
+            <td>" . $semana['cierre_lunes'] . "<br><small>Tiempo: " . $semana['tiempo_cierre_lunes'] . "</small></td>
+            <td>" . $semana['cierre_martes'] . "<br><small>Tiempo: " . $semana['tiempo_cierre_martes'] . "</small></td>
+            <td>" . $semana['cierre_miercoles'] . "<br><small>Tiempo: " . $semana['tiempo_cierre_miercoles'] . "</small></td>
+            <td>" . $semana['cierre_jueves'] . "<br><small>Tiempo: " . $semana['tiempo_cierre_jueves'] . "</small></td>
+            <td>" . $semana['cierre_viernes'] . "<br><small>Tiempo: " . $semana['tiempo_cierre_viernes'] . "</small></td>
+        </tr>
+        <tr>
+            <td style='font-weight:bold;'>Trabajo autónomo</td>
+            <td>" . $semana['trabajo_autonomo_lunes'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_lunes']) . "</small></td>
+            <td>" . $semana['trabajo_autonomo_martes'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_martes']) . "</small></td>
+            <td>" . $semana['trabajo_autonomo_miercoles'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_miercoles']) . "</small></td>
+            <td>" . $semana['trabajo_autonomo_jueves'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_jueves']) . "</small></td>
+            <td>" . $semana['trabajo_autonomo_viernes'] . "<br><small>Fecha entrega: " . fecha_es($semana['fecha_entrega_viernes']) . "</small></td>
+        </tr>
+    </table>
+    ";
+    $mpdf->WriteHTML($htmlSemana);
+}
+
+$mpdf->Output('planificacion.pdf', 'I');
 $mpdf->Output('planificacion.pdf', 'I');
