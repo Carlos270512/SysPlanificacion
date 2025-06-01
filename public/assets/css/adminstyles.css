@@ -35,10 +35,24 @@ html, body {
     border: none;
 }
 
-/* --- NAVBAR HORIZONTAL CUSTOM --- */
+/* --- NAVBAR HORIZONTAL CUSTOM Y COLORES PERSONALIZADOS --- */
+.navbar.bg-dark, .navbar.navbar-dark, .custom-navbar {
+    background-color: rgb(44, 64, 115) !important; /* Azul */
+}
+
+.navbar .navbar-brand,
+.navbar .dropdown-toggle,
+.navbar .nav-link {
+    color: #fff !important;
+}
+.navbar .dropdown-menu {
+    color: #121010 !important;
+}
+
 .custom-navbar {
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     z-index: 10;
+    background-color: rgb(44, 64, 115) !important; /* Azul para el navbar horizontal */
 }
 
 .navbar-nav.flex-row .nav-item {
@@ -49,17 +63,18 @@ html, body {
 .custom-nav-link {
     padding: 10px 22px !important;
     border-radius: 18px !important;
-    transition: background 0.2s, box-shadow 0.2s;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
     font-weight: 500;
-    color: #222 !important;
-    background: #fff;
+    color: #fff !important;
+    background: transparent !important;
     position: relative;
 }
 
-.custom-nav-link:hover, .custom-nav-link:focus, .nav-item.show .custom-nav-link {
-    background: #f1f3f8 !important;
-    box-shadow: 0 4px 18px 0 rgba(80,80,180,0.10);
-    color: #0d6efd !important;
+.custom-nav-link:hover,
+.custom-nav-link:focus,
+.nav-item.show .custom-nav-link {
+    background: #8B5C2A !important; /* Café */
+    color: #fff !important;
 }
 
 .custom-dropdown {
@@ -86,12 +101,15 @@ html, body {
 .custom-dropdown .dropdown-item {
     border-radius: 10px;
     margin: 2px 8px;
-    transition: background 0.18s;
+    transition: background 0.18s, color 0.18s;
+    color: #222;
+    background: transparent;
 }
 
-.custom-dropdown .dropdown-item:hover {
-    background: #e9ecef;
-    color: #0d6efd;
+.custom-dropdown .dropdown-item:hover,
+.custom-dropdown .dropdown-item:focus {
+    background: rgb(248, 220, 130) !important; /* Amarillo */
+    color: #222 !important;
 }
 
 /* Ajuste para el logo si es necesario */
