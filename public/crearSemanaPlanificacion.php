@@ -180,8 +180,8 @@ if ($id_unidad) {
             const data = await resp.json();
             if (data.success && data.semana) {
                 const semana = data.semana;
-                // Carga los campos simples
                 if (semana.fecha_semana) document.querySelector('input[name="semana_inicio"]').value = semana.fecha_semana;
+                if (semana.semana_fin) document.querySelector('input[name="semana_fin"]').value = semana.semana_fin; // <-- Agrega esta línea
                 if (semana.tiempo_actividades_previas) document.querySelector('input[name="tiempo_previas"]').value = semana.tiempo_actividades_previas;
 
                 waitForQuillEditors(() => {
@@ -220,8 +220,8 @@ if ($id_unidad) {
                     if (semana[`fecha_entrega_${dia}`]) document.querySelector(`input[name="entrega_${dia}"]`).value = semana[`fecha_entrega_${dia}`] || '';
                 });
                 // Deshabilita el botón guardar si ya existe
-const btnGuardar = document.getElementById('btnGuardarSemana');
-if (btnGuardar) btnGuardar.style.display = 'none';
+                const btnGuardar = document.getElementById('btnGuardarSemana');
+                if (btnGuardar) btnGuardar.style.display = 'none';
                 document.getElementById('btnVisualizarPDF').disabled = false;
                 // Guarda el id de la semana para auto-save
                 window.idSemanaGuardada = semana.id_semana;
