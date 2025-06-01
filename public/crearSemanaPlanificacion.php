@@ -85,7 +85,9 @@ if ($id_unidad) {
             ];
             foreach ($dias as $dia_key => $dia_nombre): ?>
             <tr>
-                <td class="center resaltado"><?php echo $dia_nombre; ?></td>
+                <td class="center resaltado" id="th_<?php echo $dia_key; ?>" data-nombre="<?php echo $dia_nombre; ?>">
+                    <?php echo $dia_nombre; ?>
+                </td>
                 <td><textarea name="objetivo_<?php echo $dia_key; ?>"></textarea></td>
                 <td><input type="text" name="tiempo_objetivo_<?php echo $dia_key; ?>" style="width:60px;"></td>
                 <td><textarea name="apertura_<?php echo $dia_key; ?>"></textarea></td>
