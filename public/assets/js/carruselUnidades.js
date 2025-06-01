@@ -70,14 +70,15 @@ function mostrarUnidades(unidades) {
     }
 
     // Evento para el botón Ver/Editar
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.btnVerEditarUnidad')) {
-            const btn = e.target.closest('.btnVerEditarUnidad');
-            const idUnidad = btn.getAttribute('data-id');
-            const codigo = btn.getAttribute('data-codigo');
-            window.location.href = `crearPlanificaciones.php?codigo=${encodeURIComponent(codigo)}&id_unidad=${encodeURIComponent(idUnidad)}`;
-        }
-    });
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.btnVerEditarUnidad')) {
+        const btn = e.target.closest('.btnVerEditarUnidad');
+        const idUnidad = btn.getAttribute('data-id');
+        // Tomar el código de la asignatura seleccionado actualmente
+        const codigo = select.value;
+        window.location.href = `crearPlanificaciones.php?codigo=${encodeURIComponent(codigo)}&id_unidad=${encodeURIComponent(idUnidad)}`;
+    }
+});
 
     // Flechas de desplazamiento
     flechaIzquierda.addEventListener('click', function () {
