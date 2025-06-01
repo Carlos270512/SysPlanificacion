@@ -4,25 +4,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const unidadesCarousel = document.getElementById('unidadesCarousel');
     const flechaIzquierda = document.getElementById('flechaIzquierda');
     const flechaDerecha = document.getElementById('flechaDerecha');
+    const buscadorContainer = document.getElementById('buscadorUnidadesContainer');
+    const buscador = document.getElementById('buscadorUnidades');
+    let unidadesOriginales = [];
 
     async function cargarUnidades(codigoAsignatura) {
         unidadesCarousel.innerHTML = '';
         carruselContainer.style.display = 'none';
+        buscadorContainer.style.display = 'none';
+        unidadesOriginales = [];
 
         if (!codigoAsignatura) return;
 
         const resp = await fetch(`/SysPlanificacion/app/Unidad/get_unidades.php?asignatura_codigo=${encodeURIComponent(codigoAsignatura)}`);
         if (!resp.ok) return;
         const unidades = await resp.json();
+        unidadesOriginales = unidades;
 
-        if (!unidades.length) {
-            unidadesCarousel.innerHTML = `<div class="alert alert-info m-3">No hay unidades registradas.</div>`;
-            carruselContainer.style.display = 'block';
-            flechaIzquierda.style.display = 'none';
-            flechaDerecha.style.display = 'none';
-            return;
-        }
+        mostrarUnidades(unidadesOriginales);
 
+        buscador.value = '';
+        buscadorContainer.style.display = 'block';
+    }
+
+function mostrarUnidades(unidades) {
+    unidadesCarousel.innerHTML = '';
+    if (!unidades.length) {
+        unidadesCarousel.innerHTML = `
+            <div class="d-flex justify-content-center align-items-center" style="height:180px; width:100%;">
+                <div class="alert alert-info text-center w-100 m-0">
+                    No hay unidades registradas.
+                </div>
+            </div>
+        `;
+        carruselContainer.style.display = 'block';
+        flechaIzquierda.style.display = 'none';
+        flechaDerecha.style.display = 'none';
+        return;
+    }
         unidades.forEach((unidad) => {
             const card = document.createElement('div');
             card.className = 'card unidad-card text-center shadow-sm';
@@ -30,16 +49,24 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="card-body d-flex flex-column justify-content-between">
                 <h6 class="card-title mb-2 nombre-unidad">Unidad ${unidad.numero_unidad}</h6>
                 <div class="mb-2 nombre-unidad">${unidad.nombre}</div>
-                <button class="btn btn-ver-editar mt-auto btnVerEditarUnidad" data-id="${unidad.id_unidad}" data-codigo="${codigoAsignatura}">
+                <button class="btn btn-ver-editar mt-auto btnVerEditarUnidad" data-id="${unidad.id_unidad}" data-codigo="${unidad.asignatura_codigo || ''}">
                     <i class="bi bi-pencil-square"></i> Ver/Editar
                 </button>
             </div>
             `;
             unidadesCarousel.appendChild(card);
         });
-
         carruselContainer.style.display = 'block';
         actualizarFlechas();
+    }
+
+    // Buscador de unidades
+    if (buscador) {
+        buscador.addEventListener('input', function () {
+            const texto = this.value.trim().toLowerCase();
+            const filtradas = unidadesOriginales.filter(u => u.nombre.toLowerCase().includes(texto));
+            mostrarUnidades(filtradas);
+        });
     }
 
     // Evento para el botón Ver/Editar

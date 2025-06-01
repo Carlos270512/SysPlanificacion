@@ -59,6 +59,9 @@ if ($docente) {
         <br>
 <!-- Carrusel de unidades con flechas -->
 <h2 class="mb-4">Unidades de la Asignatura</h2>
+<div class="mb-3" id="buscadorUnidadesContainer" style="display:none;">
+    <input type="text" id="buscadorUnidades" class="form-control form-control-sm" style="max-width: 300px; display: inline-block;" placeholder="Buscar unidad por nombre...">
+</div>
 <div id="carruselUnidadesContainer" style="display:none; position:relative;">
     <button id="flechaIzquierda" class="btn btn-light shadow-sm flecha-carrusel" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:2;display:none;">
         <i class="bi bi-chevron-left"></i>
