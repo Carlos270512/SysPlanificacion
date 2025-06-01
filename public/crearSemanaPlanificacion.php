@@ -17,6 +17,7 @@ if ($id_unidad) {
     <title>Crear Semana Planificación</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+    <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css">
     <style>
         .tabla-semana th, .tabla-semana td { border: 1px solid #000; padding: 4px; }
         .tabla-semana { border-collapse: collapse; width: 100%; }
@@ -24,6 +25,7 @@ if ($id_unidad) {
         textarea { width: 100%; min-height: 40px; }
         input[type="text"], input[type="date"] { width: 100%; }
         .center { text-align: center; }
+        .quill-editor { min-height: 60px; background: #fff; }
     </style>
 </head>
 <body>
@@ -45,13 +47,15 @@ if ($id_unidad) {
         </div>
         <div class="mb-2">
             <label class="resaltado">Actividades previas a la clase:</label>
-            <textarea name="actividades_previas" required></textarea>
+            <div id="editor_actividades_previas" class="quill-editor"></div>
+            <input type="hidden" name="actividades_previas" required>
             <label class="ms-2">Tiempo:</label>
             <input type="text" name="tiempo_previas" style="width:80px;" placeholder="min">
         </div>
         <div class="mb-2">
             <label class="resaltado">Contenido:</label>
-            <textarea name="contenido" required></textarea>
+            <div id="editor_contenido" class="quill-editor"></div>
+            <input type="hidden" name="contenido" required>
         </div>
         <table class="tabla-semana">
             <tr>
@@ -83,20 +87,28 @@ if ($id_unidad) {
                 'jueves' => 'Jueves',
                 'viernes' => 'Viernes'
             ];
+            $campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
             foreach ($dias as $dia_key => $dia_nombre): ?>
             <tr>
                 <td class="center resaltado" id="th_<?php echo $dia_key; ?>" data-nombre="<?php echo $dia_nombre; ?>">
                     <?php echo $dia_nombre; ?>
                 </td>
-                <td><textarea name="objetivo_<?php echo $dia_key; ?>"></textarea></td>
-                <td><input type="text" name="tiempo_objetivo_<?php echo $dia_key; ?>" style="width:60px;"></td>
-                <td><textarea name="apertura_<?php echo $dia_key; ?>"></textarea></td>
-                <td><input type="text" name="tiempo_apertura_<?php echo $dia_key; ?>" style="width:60px;"></td>
-                <td><textarea name="desarrollo_<?php echo $dia_key; ?>"></textarea></td>
-                <td><input type="text" name="tiempo_desarrollo_<?php echo $dia_key; ?>" style="width:60px;"></td>
-                <td><textarea name="cierre_<?php echo $dia_key; ?>"></textarea></td>
-                <td><input type="text" name="tiempo_cierre_<?php echo $dia_key; ?>" style="width:60px;"></td>
-                <td><textarea name="trabajo_autonomo_<?php echo $dia_key; ?>"></textarea></td>
+                <?php foreach ($campos as $campo): ?>
+                    <?php if ($campo === 'trabajo_autonomo'): ?>
+                        <td>
+                            <div id="editor_<?php echo $campo . '_' . $dia_key; ?>" class="quill-editor"></div>
+                            <input type="hidden" name="<?php echo $campo . '_' . $dia_key; ?>">
+                        </td>
+                    <?php else: ?>
+                        <td>
+                            <div id="editor_<?php echo $campo . '_' . $dia_key; ?>" class="quill-editor"></div>
+                            <input type="hidden" name="<?php echo $campo . '_' . $dia_key; ?>">
+                        </td>
+                        <td>
+                            <input type="text" name="tiempo_<?php echo $campo . '_' . $dia_key; ?>" style="width:60px;">
+                        </td>
+                    <?php endif; ?>
+                <?php endforeach; ?>
                 <td><input type="date" name="entrega_<?php echo $dia_key; ?>"></td>
             </tr>
             <?php endforeach; ?>
@@ -110,6 +122,7 @@ if ($id_unidad) {
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script src="/SysPlanificacion/public/assets/js/crearSemana.js"></script>
 </body>
 </html>
