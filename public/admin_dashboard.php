@@ -17,35 +17,13 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark w-100">
+    <nav class="navbar navbar-dark bg-dark w-100 navbar-expand-lg">
         <div class="container-fluid d-flex justify-content-between">
             <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center ms-auto">
                 <img src="assets/img/logotvn.png" alt="Logo" style="height: 40px; max-width: 100%; object-fit: contain;" class="me-2">
                 <span>Panel Administrador</span>
             </a>
-            <div class="dropdown">
-                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user-circle me-2"></i>
-                    <span class="text-warning fw-bold"><?php echo $_SESSION['usuario']['rol']; ?></span>, <?php echo $_SESSION['usuario']['nombre']; ?>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li class="px-3 py-2">
-                        <strong><?php echo $_SESSION['usuario']['nombre']; ?></strong><br>
-                        <small class="text-muted"><?php echo $_SESSION['usuario']['correo']; ?></small>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Menú horizontal con dropdowns flotantes -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom custom-navbar">
-        <div class="container-fluid">
-            <ul class="navbar-nav mx-auto flex-row">
+            <ul class="navbar-nav flex-row align-items-center mx-auto">
                 <li class="nav-item dropdown mx-2">
                     <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-cog me-2"></i>Usuarios
@@ -72,13 +50,29 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                     </ul>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i>Acerca del Sistema</a>
+                    <a class="nav-link custom-nav-link" href="#" title="Acerca del Sistema"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
             </ul>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <span class="text-warning fw-bold"><?php echo $_SESSION['usuario']['rol']; ?></span>, <?php echo $_SESSION['usuario']['nombre']; ?>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li class="px-3 py-2">
+                        <strong><?php echo $_SESSION['usuario']['nombre']; ?></strong><br>
+                        <small class="text-muted"><?php echo $_SESSION['usuario']['correo']; ?></small>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div id="content" style="height:calc(100vh - 112px);">
+    <div id="content" style="height:calc(100vh - 72px);">
         <iframe id="mainFrame" name="mainFrame" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
