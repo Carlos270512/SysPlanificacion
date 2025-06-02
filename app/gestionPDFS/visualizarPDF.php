@@ -59,7 +59,7 @@ $html = "
 
 // --- Tabla de detalles de la unidad ---
 $html .= "
-<table border='1' cellpadding='6' cellspacing='0' width='100%'>
+<table border='1' cellpadding='6' cellspacing='0' width='100%' style='font-size:10px;' >
     <tr style='background:#FFF9C4; text-align:center; font-weight:bold;'>
         <td width='25%'><strong>Objetivo de la unidad:</strong></td>
         <td width='25%'><strong>Metodologías de evaluación de la unidad:</strong></td>
@@ -93,7 +93,7 @@ if ($semana) {
     $htmlSemana = "
     <div style='font-size:14px; font-weight:bold; margin-bottom:4px;'>Semana: Del " . fecha_es($semana['fecha_semana']) . "</div>
     <div style='font-size:12px'>
-    <table border='1' cellpadding='4' cellspacing='0' width='100%'>
+    <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:9px;'>
         <tr style='background:#FFF9C4; font-weight:bold;'>
             <td colspan='6'>Actividades previas a la clase</td>
         </tr>
@@ -108,7 +108,7 @@ if ($semana) {
         </tr>
     </table>
     <br>
-    <table border='1' cellpadding='4' cellspacing='0' width='100%'>
+    <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:9px;'> 
         <tr style='background:#FFF9C4; text-align:center; font-weight:bold; font-size:12px;'>
             <td width='16%'></td>
             <td width='16%'>Lunes</td>
