@@ -12,9 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Validar que el campo sea permitido (evita SQL Injection)
     $campos_permitidos = [
-        // Lista todos los campos de la tabla semana que pueden ser actualizados
+        'semana_fin', // <-- Asegúrate de incluirlo aquí
         'actividades_previas', 'tiempo_actividades_previas', 'contenido',
         'objetivo_lunes', 'tiempo_objetivo_lunes', 'apertura_lunes', 'tiempo_apertura_lunes', 'desarrollo_lunes', 'tiempo_desarrollo_lunes', 'cierre_lunes', 'tiempo_cierre_lunes', 'trabajo_autonomo_lunes', 'fecha_entrega_lunes',
         'objetivo_martes', 'tiempo_objetivo_martes', 'apertura_martes', 'tiempo_apertura_martes', 'desarrollo_martes', 'tiempo_desarrollo_martes', 'cierre_martes', 'tiempo_cierre_martes', 'trabajo_autonomo_martes', 'fecha_entrega_martes',

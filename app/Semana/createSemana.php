@@ -12,8 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
 
         $id_unidad = $_POST['unidad_id'] ?? null;
-        // $semana_numero solo es informativo, no se guarda
-        $fecha_semana = nullIfEmpty($_POST['semana_inicio'] ?? null); // ahora se llama semana_inicio
+        $fecha_semana = nullIfEmpty($_POST['semana_inicio'] ?? null);
+        $semana_fin = nullIfEmpty($_POST['semana_fin'] ?? null);
+
         $actividades_previas = $_POST['actividades_previas'] ?? null;
         $tiempo_previas = $_POST['tiempo_previas'] ?? null;
         $contenido = $_POST['contenido'] ?? null;
@@ -38,14 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $pdo->prepare("
             INSERT INTO semana (
-                id_unidad, fecha_semana, actividades_previas, tiempo_actividades_previas, contenido,
+                id_unidad, fecha_semana, semana_fin, actividades_previas, tiempo_actividades_previas, contenido,
                 fecha_lunes, objetivo_lunes, tiempo_objetivo_lunes, apertura_lunes, tiempo_apertura_lunes, desarrollo_lunes, tiempo_desarrollo_lunes, cierre_lunes, tiempo_cierre_lunes, trabajo_autonomo_lunes, fecha_entrega_lunes,
                 fecha_martes, objetivo_martes, tiempo_objetivo_martes, apertura_martes, tiempo_apertura_martes, desarrollo_martes, tiempo_desarrollo_martes, cierre_martes, tiempo_cierre_martes, trabajo_autonomo_martes, fecha_entrega_martes,
                 fecha_miercoles, objetivo_miercoles, tiempo_objetivo_miercoles, apertura_miercoles, tiempo_apertura_miercoles, desarrollo_miercoles, tiempo_desarrollo_miercoles, cierre_miercoles, tiempo_cierre_miercoles, trabajo_autonomo_miercoles, fecha_entrega_miercoles,
                 fecha_jueves, objetivo_jueves, tiempo_objetivo_jueves, apertura_jueves, tiempo_apertura_jueves, desarrollo_jueves, tiempo_desarrollo_jueves, cierre_jueves, tiempo_cierre_jueves, trabajo_autonomo_jueves, fecha_entrega_jueves,
                 fecha_viernes, objetivo_viernes, tiempo_objetivo_viernes, apertura_viernes, tiempo_apertura_viernes, desarrollo_viernes, tiempo_desarrollo_viernes, cierre_viernes, tiempo_cierre_viernes, trabajo_autonomo_viernes, fecha_entrega_viernes
             ) VALUES (
-                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
@@ -57,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $params = [
             $id_unidad,
             $fecha_semana,
+            $semana_fin,
             $actividades_previas,
             $tiempo_previas,
             $contenido,
@@ -129,7 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->execute($params);
 
-        // Obtener el ID de la semana recién insertada
         $semana_id = $pdo->lastInsertId();
 
         $pdo->commit();

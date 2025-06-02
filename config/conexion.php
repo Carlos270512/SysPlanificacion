@@ -4,8 +4,8 @@
 $host = 'localhost';           // O la IP de tu servidor de base de datos
 $dbname = 'sisplanificacion';  // Nombre de la base de datos
 $username = 'root';            // Tu usuario de MySQL (ajústalo según tu configuración)
-$password = '';                // Tu contraseña de MySQL (ajústalo según tu configuración)
-
+$password = 'root';                // Tu contraseña de MySQL (ajústalo según tu configuración)
+     
 // Crear conexión con la base de datos
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

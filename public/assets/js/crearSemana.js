@@ -27,6 +27,18 @@ document.addEventListener('DOMContentLoaded', function () {
             viernes.setDate(fecha.getDate() + 4);
             semanaFin.value = viernes.toISOString().slice(0, 10);
 
+            // Guarda automáticamente semana_fin si ya existe una semana guardada
+            const semanaId = window.idSemanaGuardada || idSemanaGuardada;
+            if (semanaId) {
+                fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        semana_id: semanaId,
+                        campo: 'semana_fin',
+                        valor: semanaFin.value
+                    })
+                });
+            }
             dias.forEach((diaNombre, idx) => {
                 const th = document.getElementById('th_' + diaNombre);
                 if (th) {
@@ -142,27 +154,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Evento para el botón Visualizar PDF ---
-    const btnPDF = document.getElementById('btnVisualizarPDF');
-    if (btnPDF) {
-        btnPDF.addEventListener('click', function () {
-            // Solo enviamos los IDs al backend
-            const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
-            if (!idSemanaGuardada) {
-                alert('Primero debe guardar la semana.');
-                return;
-            }
-            const pdfWindow = window.open('', '_blank');
-            fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
-                method: 'POST',
-                body: new URLSearchParams({ semana_id: idSemanaGuardada, unidad_id: idUnidad })
-            })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    pdfWindow.location.href = url;
-                });
-        });
-    }
+const btnPDF = document.getElementById('btnVisualizarPDF');
+if (btnPDF) {
+    btnPDF.addEventListener('click', function () {
+        // Solo enviamos los IDs al backend
+        const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
+        const semanaId = window.idSemanaGuardada; // <-- usa siempre el global
+        if (!semanaId) {
+            alert('Primero debe guardar la semana.');
+            return;
+        }
+        const pdfWindow = window.open('', '_blank');
+        fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
+            method: 'POST',
+            body: new URLSearchParams({ semana_id: semanaId, unidad_id: idUnidad })
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                pdfWindow.location.href = url;
+            });
+    });
+}
 
     // --- AUTO-SAVE Y PINTADO EN VERDE ---
 
@@ -181,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let campo = input.name;
             const valor = input.value;
             // No guardar campos que no existen en la tabla
-            if (campo === 'semana_inicio' || campo === 'semana_fin' || campo === 'unidad_id') return;
+            if (campo === 'semana_inicio' || campo === 'unidad_id') return; // Elimina 'semana_fin' de aquí
             // Ajuste para campos de tiempo previas
             if (campo === 'tiempo_previas') campo = 'tiempo_actividades_previas';
             // Ajuste para campos de fecha de entrega

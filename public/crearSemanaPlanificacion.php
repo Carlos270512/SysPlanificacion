@@ -70,9 +70,9 @@ if ($id_unidad) {
             <input type="hidden" name="unidad_id" value="<?php echo htmlspecialchars($id_unidad); ?>">
             <div class="mb-2">
                 <label class="resaltado">Semana: </label>
-                <input type="date" name="semana_inicio" required>
-                <span class="ms-2">al</span>
-                <input type="date" name="semana_fin" disabled>
+<input type="date" name="semana_inicio" required>
+<span class="ms-2">al</span>
+<input type="date" name="semana_fin" readonly>
             </div>
             <div class="mb-2">
                 <label class="resaltado">Actividades previas a la clase:</label>
