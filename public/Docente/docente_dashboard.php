@@ -19,12 +19,29 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark w-100">
+    <nav class="navbar navbar-dark bg-dark w-100 navbar-expand-lg">
         <div class="container-fluid d-flex justify-content-between">
             <a href="docente_dashboard.php" class="navbar-brand d-flex align-items-center">
-                <img src="../assets/img/logo.png" alt="Logo" height="40" class="me-2">
+                <img src="../assets/img/logotvn.png" alt="Logo" height="40" class="me-2">
                 <span>Panel Docente</span>
             </a>
+            <ul class="navbar-nav flex-row align-items-center mx-auto">
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="planificacionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-cog me-2"></i>Planificación
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionDropdown">
+                        <li><a class="dropdown-item" href="../generarPlanificacion.php" target="mainFrame">Generar Planificación</a></li>
+                        <li><a class="dropdown-item" href="../planificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Generar Reportes</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i>Acerca del Sistema</a>
+                </li>
+            </ul>
             <div class="dropdown">
                 <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user-circle me-2"></i>
@@ -44,19 +61,10 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
         </div>
     </nav>
 
-    <div class="d-flex">
-        <div id="sidebar">
-            <a href="../generarPlanificacion.php" target="mainFrame"><i class="fas fa-user-cog me-2"></i> Generar Planificacion</a>
-            <a href="../planificaciones.php" target="mainFrame"><i class="fas fa-book me-2"></i> Gestión de Planificaciones</a>
-            <a href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i> Generar Reportes</a>
-            <a href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i> Acerca del Sistema</a>
-        </div>
-        <div id="content">
-            <iframe id="mainFrame" name="mainFrame" src="../generarPlanificacion.php" frameborder="0"></iframe>
-        </div>
+    <div id="content" style="height:calc(100vh - 72px);">
+        <iframe id="mainFrame" name="mainFrame" src="../generarPlanificacion.php" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
