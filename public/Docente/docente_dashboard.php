@@ -14,7 +14,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Docente</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../assets/css/adminstyles.css">
+    <link rel="stylesheet" href="../assets/css/docenteStyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
