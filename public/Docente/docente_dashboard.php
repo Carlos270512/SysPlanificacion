@@ -35,7 +35,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
                         <strong><?php echo $_SESSION['usuario']['nombre']; ?></strong><br>
                         <small class="text-muted"><?php echo $_SESSION['usuario']['correo']; ?></small>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li><a class="dropdown-item text-danger" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                 </ul>
             </div>
@@ -44,13 +46,13 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
 
     <div class="d-flex">
         <div id="sidebar">
-            <a href="generarPlanificacion.php" target="mainFrame"><i class="fas fa-user-cog me-2"></i> Generar Planificacion</a>   
+            <a href="../generarPlanificacion.php" target="mainFrame"><i class="fas fa-user-cog me-2"></i> Generar Planificacion</a>
             <a href="../planificaciones.php" target="mainFrame"><i class="fas fa-book me-2"></i> Gestión de Planificaciones</a>
             <a href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i> Generar Reportes</a>
             <a href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i> Acerca del Sistema</a>
         </div>
         <div id="content">
-            <iframe id="mainFrame" name="mainFrame" src="" frameborder="0"></iframe>
+            <iframe id="mainFrame" name="mainFrame" src="../generarPlanificacion.php" frameborder="0"></iframe>
         </div>
     </div>
 

@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header('Location: coordinador_dashboard.php');
                     break;
                 case 'DOCENTE':
-                    header('Location: docente_dashboard.php');
+                    header('Location: Docente/docente_dashboard.php');
                     break;
                 default:
                     session_destroy();
