@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const params = new URLSearchParams(window.location.search);
     const idUnidad = params.get('id_unidad');
     if (!idUnidad) return;
@@ -28,9 +28,66 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('semana_fin').value = semana.semana_fin;
         }
         if (semana.tiempo_actividades_previas) document.querySelector('input[name="tiempo_previas"]').value = semana.tiempo_actividades_previas;
+        // Función para actualizar el color de los tabs según el estado de los campos
+        function actualizarColoresTabsDias() {
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+            const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
 
+            dias.forEach(dia => {
+                let llenos = 0;
+                let vacios = 0;
+                campos.forEach(campo => {
+                    const input = document.querySelector(`input[name="${campo}_${dia}"]`);
+                    // Si usas Quill, revisa el contenido del editor también
+                    let valor = '';
+                    if (window.quill_editors && window.quill_editors[`${campo}_${dia}`]) {
+                        valor = window.quill_editors[`${campo}_${dia}`].getText().trim();
+                    } else if (input) {
+                        valor = input.value.trim();
+                    }
+                    if (valor.length > 0) {
+                        llenos++;
+                    } else {
+                        vacios++;
+                    }
+                });
+
+                // Selecciona el botón del tab
+                const tabBtn = document.getElementById(`tab-${dia}`);
+                if (tabBtn) {
+                    tabBtn.classList.remove('text-success', 'text-warning', 'text-danger');
+                    if (llenos === campos.length) {
+                        tabBtn.classList.add('text-success');
+                    } else if (llenos === 0) {
+                        tabBtn.classList.add('text-danger');
+                    } else {
+                        tabBtn.classList.add('text-warning');
+                    }
+                }
+            });
+        }
+
+        // Llama a la función después de cargar los datos y cada vez que se edite un campo
+        function agregarListenersDias() {
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+            const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+            dias.forEach(dia => {
+                campos.forEach(campo => {
+                    // Si usas Quill, escucha el evento 'text-change'
+                    if (window.quill_editors && window.quill_editors[`${campo}_${dia}`]) {
+                        window.quill_editors[`${campo}_${dia}`].on('text-change', actualizarColoresTabsDias);
+                    }
+                    // También escucha cambios en los inputs hidden por si acaso
+                    const input = document.querySelector(`input[name="${campo}_${dia}"]`);
+                    if (input) {
+                        input.addEventListener('input', actualizarColoresTabsDias);
+                    }
+                });
+            });
+        }
         waitForQuillEditors(() => {
-            // Carga y sincroniza los campos Quill y sus inputs hidden
+            // ...código para cargar datos en los editores...
+            // Sincroniza los campos Quill y sus inputs hidden
             if (semana.actividades_previas) {
                 window.quill_editors['actividades_previas'].root.innerHTML = semana.actividades_previas;
                 const input = document.querySelector('input[name="actividades_previas"]');
@@ -53,6 +110,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                     }
                 });
             });
+
+            // <--- AGREGA ESTAS DOS LÍNEAS AL FINAL DEL CALLBACK --->
+            agregarListenersDias();
+            actualizarColoresTabsDias();
         });
 
         // Carga los campos de tiempo y fecha de entrega
