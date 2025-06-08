@@ -118,7 +118,7 @@ tablaSemanas.addEventListener('click', async function (e) {
                 document.getElementById('id_semana').value = semana.id_semana;
                 // Habilitar botones
                 document.getElementById('btnGuardarSemana').disabled = false;
-                document.getElementById('btnGuardarSemana').style.display = '';
+                document.getElementById('btnGuardarSemana').style.display = 'none';
                 document.getElementById('btnVisualizarPDF').disabled = false;
             }
         } catch (e) {
