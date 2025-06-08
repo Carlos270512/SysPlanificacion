@@ -33,6 +33,18 @@ if ($id_unidad) {
         <?php endif; ?>
         <div id="msgSemana"></div>
 
+        <!-- TABLA DE SEMANAS Y BOTÓN NUEVA SEMANA -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Semanas de esta unidad</h5>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btnNuevaSemana">
+                    + Nueva semana
+                </button>
+            </div>
+            <div id="tablaSemanasUnidad"></div>
+        </div>
+        <!-- FIN TABLA DE SEMANAS -->
+
         <!-- INICIO ACORDEÓN -->
         <div class="accordion" id="acordeonPlanificacion">
             <div class="accordion-item">
@@ -46,6 +58,7 @@ if ($id_unidad) {
                         <!-- FORMULARIO ORIGINAL -->
                         <form id="formSemana" method="post" action="/SysPlanificacion/app/Semana/createSemana.php">
                             <input type="hidden" name="unidad_id" value="<?php echo htmlspecialchars($id_unidad); ?>">
+                            <input type="hidden" name="id_semana" id="id_semana" value="">
                             <div class="card shadow-sm mb-4">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
@@ -180,7 +193,8 @@ if ($id_unidad) {
     <script src="/SysPlanificacion/public/assets/js/pdfBuilder.js"></script>
     <script src="/SysPlanificacion/public/assets/js/crearSemana.js"></script>
     <script src="/SysPlanificacion/public/assets/js/crearSemanaPlanificacion.js"></script>
-    <script src="/SysPlanificacion/public/assets/js/crearSemanaPlanificacion.js"></script>
+    <!-- Nuevo JS para gestión de semanas -->
+    <script src="/SysPlanificacion/public/assets/js/gestionSemanasUnidad.js"></script>
 </body>
 
 </html>
