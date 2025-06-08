@@ -105,31 +105,47 @@ document.addEventListener('DOMContentLoaded', function () {
         // 4. Botón "Eliminar" (opcional)
         if (e.target.classList.contains('btn-eliminar-semana')) {
             const idSemana = e.target.getAttribute('data-id');
-            if (confirm('¿Seguro que deseas eliminar esta semana?')) {
-                try {
-                    const resp = await fetch(`/SysPlanificacion/app/Semana/eliminarSemana.php?id_semana=${idSemana}`, { method: 'POST' });
-                    const data = await resp.json();
-                    if (data.success) {
-                        cargarSemanas();
-                        // Si la semana eliminada era la que estaba en el formulario, limpia el formulario
-                        if (window.idSemanaGuardada == idSemana) {
-                            formSemana.reset();
-                            if (window.quill_editors) {
-                                Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
-                            }
-                            window.idSemanaGuardada = null;
-                            document.getElementById('id_semana').value = '';
-                            document.getElementById('btnGuardarSemana').disabled = false;
-                            document.getElementById('btnGuardarSemana').style.display = '';
-                            document.getElementById('btnVisualizarPDF').disabled = true;
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará la semana seleccionada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const resp = await fetch('/SysPlanificacion/app/Semana/eliminarSemana.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'id_semana=' + encodeURIComponent(idSemana)
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            Swal.fire(
+                                '¡Eliminado!',
+                                'La semana ha sido eliminada correctamente.',
+                                'success'
+                            );
+                            cargarSemanas();
+                        } else {
+                            Swal.fire(
+                                'Error',
+                                'No se pudo eliminar la semana.',
+                                'error'
+                            );
                         }
-                    } else {
-                        alert('No se pudo eliminar la semana');
+                    } catch (e) {
+                        Swal.fire(
+                            'Error',
+                            'Error al eliminar la semana.',
+                            'error'
+                        );
                     }
-                } catch (e) {
-                    alert('Error al eliminar la semana');
                 }
-            }
+            });
         }
     });
 

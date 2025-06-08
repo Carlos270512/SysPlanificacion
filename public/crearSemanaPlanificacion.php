@@ -194,6 +194,7 @@ if ($id_unidad) {
     <script src="/SysPlanificacion/public/assets/js/crearSemana.js"></script>
     <script src="/SysPlanificacion/public/assets/js/crearSemanaPlanificacion.js"></script>
     <!-- Nuevo JS para gestión de semanas -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/SysPlanificacion/public/assets/js/gestionSemanasUnidad.js"></script>
 </body>
 
