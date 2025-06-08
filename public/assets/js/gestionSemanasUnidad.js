@@ -65,43 +65,66 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 3. Botón "Editar"
-    tablaSemanas.addEventListener('click', async function (e) {
-        if (e.target.classList.contains('btn-editar-semana')) {
-            const idSemana = e.target.getAttribute('data-id');
-            try {
-                const resp = await fetch(`/SysPlanificacion/app/Semana/getSemanaById.php?id_semana=${idSemana}`);
-                const data = await resp.json();
-                if (data.success && data.semana) {
-                    // Llenar el formulario con los datos de la semana seleccionada
-                    const semana = data.semana;
-                    document.getElementById('semana_inicio').value = semana.fecha_semana || '';
-                    document.getElementById('semana_fin').value = semana.semana_fin || '';
-                    document.querySelector('input[name="tiempo_previas"]').value = semana.tiempo_actividades_previas || '';
-                    // Llenar campos Quill y otros campos según tu lógica
-                    if (window.quill_editors) {
-                        if (semana.actividades_previas && window.quill_editors['editor_actividades_previas']) {
-                            window.quill_editors['editor_actividades_previas'].setContents(window.quill_editors['editor_actividades_previas'].clipboard.convert(semana.actividades_previas));
-                        }
-                        if (semana.contenido && window.quill_editors['editor_contenido']) {
-                            window.quill_editors['editor_contenido'].setContents(window.quill_editors['editor_contenido'].clipboard.convert(semana.contenido));
-                        }
-                        // Repite para los campos de cada día si es necesario
-                    }
-                    // Llenar campos de días (objetivo, apertura, etc.) si tu backend los devuelve
-                    // ...
-                    // Guardar el id de la semana para autoguardado
-                    window.idSemanaGuardada = semana.id_semana;
-                    // Poner el id en el campo oculto
-                    document.getElementById('id_semana').value = semana.id_semana;
-                    // Habilitar botones
-                    document.getElementById('btnGuardarSemana').disabled = false;
-                    document.getElementById('btnGuardarSemana').style.display = '';
-                    document.getElementById('btnVisualizarPDF').disabled = false;
+tablaSemanas.addEventListener('click', async function (e) {
+    if (e.target.classList.contains('btn-editar-semana')) {
+        const idSemana = e.target.getAttribute('data-id');
+        try {
+            const resp = await fetch(`/SysPlanificacion/app/Semana/getSemanaById.php?id_semana=${idSemana}`);
+            const data = await resp.json();
+            if (data.success && data.semana) {
+                const semana = data.semana;
+                // Fechas principales
+                document.getElementById('semana_inicio').value = semana.fecha_semana || '';
+                document.getElementById('semana_fin').value = semana.semana_fin || '';
+                document.querySelector('input[name="tiempo_previas"]').value = semana.tiempo_actividades_previas || '';
+                // Actividades previas
+                if (window.quill_editors && window.quill_editors['actividades_previas']) {
+                    window.quill_editors['actividades_previas'].root.innerHTML = semana.actividades_previas || '';
                 }
-            } catch (e) {
-                alert('Error al cargar la semana seleccionada');
+                document.querySelector('input[name="actividades_previas"]').value = semana.actividades_previas || '';
+                // Contenido
+                if (window.quill_editors && window.quill_editors['contenido']) {
+                    window.quill_editors['contenido'].root.innerHTML = semana.contenido || '';
+                }
+                document.querySelector('input[name="contenido"]').value = semana.contenido || '';
+
+                // Campos de cada día
+                const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+                const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+                dias.forEach(dia => {
+                    campos.forEach(campo => {
+                        const key = `${campo}_${dia}`;
+                        if (window.quill_editors && window.quill_editors[key]) {
+                            window.quill_editors[key].root.innerHTML = semana[key] || '';
+                        }
+                        const input = document.querySelector(`input[name="${key}"]`);
+                        if (input) input.value = semana[key] || '';
+                    });
+                    // Tiempos y fecha de entrega
+                    if (document.querySelector(`input[name="tiempo_objetivo_${dia}"]`))
+                        document.querySelector(`input[name="tiempo_objetivo_${dia}"]`).value = semana[`tiempo_objetivo_${dia}`] || '';
+                    if (document.querySelector(`input[name="tiempo_apertura_${dia}"]`))
+                        document.querySelector(`input[name="tiempo_apertura_${dia}"]`).value = semana[`tiempo_apertura_${dia}`] || '';
+                    if (document.querySelector(`input[name="tiempo_desarrollo_${dia}"]`))
+                        document.querySelector(`input[name="tiempo_desarrollo_${dia}"]`).value = semana[`tiempo_desarrollo_${dia}`] || '';
+                    if (document.querySelector(`input[name="tiempo_cierre_${dia}"]`))
+                        document.querySelector(`input[name="tiempo_cierre_${dia}"]`).value = semana[`tiempo_cierre_${dia}`] || '';
+                    if (document.querySelector(`input[name="entrega_${dia}"]`))
+                        document.querySelector(`input[name="entrega_${dia}"]`).value = semana[`fecha_entrega_${dia}`] || '';
+                });
+
+                // Guardar el id de la semana para autoguardado
+                window.idSemanaGuardada = semana.id_semana;
+                document.getElementById('id_semana').value = semana.id_semana;
+                // Habilitar botones
+                document.getElementById('btnGuardarSemana').disabled = false;
+                document.getElementById('btnGuardarSemana').style.display = '';
+                document.getElementById('btnVisualizarPDF').disabled = false;
             }
+        } catch (e) {
+            alert('Error al cargar la semana seleccionada');
         }
+    }
         // 4. Botón "Eliminar" (opcional)
         if (e.target.classList.contains('btn-eliminar-semana')) {
             const idSemana = e.target.getAttribute('data-id');
@@ -151,4 +174,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inicializar tabla al cargar
     if (idUnidad) cargarSemanas();
+    if (formSemana) {
+    formSemana.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const formData = new FormData(formSemana);
+        try {
+            const resp = await fetch(formSemana.action, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await resp.json();
+            if (data.success) {
+                Swal.fire('Guardado', 'Semana guardada correctamente.', 'success');
+                // Limpia el formulario si es necesario
+                // formSemana.reset();
+                // Recarga la tabla de semanas automáticamente
+                cargarSemanas();
+                // Opcional: deshabilita el botón guardar si solo se permite una semana activa
+                document.getElementById('btnGuardarSemana').disabled = true;
+                document.getElementById('btnGuardarSemana').style.display = 'none';
+                document.getElementById('btnVisualizarPDF').disabled = false;
+            } else {
+                Swal.fire('Error', data.message || 'No se pudo guardar la semana.', 'error');
+            }
+        } catch (e) {
+            Swal.fire('Error', 'Error al guardar la semana.', 'error');
+        }
+    });
+}
 });
