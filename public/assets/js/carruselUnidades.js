@@ -27,21 +27,21 @@ document.addEventListener('DOMContentLoaded', function () {
         buscadorContainer.style.display = 'block';
     }
 
-function mostrarUnidades(unidades) {
-    unidadesCarousel.innerHTML = '';
-    if (!unidades.length) {
-        unidadesCarousel.innerHTML = `
+    function mostrarUnidades(unidades) {
+        unidadesCarousel.innerHTML = '';
+        if (!unidades.length) {
+            unidadesCarousel.innerHTML = `
             <div class="d-flex justify-content-center align-items-center" style="height:180px; width:100%;">
                 <div class="alert alert-info text-center w-100 m-0">
                     No hay unidades registradas.
                 </div>
             </div>
         `;
-        carruselContainer.style.display = 'block';
-        flechaIzquierda.style.display = 'none';
-        flechaDerecha.style.display = 'none';
-        return;
-    }
+            carruselContainer.style.display = 'block';
+            flechaIzquierda.style.display = 'none';
+            flechaDerecha.style.display = 'none';
+            return;
+        }
         unidades.forEach((unidad) => {
             const card = document.createElement('div');
             card.className = 'card unidad-card text-center shadow-sm';
@@ -70,15 +70,15 @@ function mostrarUnidades(unidades) {
     }
 
     // Evento para el botón Ver/Editar
-document.addEventListener('click', function (e) {
-    if (e.target.closest('.btnVerEditarUnidad')) {
-        const btn = e.target.closest('.btnVerEditarUnidad');
-        const idUnidad = btn.getAttribute('data-id');
-        // Tomar el código de la asignatura seleccionado actualmente
-        const codigo = select.value;
-        window.location.href = `crearPlanificaciones.php?codigo=${encodeURIComponent(codigo)}&id_unidad=${encodeURIComponent(idUnidad)}`;
-    }
-});
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.btnVerEditarUnidad')) {
+            const btn = e.target.closest('.btnVerEditarUnidad');
+            const idUnidad = btn.getAttribute('data-id');
+            // Tomar el código de la asignatura seleccionado actualmente
+            const codigo = select.value;
+            window.location.href = `crearPlanificaciones.php?codigo=${encodeURIComponent(codigo)}&id_unidad=${encodeURIComponent(idUnidad)}`;
+        }
+    });
 
     // Flechas de desplazamiento
     flechaIzquierda.addEventListener('click', function () {
@@ -92,10 +92,10 @@ document.addEventListener('click', function (e) {
 
     // Mostrar/ocultar flechas según scroll
     function actualizarFlechas() {
-        const scrollLeft = unidadesCarousel.scrollLeft;
-        const maxScrollLeft = unidadesCarousel.scrollWidth - unidadesCarousel.clientWidth;
-        flechaIzquierda.style.display = scrollLeft > 10 ? 'block' : 'none';
-        flechaDerecha.style.display = scrollLeft < maxScrollLeft - 10 ? 'block' : 'none';
+        const scrollLeft = Math.round(unidadesCarousel.scrollLeft);
+        const maxScrollLeft = Math.round(unidadesCarousel.scrollWidth - unidadesCarousel.clientWidth);
+        flechaIzquierda.style.display = scrollLeft > 5 ? 'block' : 'none';
+        flechaDerecha.style.display = scrollLeft < maxScrollLeft - 5 ? 'block' : 'none';
     }
     unidadesCarousel.addEventListener('scroll', actualizarFlechas);
 

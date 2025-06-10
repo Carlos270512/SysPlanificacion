@@ -31,11 +31,18 @@
   display: flex;
   flex-direction: row;
   gap: 18px;
-  overflow: hidden;         /* <-- Oculta el scroll horizontal */
+  overflow-x: auto;      /* Permite el scroll horizontal */
+  overflow-y: hidden;
   padding: 12px 0 16px 0;
   margin-bottom: 10px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE y Edge */
 }
-
+#unidadesCarousel::-webkit-scrollbar,
+.unidades-carousel::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari y Opera */
+}
 .unidad-card {
   min-width: 210px;
   max-width: 220px;
@@ -98,4 +105,10 @@
   background: #6B3F13;
   border-color: #6B3F13;
   color: #fff;
+}
+#carruselUnidadesContainer {
+  position: relative;
+}
+.flecha-carrusel {
+  z-index: 10;
 }
