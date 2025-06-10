@@ -18,3 +18,25 @@
 .table tbody tr:hover {
   background-color: #fff9e1 !important; /* Amarillo suave al pasar el mouse */
 }
+.modal-content .modal-header {
+  background: #2C4073 !important;
+  background-color: #2C4073 !important;
+  color: #fff !important;
+  border-bottom: 1px solid #6b421e !important;
+}
+
+.modal-content .modal-title,
+.modal-content .modal-header .modal-title {
+  color: #fff !important;
+}
+
+/* Más específico para el footer del modal */
+.modal-content .modal-footer {
+  background-color: #f5e9da !important;
+  border-top: 1px solid #e0c9a6 !important;
+}
+
+/* Botón cerrar blanco */
+.modal-content .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}

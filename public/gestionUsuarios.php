@@ -27,8 +27,8 @@ $hayErrores = isset($_GET['errores']);
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Usuarios (Docentes)</title>
-        <link rel="stylesheet" href="assets/css/gestionUsuariosSytles.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/gestionUsuariosSytles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -49,7 +49,71 @@ $hayErrores = isset($_GET['errores']);
                 <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
             </div>
             <button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>
+            <button type="button" class="btn btn-success mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#registrarDocenteModal">
+                Registrar
+            </button>
         </form>
+
+        <!-- Modal Registrar Docente -->
+        <div class="modal fade" id="registrarDocenteModal" tabindex="-1" aria-labelledby="registrarDocenteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form class="modal-content" action="../app/registrarDocenteManual.php" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="registrarDocenteModalLabel">Registrar Docente</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label for="codigo" class="form-label">Código</label>
+                                    <input type="text" class="form-control" name="codigo" id="codigo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="carrera" class="form-label">Carrera</label>
+                                    <input type="text" class="form-control" name="carrera" id="carrera" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" name="nombre" id="nombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="titulo" class="form-label">Título</label>
+                                    <input type="text" class="form-control" name="titulo" id="titulo" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha_ingreso" class="form-label">Fecha de Ingreso</label>
+                                    <input type="date" class="form-control" name="fecha_ingreso" id="fecha_ingreso" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="rol" class="form-label">Rol</label>
+                                    <select class="form-control" name="rol" id="rol" required>
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="DOCENTE">DOCENTE</option>
+                                        <option value="COORDINADOR">COORDINADOR</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="correo" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" name="correo" id="correo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Contraseña</label>
+                                    <input type="password" class="form-control" name="password" id="password" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-cafe">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="mb-3">
             <a href="gestionUsuarios.php?estado=ACTIVO" class="btn btn-outline-success btn-sm <?= (!isset($_GET['estado']) || $_GET['estado'] === 'ACTIVO') ? 'active' : '' ?>">Mostrar Activos</a>
             <a href="gestionUsuarios.php?estado=INACTIVO" class="btn btn-outline-secondary btn-sm <?= (isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO') ? 'active' : '' ?>">Mostrar Inactivos</a>
