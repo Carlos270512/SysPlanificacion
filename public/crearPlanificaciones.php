@@ -70,62 +70,7 @@ if ($id_unidad) {
     <title>Planificación de Clase</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-    <style>
-        .tabla-planificacion td,
-        .tabla-planificacion th {
-            border: 1px solid #000;
-            padding: 4px 8px;
-        }
-
-        .tabla-planificacion th {
-            background: #ffff99;
-            color: #000;
-        }
-
-        .tabla-planificacion {
-            width: 90%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-
-        .resaltado {
-            background: #ffff99;
-            font-weight: bold;
-        }
-
-        .subrayado {
-            border-bottom: 2px solid #888;
-            display: inline-block;
-            min-width: 80px;
-        }
-
-        .is-valid {
-            border: 2px solid #28a745 !important;
-            background-color: #eaffea !important;
-        }
-
-        .is-invalid {
-            border: 2px solid #dc3545 !important;
-            background-color: #ffeaea !important;
-        }
-
-        .quill-editor {
-            background: #fff;
-            min-height: 100px;
-            border-radius: 0.375rem;
-            margin-bottom: 8px;
-        }
-
-        .quill-valid {
-            border: 2px solid #28a745 !important;
-            background-color: #eaffea !important;
-        }
-
-        .quill-invalid {
-            border: 2px solid #dc3545 !important;
-            background-color: #ffeaea !important;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/crearPlanificacionestyle.css">
 </head>
 
 <body>
@@ -200,22 +145,24 @@ if ($id_unidad) {
                     <input type="hidden" name="id_unidad" id="id_unidad" value="<?php echo $unidad ? htmlspecialchars($unidad['id_unidad']) : ''; ?>">
                 </tr>
             </table>
-            <div class="mt-3 text-end">
-                <?php if (!$unidad): ?>
-                    <button type="submit" id="btnGuardarSemana" class="btn btn-primary">
-                        Guardar Unidad
-                    </button>
-                <?php endif; ?>
-                <button type="button" id="btnNuevaSemana" class="btn btn-success ms-2" <?php echo ($unidad ? '' : 'disabled'); ?>>
-                    Nueva semana
+            <div class="mt-3 d-flex justify-content-between align-items-center">
+                <!-- Botón Atrás alineado a la izquierda pero con margen a la derecha -->
+                <button type="button" class="btn btn-secondary btn-atras-custom" data-bs-toggle="modal" data-bs-target="#modalConfirmarAtras">
+                    &larr; Atrás
                 </button>
-
+                <div>
+                    <?php if (!$unidad): ?>
+                        <button type="submit" id="btnGuardarSemana" class="btn btn-primary">
+                            Guardar Unidad
+                        </button>
+                    <?php endif; ?>
+                    <button type="button" id="btnNuevaSemana" class="btn  ms-2 btn-nueva-semana-custom" <?php echo ($unidad ? '' : 'disabled'); ?>>
+                        Nueva semana
+                    </button>
+                </div>
             </div>
         </form>
-        <!-- Botón Atrás -->
-        <button type="button" class="btn btn-secondary mt-4" data-bs-toggle="modal" data-bs-target="#modalConfirmarAtras">
-            &larr; Atrás
-        </button>
+
     </div>
 
     <!-- Modal de confirmación -->
