@@ -35,14 +35,13 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/Administrador/toast.js"></script>
 </head>
 
 <body>
     <div class="container-fluid mt-5">
         <h2 class="mb-4">Importar Usuarios desde Excel</h2>
-
-        <?php echo $mensaje; ?>
-
         <form action="../app/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
@@ -237,6 +236,62 @@ $hayErrores = isset($_GET['errores']);
             });
         });
     </script>
+    
+        <?php if (!empty($mensaje)): ?>
+        <?php
+        // Determina los valores para el toast
+        $toastType = '';
+        $toastTitle = '';
+        $toastIconColor = '';
+        $toastPopupClass = '';
+        $toastTimer = 4000;
+
+        if (isset($_GET['exito'])) {
+            $toastType = 'success';
+            $toastTitle = 'Usuarios cargados correctamente desde Excel.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-success text-white';
+            $toastTimer = 4000;
+        } elseif (isset($_GET['error'])) {
+            $toastType = 'error';
+            $toastTitle = 'Hubo un error al procesar el archivo.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-danger text-white';
+            $toastTimer = 5000;
+        } elseif (isset($_GET['error_encabezados'])) {
+            $toastType = 'warning';
+            $toastTitle = 'Los encabezados del archivo no son válidos.';
+            $toastIconColor = '#664d03';
+            $toastPopupClass = 'bg-warning text-dark';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['error_subida'])) {
+            $toastType = 'error';
+            $toastTitle = 'Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-danger text-white';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['error_formato'])) {
+            $toastType = 'warning';
+            $toastTitle = 'El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.';
+            $toastIconColor = '#664d03';
+            $toastPopupClass = 'bg-warning text-dark';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['archivo_subido'])) {
+            $toastType = 'info';
+            $toastTitle = 'Ya se subió este archivo anteriormente. Por favor, selecciona un archivo diferente.';
+            $toastIconColor = '#055160';
+            $toastPopupClass = 'bg-info text-dark';
+            $toastTimer = 5000;
+        }
+        ?>
+        <script>
+            window.toastType = "<?= $toastType ?>";
+            window.toastTitle = "<?= $toastTitle ?>";
+            window.toastIconColor = "<?= $toastIconColor ?>";
+            window.toastPopupClass = "<?= $toastPopupClass ?>";
+            window.toastTimer = <?= $toastTimer ?>;
+        </script>
+        <?php endif; ?>
 </body>
 
 </html>
