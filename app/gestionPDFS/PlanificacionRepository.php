@@ -40,4 +40,11 @@ class PlanificacionRepository
         $stmt->execute([$asignatura_codigo]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getSemanasPorUnidad($unidad_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM semana WHERE id_unidad = ? ORDER BY fecha_semana ASC");
+        $stmt->execute([$unidad_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
