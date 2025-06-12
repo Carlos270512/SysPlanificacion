@@ -190,12 +190,11 @@ if ($id_unidad) {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-    <script src="/SysPlanificacion/public/assets/js/pdfBuilder.js"></script>
-    <script src="/SysPlanificacion/public/assets/js/crearSemana.js"></script>
-    <script src="/SysPlanificacion/public/assets/js/crearSemanaPlanificacion.js"></script>
+    <script src="/SysPlanificacion/public/assets/js/Semana/crearSemana.js"></script>
+    <script src="/SysPlanificacion/public/assets/js/Semana/crearSemanaPlanificacion.js"></script>
     <!-- Nuevo JS para gestión de semanas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/SysPlanificacion/public/assets/js/gestionSemanasUnidad.js"></script>
+    <script src="/SysPlanificacion/public/assets/js/Semana/gestionSemanasUnidad.js"></script>
 </body>
 
 </html>
