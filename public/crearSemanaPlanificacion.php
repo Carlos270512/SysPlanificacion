@@ -173,8 +173,7 @@ if ($id_unidad) {
                                 </div>
                             </div>
                             <div class="mt-3 text-end">
-                                <button type="submit" class="btn btn-primary" id="btnGuardarSemana">Guardar Semana</button>
-                                <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
+                                <button type="submit" class="btn btn-primary" id="btnGuardarSemana" style="display:none;">Guardar Semana</button> <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
                                 <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?>" class="btn btn-secondary ms-2">
                                     &larr; Atrás
                                 </a>
