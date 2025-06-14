@@ -1,24 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // --- Lógica de fechas y encabezados (original) ---
+    // --- Lógica de fechas y encabezados (sin Pikaday) ---
     const semanaInicio = document.querySelector('input[name="semana_inicio"]');
     const semanaFin = document.querySelector('input[name="semana_fin"]');
     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
     if (semanaInicio) {
-        const picker = new Pikaday({
-            field: semanaInicio,
-            format: 'YYYY-MM-DD',
-            toString(date) {
-                const day = ("0" + date.getDate()).slice(-2);
-                const month = ("0" + (date.getMonth() + 1)).slice(-2);
-                return date.getFullYear() + '-' + month + '-' + day;
-            },
-            disableDayFn: function (date) {
-                return date.getDay() !== 1;
-            }
-        });
-
-        semanaInicio.addEventListener('change', function () {
+        semanaInicio.addEventListener('change', async function () {
             if (!semanaInicio.value) return;
             const [anio, mes, dia] = semanaInicio.value.split('-').map(Number);
             const fecha = new Date(anio, mes - 1, dia);
@@ -154,28 +141,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Evento para el botón Visualizar PDF ---
-const btnPDF = document.getElementById('btnVisualizarPDF');
-if (btnPDF) {
-    btnPDF.addEventListener('click', function () {
-        // Solo enviamos los IDs al backend
-        const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
-        const semanaId = window.idSemanaGuardada; // <-- usa siempre el global
-        if (!semanaId) {
-            alert('Primero debe guardar la semana.');
-            return;
-        }
-        const pdfWindow = window.open('', '_blank');
-        fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
-            method: 'POST',
-            body: new URLSearchParams({ semana_id: semanaId, unidad_id: idUnidad })
-        })
-            .then(response => response.blob())
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                pdfWindow.location.href = url;
-            });
-    });
-}
+    const btnPDF = document.getElementById('btnVisualizarPDF');
+    if (btnPDF) {
+        btnPDF.addEventListener('click', function () {
+            // Solo enviamos los IDs al backend
+            const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
+            const semanaId = window.idSemanaGuardada; // <-- usa siempre el global
+            if (!semanaId) {
+                alert('Primero debe guardar la semana.');
+                return;
+            }
+            const pdfWindow = window.open('', '_blank');
+            fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
+                method: 'POST',
+                body: new URLSearchParams({ semana_id: semanaId, unidad_id: idUnidad })
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    pdfWindow.location.href = url;
+                });
+        });
+    }
 
     // --- AUTO-SAVE Y PINTADO EN VERDE ---
 
@@ -194,7 +181,8 @@ if (btnPDF) {
             let campo = input.name;
             const valor = input.value;
             // No guardar campos que no existen en la tabla
-            if (campo === 'semana_inicio' || campo === 'unidad_id') return; // Elimina 'semana_fin' de aquí
+            if (campo === 'unidad_id') return;
+            if (campo === 'semana_inicio') campo = 'fecha_semana';
             // Ajuste para campos de tiempo previas
             if (campo === 'tiempo_previas') campo = 'tiempo_actividades_previas';
             // Ajuste para campos de fecha de entrega
@@ -203,7 +191,6 @@ if (btnPDF) {
             }
             // Ajuste para campos de fecha de los días (si usas fecha_lunes, etc.)
             if (campo.startsWith('fecha_') && !['fecha_semana', 'fecha_entrega_lunes', 'fecha_entrega_martes', 'fecha_entrega_miercoles', 'fecha_entrega_jueves', 'fecha_entrega_viernes'].includes(campo)) {
-                // Se guarda como fecha_lunes, fecha_martes, etc.
                 campo = campo;
             }
             const resp = await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
