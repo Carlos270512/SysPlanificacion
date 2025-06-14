@@ -4,6 +4,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const semanaFin = document.querySelector('input[name="semana_fin"]');
     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
+    // --- Auto-save para semana_inicio y semana_fin ---
+    if (semanaInicio) {
+        semanaInicio.addEventListener('blur', async function () {
+            const semanaId = window.idSemanaGuardada || document.getElementById('id_semana')?.value;
+            if (!semanaId) return;
+            await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    semana_id: semanaId,
+                    campo: 'fecha_semana',
+                    valor: semanaInicio.value
+                })
+            });
+        });
+    }
+    if (semanaFin) {
+        semanaFin.addEventListener('blur', async function () {
+            const semanaId = window.idSemanaGuardada || document.getElementById('id_semana')?.value;
+            if (!semanaId) return;
+            await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    semana_id: semanaId,
+                    campo: 'semana_fin',
+                    valor: semanaFin.value
+                })
+            });
+        });
+    }
     if (semanaInicio) {
         semanaInicio.addEventListener('change', async function () {
             if (!semanaInicio.value) return;
