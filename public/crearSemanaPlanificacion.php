@@ -66,7 +66,7 @@ if ($id_unidad) {
                                         <span class="fw-semibold fs-5 me-2">Del</span>
                                         <input type="date" name="semana_inicio" id="semana_inicio" class="form-control form-control-sm w-auto me-2" required>
                                         <span class="fw-semibold fs-5 me-2">al</span>
-                                        <input type="date" name="semana_fin" id="semana_fin" class="form-control form-control-sm w-auto" readonly>
+                                        <input type="date" name="semana_fin" id="semana_fin" class="form-control form-control-sm w-auto" required>
                                     </div>
                                     <div class="mb-2">
                                         <label class="fw-bold fs-6 mb-1" style="background: #f8f9fa; padding: 4px 8px; border-radius: 4px;">

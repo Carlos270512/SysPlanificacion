@@ -33,51 +33,51 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-    if (semanaInicio) {
-        semanaInicio.addEventListener('change', async function () {
-            if (!semanaInicio.value) return;
-            const [anio, mes, dia] = semanaInicio.value.split('-').map(Number);
-            const fecha = new Date(anio, mes - 1, dia);
-
-            const viernes = new Date(fecha);
-            viernes.setDate(fecha.getDate() + 4);
-            semanaFin.value = viernes.toISOString().slice(0, 10);
-
-            // Guarda automáticamente semana_fin si ya existe una semana guardada
-            const semanaId = window.idSemanaGuardada || idSemanaGuardada;
-            if (semanaId) {
-                fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
-                    method: 'POST',
-                    body: new URLSearchParams({
-                        semana_id: semanaId,
-                        campo: 'semana_fin',
-                        valor: semanaFin.value
-                    })
-                });
-            }
-            dias.forEach((diaNombre, idx) => {
-                const th = document.getElementById('th_' + diaNombre);
-                if (th) {
-                    const d = new Date(fecha);
-                    d.setDate(fecha.getDate() + idx);
-                    const diaNum = ("0" + d.getDate()).slice(-2);
-                    const mesNum = ("0" + (d.getMonth() + 1)).slice(-2);
-                    const anio = d.getFullYear();
-                    th.textContent = th.dataset.nombre + ' - ' + diaNum + '/' + mesNum + '/' + anio;
-                }
-                let input = document.querySelector('input[name="fecha_' + diaNombre + '"]');
-                if (!input) {
-                    input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'fecha_' + diaNombre;
-                    semanaInicio.form.appendChild(input);
-                }
-                const d = new Date(fecha);
-                d.setDate(fecha.getDate() + idx);
-                input.value = d.toISOString().slice(0, 10);
-            });
-        });
-    }
+    //if (semanaInicio) {
+    //    semanaInicio.addEventListener('change', async function () {
+    //        if (!semanaInicio.value) return;
+    //        const [anio, mes, dia] = semanaInicio.value.split('-').map(Number);
+    //        const fecha = new Date(anio, mes - 1, dia);
+//
+    //        const viernes = new Date(fecha);
+    //        viernes.setDate(fecha.getDate() + 4);
+    //        semanaFin.value = viernes.toISOString().slice(0, 10);
+//
+    //        // Guarda automáticamente semana_fin si ya existe una semana guardada
+    //        const semanaId = window.idSemanaGuardada || idSemanaGuardada;
+    //        if (semanaId) {
+    //            fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+    //                method: 'POST',
+    //                body: new URLSearchParams({
+    //                    semana_id: semanaId,
+    //                    campo: 'semana_fin',
+    //                    valor: semanaFin.value
+    //                })
+    //            });
+    //        }
+    //        dias.forEach((diaNombre, idx) => {
+    //            const th = document.getElementById('th_' + diaNombre);
+    //            if (th) {
+    //                const d = new Date(fecha);
+    //                d.setDate(fecha.getDate() + idx);
+    //                const diaNum = ("0" + d.getDate()).slice(-2);
+    //                const mesNum = ("0" + (d.getMonth() + 1)).slice(-2);
+    //                const anio = d.getFullYear();
+    //                th.textContent = th.dataset.nombre + ' - ' + diaNum + '/' + mesNum + '/' + anio;
+    //            }
+    //            let input = document.querySelector('input[name="fecha_' + diaNombre + '"]');
+    //            if (!input) {
+    //                input = document.createElement('input');
+    //                input.type = 'hidden';
+    //                input.name = 'fecha_' + diaNombre;
+    //                semanaInicio.form.appendChild(input);
+    //            }
+    //            const d = new Date(fecha);
+    //            d.setDate(fecha.getDate() + idx);
+    //            input.value = d.toISOString().slice(0, 10);
+    //        });
+    //    });
+    //}
 
     // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
     const quillToolbar = [

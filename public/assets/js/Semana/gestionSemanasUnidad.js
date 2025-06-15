@@ -6,41 +6,41 @@ document.addEventListener('DOMContentLoaded', function () {
     const formSemana = document.getElementById('formSemana');
 
     // --- NUEVO: función para sumar días y calcular fecha de fin ---
-    function sumarDias(fechaStr, dias) {
-        const fecha = new Date(fechaStr);
-        fecha.setDate(fecha.getDate() + dias);
-        return fecha.toISOString().slice(0, 10);
-    }
+    //function sumarDias(fechaStr, dias) {
+    //    const fecha = new Date(fechaStr);
+    //    fecha.setDate(fecha.getDate() + dias);
+    //    return fecha.toISOString().slice(0, 10);
+    //}
 
     // --- NUEVO: evento para calcular semana_fin automáticamente ---
-    const inputSemanaInicio = document.getElementById('semana_inicio');
-    const inputSemanaFin = document.getElementById('semana_fin');
-
-    if (inputSemanaInicio && inputSemanaFin) {
-        inputSemanaInicio.addEventListener('change', async function () {
-            // Calcula automáticamente la fecha de fin
-            if (inputSemanaInicio.value) {
-                inputSemanaFin.value = sumarDias(inputSemanaInicio.value, 4);
-            } else {
-                inputSemanaFin.value = '';
-            }
-
-            // Guarda automáticamente la fecha de inicio si hay una semana cargada
-            if (window.idSemanaGuardada && inputSemanaInicio.value) {
-                try {
-                    await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'semana_id=' + encodeURIComponent(window.idSemanaGuardada) +
-                            '&campo=fecha_semana' +
-                            '&valor=' + encodeURIComponent(inputSemanaInicio.value)
-                    });
-                } catch (e) {
-                    // Manejo de error opcional
-                }
-            }
-        });
-    }
+    //const inputSemanaInicio = document.getElementById('semana_inicio');
+    //const inputSemanaFin = document.getElementById('semana_fin');
+    //
+    //if (inputSemanaInicio && inputSemanaFin) {
+    //    inputSemanaInicio.addEventListener('change', async function () {
+    //        // Calcula automáticamente la fecha de fin
+    //        if (inputSemanaInicio.value) {
+    //            inputSemanaFin.value = sumarDias(inputSemanaInicio.value, 4);
+    //        } else {
+    //            inputSemanaFin.value = '';
+    //        }
+    //
+    //        // Guarda automáticamente la fecha de inicio si hay una semana cargada
+    //        if (window.idSemanaGuardada && inputSemanaInicio.value) {
+    //            try {
+    //                await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+    //                    method: 'POST',
+    //                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //                    body: 'semana_id=' + encodeURIComponent(window.idSemanaGuardada) +
+    //                        '&campo=fecha_semana' +
+    //                        '&valor=' + encodeURIComponent(inputSemanaInicio.value)
+    //                });
+    //            } catch (e) {
+    //                // Manejo de error opcional
+    //            }
+    //        }
+    //    });
+    //}
     // 1. Cargar semanas de la unidad
     async function cargarSemanas() {
         tablaSemanas.innerHTML = '<div class="text-center">Cargando...</div>';
@@ -80,22 +80,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 2. Botón "Nueva semana"
-    // ...existing code...
     btnNuevaSemana.addEventListener('click', function () {
         Swal.fire({
             title: '¿Crear nueva semana?',
             html: `
             <div style="margin-top:10px;">
                 <label style="font-size:15px;">Fecha de inicio:</label>
-                <input type="date" id="swal_fecha_semana" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+                <input type="date" id="swal_fecha_semana_inicio" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+                <label style="font-size:15px;">Fecha de fin:</label>
+                <input type="date" id="swal_fecha_semana_fin" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
             </div>
         `,
             preConfirm: () => {
-                const fecha = document.getElementById('swal_fecha_semana').value;
-                if (!fecha) {
-                    Swal.showValidationMessage('Debes ingresar la fecha de inicio');
+                const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
+                const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
+                if (!fechaInicio || !fechaFin) {
+                    Swal.showValidationMessage('Debes ingresar ambas fechas');
                 }
-                return fecha;
+                return { fechaInicio, fechaFin };
             },
             showCancelButton: true,
             confirmButtonText: 'Sí, crear',
@@ -117,31 +119,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('btnGuardarSemana').style.display = 'none';
                 document.getElementById('btnVisualizarPDF').disabled = true;
 
-                // Crear semana vacía en la base de datos con fecha de inicio
+                // Crear semana vacía en la base de datos con ambas fechas
                 try {
                     const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'unidad_id=' + encodeURIComponent(idUnidad) + '&semana_inicio=' + encodeURIComponent(result.value)
+                        body: 'unidad_id=' + encodeURIComponent(idUnidad) +
+                            '&semana_inicio=' + encodeURIComponent(result.value.fechaInicio) +
+                            '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
                     });
                     const data = await resp.json();
                     if (data.success && data.semana_id) {
                         window.idSemanaGuardada = data.semana_id;
                         document.getElementById('id_semana').value = data.semana_id;
-                        document.getElementById('semana_inicio').value = result.value;
+                        document.getElementById('semana_inicio').value = result.value.fechaInicio;
+                        document.getElementById('semana_fin').value = result.value.fechaFin;
 
-                        // Mostrar el acordeón y el botón Guardar
+                        // Mostrar el acordeón
                         const acordeon = document.getElementById('acordeonPlanificacion');
                         if (acordeon) acordeon.style.display = 'block';
-                        const btnGuardar = document.getElementById('btnGuardarSemana');
-                        //if (btnGuardar) {
-                        //    btnGuardar.disabled = false;
-                        //    btnGuardar.style.display = '';
-                        //}
                         document.getElementById('btnVisualizarPDF').disabled = true;
 
-                        // Dispara el evento para calcular semana_fin
-                        document.getElementById('semana_inicio').dispatchEvent(new Event('change'));
                         Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla.', 'success');
                         cargarSemanas();
                     } else {
@@ -153,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-    // ...existing code...
 
     // 3. Botón "Editar"
     tablaSemanas.addEventListener('click', async function (e) {
@@ -163,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (acordeon) acordeon.style.display = 'block';
             const btnGuardar = document.getElementById('btnGuardarSemana');
             //if (btnGuardar) {
-                //btnGuardar.disabled = false;
-                //btnGuardar.style.display = '';
+            //btnGuardar.disabled = false;
+            //btnGuardar.style.display = '';
             //}
             document.getElementById('btnVisualizarPDF').disabled = false;
             try {
