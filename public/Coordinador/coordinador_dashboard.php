@@ -31,8 +31,8 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'COORDINADOR
                         <i class="fas fa-user-cog me-2"></i>Planificación
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionDropdown">
-                        <li><a class="dropdown-item" href="../generarPlanificacion.php" target="mainFrame">Generar Planificación</a></li>
-                        <li><a class="dropdown-item" href="../planificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
+                        <li><a class="dropdown-item" href="revisarPlanficaciones.php" target="mainFrame">Revisar Planificación</a></li>
+                        <li><a class="dropdown-item" href="../planificaciones.php" target="mainFrame">Generar Planificaciones </a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-2">
@@ -62,7 +62,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'COORDINADOR
     </nav>
 
     <div id="content" style="height:calc(100vh - 72px);">
-        <iframe id="mainFrame" name="mainFrame" src="../generarPlanificacion.php" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="mainFrame" name="mainFrame" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
