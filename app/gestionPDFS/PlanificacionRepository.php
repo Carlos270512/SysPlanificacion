@@ -47,4 +47,18 @@ class PlanificacionRepository
         $stmt->execute([$unidad_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getDocentePorUnidad($unidad_id)
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT d.codigo, d.nombre
+        FROM unidad u
+        JOIN asignatura a ON u.asignatura_codigo = a.codigo
+        JOIN docente d ON a.docente_codigo = d.codigo
+        WHERE u.id_unidad = ?
+        LIMIT 1
+    ");
+        $stmt->execute([$unidad_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC); // Devuelve ['codigo' => ..., 'nombre' => ...] o false
+    }
 }

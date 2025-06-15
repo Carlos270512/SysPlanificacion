@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/conexion.php';
+require_once __DIR__ . '/PlanificacionRepository.php';
 
 header('Content-Type: application/json');
 
@@ -17,8 +18,10 @@ try {
     $tipo_mime = $_FILES['archivo_pdf']['type'] ?? 'application/pdf';
     $archivo_pdf = file_get_contents($_FILES['archivo_pdf']['tmp_name']);
 
-    // Puedes obtener el usuario de sesión si lo necesitas
-    $usuario_creacion = isset($_POST['usuario_creacion']) ? $_POST['usuario_creacion'] : null;
+    // Obtener el usuario (docente) asociado a la unidad usando el repositorio
+    $repo = new PlanificacionRepository($pdo);
+    $docente = $repo->getDocentePorUnidad($unidad_id);
+    $usuario_creacion = $docente ? $docente['codigo'] : null; // O usa $docente['nombre'] si prefieres
 
     $stmt = $pdo->prepare("INSERT INTO planificaciones (unidad_id, nombre_archivo, archivo_pdf, tipo_mime, usuario_creacion) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([$unidad_id, $nombre_archivo, $archivo_pdf, $tipo_mime, $usuario_creacion]);
