@@ -21,12 +21,26 @@ try {
     // Obtener el usuario (docente) asociado a la unidad usando el repositorio
     $repo = new PlanificacionRepository($pdo);
     $docente = $repo->getDocentePorUnidad($unidad_id);
-    $usuario_creacion = $docente ? $docente['codigo'] : null; // O usa $docente['nombre'] si prefieres
+    $usuario = $docente ? $docente['codigo'] : null; // O usa $docente['nombre'] si prefieres
 
-    $stmt = $pdo->prepare("INSERT INTO planificaciones (unidad_id, nombre_archivo, archivo_pdf, tipo_mime, usuario_creacion) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$unidad_id, $nombre_archivo, $archivo_pdf, $tipo_mime, $usuario_creacion]);
+    // Verificar si ya existe una planificación para esa unidad
+    $stmt = $pdo->prepare("SELECT id_planificacion FROM planificaciones WHERE unidad_id = ?");
+    $stmt->execute([$unidad_id]);
+    $existe = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode(['success' => true, 'message' => 'PDF guardado correctamente.']);
+    if ($existe) {
+        // Actualizar PDF existente
+        $stmt = $pdo->prepare("UPDATE planificaciones 
+            SET nombre_archivo = ?, archivo_pdf = ?, tipo_mime = ?, fecha_actualizacion = NOW(), usuario_actualizacion = ?
+            WHERE unidad_id = ?");
+        $stmt->execute([$nombre_archivo, $archivo_pdf, $tipo_mime, $usuario, $unidad_id]);
+        echo json_encode(['success' => true, 'message' => 'PDF actualizado correctamente.']);
+    } else {
+        // Insertar nuevo PDF
+        $stmt = $pdo->prepare("INSERT INTO planificaciones (unidad_id, nombre_archivo, archivo_pdf, tipo_mime, usuario_creacion) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$unidad_id, $nombre_archivo, $archivo_pdf, $tipo_mime, $usuario]);
+        echo json_encode(['success' => true, 'message' => 'PDF guardado correctamente.']);
+    }
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
