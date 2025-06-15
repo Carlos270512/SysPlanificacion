@@ -204,6 +204,81 @@ if (btnPDF) {
     });
 }
 
+
+//botn para procesar el pdf 
+
+const btnGuardarPDF = document.getElementById('btnGuardarPDF');
+if (btnGuardarPDF) {
+    btnGuardarPDF.addEventListener('click', async function () {
+        // Obtén los datos necesarios
+        const nombreUnidad = window.nombreUnidad || 'planificacion.pdf';
+        const idUnidad = document.querySelector('input[name="unidad_id"]')?.value || '';
+        const fechaCreacion = new Date().toLocaleString();
+        const blob = window._ultimoPDFBlob;
+
+        if (!blob) {
+            Swal.fire('Error', 'No se ha generado el PDF.', 'error');
+            return;
+        }
+
+        // Muestra el SweetAlert de confirmación
+        const result = await Swal.fire({
+            title: '¿Guardar este PDF?',
+            html: `
+                <div style="text-align:left">
+                    <b>Nombre de archivo:</b> ${nombreUnidad}.pdf<br>
+                    <b>ID Unidad:</b> ${idUnidad}<br>
+                    <b>Fecha de creación:</b> ${fechaCreacion}
+                </div>
+                <hr>
+                ¿Deseas guardar este PDF en la base de datos?
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            if (result.isConfirmed) {
+    try {
+        // Mostrar loader
+        Swal.fire({
+            title: 'Guardando...',
+            text: 'El PDF se está guardando.',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        // Prepara el FormData
+        const formData = new FormData();
+        formData.append('unidad_id', idUnidad);
+        formData.append('nombre_archivo', nombreUnidad + '.pdf');
+        formData.append('archivo_pdf', blob, nombreUnidad + '.pdf');
+        // Si tienes usuario, puedes agregarlo aquí:
+        // formData.append('usuario_creacion', usuario);
+
+        // Envía al backend
+        const response = await fetch('/SysPlanificacion/app/gestionPDFS/guardarPlanificacion.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire('¡Éxito!', data.message || 'PDF guardado correctamente.', 'success');
+        } else {
+            Swal.fire('Error', data.message || 'No se pudo guardar el PDF.', 'error');
+        }
+    } catch (e) {
+        Swal.fire('Error', 'Ocurrió un error al guardar el PDF.', 'error');
+    }
+}
+            
+        }
+    });
+}
+
     // --- AUTO-SAVE Y PINTADO EN VERDE ---
 
     // Función para pintar de verde temporalmente

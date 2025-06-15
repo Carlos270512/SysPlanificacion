@@ -213,6 +213,10 @@ if ($id_unidad) {
         </div>
     </div>
 
+    <script>
+        window.nombreUnidad = "<?php echo addslashes($nombre_unidad); ?>";
+    </script>
+
 </body>
 
 </html>
