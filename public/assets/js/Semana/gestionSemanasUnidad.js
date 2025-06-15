@@ -80,10 +80,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 2. Botón "Nueva semana"
-    btnNuevaSemana.addEventListener('click', function () {
-        Swal.fire({
-            title: '¿Crear nueva semana?',
-            html: `
+btnNuevaSemana.addEventListener('click', function () {
+    Swal.fire({
+        title: '¿Crear nueva semana?',
+        html: `
             <div style="margin-top:10px;">
                 <label style="font-size:15px;">Fecha de inicio:</label>
                 <input type="date" id="swal_fecha_semana_inicio" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
@@ -91,66 +91,74 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="date" id="swal_fecha_semana_fin" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
             </div>
         `,
-            preConfirm: () => {
-                const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
-                const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
-                if (!fechaInicio || !fechaFin) {
-                    Swal.showValidationMessage('Debes ingresar ambas fechas');
-                }
-                return { fechaInicio, fechaFin };
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Sí, crear',
-            cancelButtonText: 'Cancelar'
-        }).then(async (result) => {
-            if (result.isConfirmed && result.value) {
-                if (!formSemana) return;
-                formSemana.reset();
-                // Limpiar editores Quill si existen
-                if (window.quill_editors) {
-                    Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
-                }
-                // Limpiar campos hidden y fechas
-                document.getElementById('semana_inicio').value = '';
-                document.getElementById('semana_fin').value = '';
-                window.idSemanaGuardada = null;
-                document.getElementById('id_semana').value = '';
-                document.getElementById('btnGuardarSemana').disabled = true;
-                document.getElementById('btnGuardarSemana').style.display = 'none';
-                document.getElementById('btnVisualizarPDF').disabled = true;
-
-                // Crear semana vacía en la base de datos con ambas fechas
-                try {
-                    const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'unidad_id=' + encodeURIComponent(idUnidad) +
-                            '&semana_inicio=' + encodeURIComponent(result.value.fechaInicio) +
-                            '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
-                    });
-                    const data = await resp.json();
-                    if (data.success && data.semana_id) {
-                        window.idSemanaGuardada = data.semana_id;
-                        document.getElementById('id_semana').value = data.semana_id;
-                        document.getElementById('semana_inicio').value = result.value.fechaInicio;
-                        document.getElementById('semana_fin').value = result.value.fechaFin;
-
-                        // Mostrar el acordeón
-                        const acordeon = document.getElementById('acordeonPlanificacion');
-                        if (acordeon) acordeon.style.display = 'block';
-                        document.getElementById('btnVisualizarPDF').disabled = true;
-
-                        Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla.', 'success');
-                        cargarSemanas();
-                    } else {
-                        Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
-                    }
-                } catch (e) {
-                    Swal.fire('Error', 'Error al crear la semana.', 'error');
-                }
+        preConfirm: () => {
+            const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
+            const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
+            if (!fechaInicio || !fechaFin) {
+                Swal.showValidationMessage('Debes ingresar ambas fechas');
             }
-        });
+            return { fechaInicio, fechaFin };
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Sí, crear',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed && result.value) {
+            if (!formSemana) return;
+            formSemana.reset();
+            // Limpiar editores Quill si existen
+            if (window.quill_editors) {
+                Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
+            }
+            // Limpiar campos hidden y fechas
+            document.getElementById('semana_inicio').value = '';
+            document.getElementById('semana_fin').value = '';
+            window.idSemanaGuardada = null;
+            document.getElementById('id_semana').value = '';
+            // Oculta el botón guardar semana si existe
+            const btnGuardar = document.getElementById('btnGuardarSemana');
+            if (btnGuardar) {
+                btnGuardar.disabled = true;
+                btnGuardar.style.display = 'none';
+            }
+            document.getElementById('btnVisualizarPDF').disabled = true;
+
+            // Crear semana vacía en la base de datos con ambas fechas
+            try {
+                const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'unidad_id=' + encodeURIComponent(idUnidad) +
+                        '&semana_inicio=' + encodeURIComponent(result.value.fechaInicio) +
+                        '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
+                });
+                const data = await resp.json();
+                if (data.success && data.semana_id) {
+                    window.idSemanaGuardada = data.semana_id;
+                    document.getElementById('id_semana').value = data.semana_id;
+                    document.getElementById('semana_inicio').value = result.value.fechaInicio;
+                    document.getElementById('semana_fin').value = result.value.fechaFin;
+
+                    // Mostrar el acordeón
+                    const acordeon = document.getElementById('acordeonPlanificacion');
+                    if (acordeon) acordeon.style.display = 'block';
+
+                    // Habilitar el botón PDF
+                    document.getElementById('btnVisualizarPDF').disabled = false;
+
+                    // Recargar la tabla de semanas
+                    cargarSemanas();
+
+                    Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla o visualizar el PDF.', 'success');
+                } else {
+                    Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Error al crear la semana.', 'error');
+            }
+        }
     });
+});
 
     // 3. Botón "Editar"
     tablaSemanas.addEventListener('click', async function (e) {
