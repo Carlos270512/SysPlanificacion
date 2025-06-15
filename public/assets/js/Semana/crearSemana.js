@@ -154,9 +154,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await resp.json();
                 if (data.success) {
                     msgDiv.innerHTML = '<div class="alert alert-success">¡Semana guardada correctamente!</div>';
-                    const btnGuardar = document.getElementById('btnGuardarSemana');
+                    //const btnGuardar = document.getElementById('btnGuardarSemana');
                     const btnPDF = document.getElementById('btnVisualizarPDF');
-                    if (btnGuardar) btnGuardar.disabled = true;
+                    //if (btnGuardar) btnGuardar.disabled = true;
                     if (btnPDF) btnPDF.disabled = false;
                     idSemanaGuardada = data.semana_id; // <-- Guardamos el id correcto del backend
                     window.idSemanaGuardada = idSemanaGuardada; // Para acceso global

@@ -13,34 +13,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- NUEVO: evento para calcular semana_fin automáticamente ---
-const inputSemanaInicio = document.getElementById('semana_inicio');
-const inputSemanaFin = document.getElementById('semana_fin');
+    const inputSemanaInicio = document.getElementById('semana_inicio');
+    const inputSemanaFin = document.getElementById('semana_fin');
 
-if (inputSemanaInicio && inputSemanaFin) {
-    inputSemanaInicio.addEventListener('change', async function () {
-        // Calcula automáticamente la fecha de fin
-        if (inputSemanaInicio.value) {
-            inputSemanaFin.value = sumarDias(inputSemanaInicio.value, 4);
-        } else {
-            inputSemanaFin.value = '';
-        }
-
-        // Guarda automáticamente la fecha de inicio si hay una semana cargada
-        if (window.idSemanaGuardada && inputSemanaInicio.value) {
-            try {
-                await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'semana_id=' + encodeURIComponent(window.idSemanaGuardada) +
-                          '&campo=fecha_semana' +
-                          '&valor=' + encodeURIComponent(inputSemanaInicio.value)
-                });
-            } catch (e) {
-                // Manejo de error opcional
+    if (inputSemanaInicio && inputSemanaFin) {
+        inputSemanaInicio.addEventListener('change', async function () {
+            // Calcula automáticamente la fecha de fin
+            if (inputSemanaInicio.value) {
+                inputSemanaFin.value = sumarDias(inputSemanaInicio.value, 4);
+            } else {
+                inputSemanaFin.value = '';
             }
-        }
-    });
-}
+
+            // Guarda automáticamente la fecha de inicio si hay una semana cargada
+            if (window.idSemanaGuardada && inputSemanaInicio.value) {
+                try {
+                    await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'semana_id=' + encodeURIComponent(window.idSemanaGuardada) +
+                            '&campo=fecha_semana' +
+                            '&valor=' + encodeURIComponent(inputSemanaInicio.value)
+                    });
+                } catch (e) {
+                    // Manejo de error opcional
+                }
+            }
+        });
+    }
     // 1. Cargar semanas de la unidad
     async function cargarSemanas() {
         tablaSemanas.innerHTML = '<div class="text-center">Cargando...</div>';
@@ -114,7 +114,7 @@ if (inputSemanaInicio && inputSemanaFin) {
                 window.idSemanaGuardada = null;
                 document.getElementById('id_semana').value = '';
                 document.getElementById('btnGuardarSemana').disabled = true;
-                document.getElementById('btnGuardarSemana').style.display = '';
+                document.getElementById('btnGuardarSemana').style.display = 'none';
                 document.getElementById('btnVisualizarPDF').disabled = true;
 
                 // Crear semana vacía en la base de datos con fecha de inicio
@@ -129,7 +129,18 @@ if (inputSemanaInicio && inputSemanaFin) {
                         window.idSemanaGuardada = data.semana_id;
                         document.getElementById('id_semana').value = data.semana_id;
                         document.getElementById('semana_inicio').value = result.value;
-                        // --- NUEVO: dispara el evento para calcular semana_fin ---
+
+                        // Mostrar el acordeón y el botón Guardar
+                        const acordeon = document.getElementById('acordeonPlanificacion');
+                        if (acordeon) acordeon.style.display = 'block';
+                        const btnGuardar = document.getElementById('btnGuardarSemana');
+                        //if (btnGuardar) {
+                        //    btnGuardar.disabled = false;
+                        //    btnGuardar.style.display = '';
+                        //}
+                        document.getElementById('btnVisualizarPDF').disabled = true;
+
+                        // Dispara el evento para calcular semana_fin
                         document.getElementById('semana_inicio').dispatchEvent(new Event('change'));
                         Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla.', 'success');
                         cargarSemanas();
@@ -148,6 +159,14 @@ if (inputSemanaInicio && inputSemanaFin) {
     tablaSemanas.addEventListener('click', async function (e) {
         if (e.target.classList.contains('btn-editar-semana')) {
             const idSemana = e.target.getAttribute('data-id');
+            const acordeon = document.getElementById('acordeonPlanificacion');
+            if (acordeon) acordeon.style.display = 'block';
+            const btnGuardar = document.getElementById('btnGuardarSemana');
+            //if (btnGuardar) {
+                //btnGuardar.disabled = false;
+                //btnGuardar.style.display = '';
+            //}
+            document.getElementById('btnVisualizarPDF').disabled = false;
             try {
                 const resp = await fetch(`/SysPlanificacion/app/Semana/getSemanaById.php?id_semana=${idSemana}`);
                 const data = await resp.json();
@@ -197,7 +216,7 @@ if (inputSemanaInicio && inputSemanaFin) {
                     window.idSemanaGuardada = semana.id_semana;
                     document.getElementById('id_semana').value = semana.id_semana;
                     // Habilitar botones
-                    document.getElementById('btnGuardarSemana').disabled = false;
+                    //document.getElementById('btnGuardarSemana').disabled = false;
                     document.getElementById('btnGuardarSemana').style.display = 'none';
                     document.getElementById('btnVisualizarPDF').disabled = false;
                 }

@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const resp = await fetch(`/SysPlanificacion/app/Semana/getSemana.php?id_unidad=${idUnidad}`);
     const data = await resp.json();
     if (data.success && data.semana) {
+        // Muestra el acordeón si ya existe una semana
+        const acordeon = document.getElementById('acordeonPlanificacion');
+        if (acordeon) acordeon.style.display = 'block';
         const semana = data.semana;
         if (semana.fecha_semana) document.getElementById('semana_inicio').value = semana.fecha_semana;
         if (semana.semana_fin) {
@@ -127,7 +130,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
         // Deshabilita el botón guardar si ya existe
         const btnGuardar = document.getElementById('btnGuardarSemana');
-        if (btnGuardar) btnGuardar.style.display = 'none';
+        //if (btnGuardar) {
+            //btnGuardar.disabled = false;
+            //btnGuardar.style.display = 'none';
+        //}
         document.getElementById('btnVisualizarPDF').disabled = false;
         // Guarda el id de la semana para auto-save
         window.idSemanaGuardada = semana.id_semana;
