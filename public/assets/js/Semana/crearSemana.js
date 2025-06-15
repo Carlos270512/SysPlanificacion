@@ -171,27 +171,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Evento para el botón Visualizar PDF ---
     const btnPDF = document.getElementById('btnVisualizarPDF');
-    if (btnPDF) {
-        btnPDF.addEventListener('click', function () {
-            // Solo enviamos los IDs al backend
-            const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
-            const semanaId = window.idSemanaGuardada; // <-- usa siempre el global
-            if (!semanaId) {
-                alert('Primero debe guardar la semana.');
-                return;
-            }
-            const pdfWindow = window.open('', '_blank');
-            fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
-                method: 'POST',
-                body: new URLSearchParams({ semana_id: semanaId, unidad_id: idUnidad })
-            })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    pdfWindow.location.href = url;
-                });
-        });
-    }
+if (btnPDF) {
+    btnPDF.addEventListener('click', function () {
+        const idUnidad = form.querySelector('input[name="unidad_id"]')?.value || '';
+        const semanaId = window.idSemanaGuardada;
+        if (!semanaId) {
+            alert('Primero debe guardar la semana.');
+            return;
+        }
+        // Deshabilita el botón guardar PDF mientras carga
+        const btnGuardarPDF = document.getElementById('btnGuardarPDF');
+        if (btnGuardarPDF) btnGuardarPDF.disabled = true;
+
+        fetch('/SysPlanificacion/app/gestionPDFS/visualizarPDF.php', {
+            method: 'POST',
+            body: new URLSearchParams({ semana_id: semanaId, unidad_id: idUnidad })
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                // Carga el PDF en el iframe del modal
+                const iframe = document.getElementById('iframePDF');
+                if (iframe) iframe.src = url;
+                // Guarda el blob para el botón "Guardar PDF"
+                window._ultimoPDFBlob = blob;
+                // Habilita el botón guardar PDF
+                if (btnGuardarPDF) btnGuardarPDF.disabled = false;
+                // Muestra el modal
+                const modal = new bootstrap.Modal(document.getElementById('modalVisualizarPDF'));
+                modal.show();
+            });
+    });
+}
 
     // --- AUTO-SAVE Y PINTADO EN VERDE ---
 

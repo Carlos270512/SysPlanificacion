@@ -194,6 +194,25 @@ if ($id_unidad) {
     <!-- Nuevo JS para gestión de semanas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/SysPlanificacion/public/assets/js/Semana/gestionSemanasUnidad.js"></script>
+
+    <div class="modal fade" id="modalVisualizarPDF" tabindex="-1" aria-labelledby="modalVisualizarPDFLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width:90vw;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVisualizarPDFLabel">Vista previa de la planificación (PDF)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" style="height:80vh;">
+                    <iframe id="iframePDF" src="" style="width:100%;height:100%;border:none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnGuardarPDF" disabled>Guardar PDF</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
