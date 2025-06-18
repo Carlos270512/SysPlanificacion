@@ -10,6 +10,7 @@ $bibliografia = isset($_POST['bibliografia']) ? $_POST['bibliografia'] : '';
 $metodologia = isset($_POST['metodologia']) ? $_POST['metodologia'] : '';
 $actividades_recuperacion = isset($_POST['actividades_recuperacion']) ? $_POST['actividades_recuperacion'] : '';
 $recursos_didacticos = isset($_POST['recursos_didacticos']) ? $_POST['recursos_didacticos'] : '';
+$estrategia = isset($_POST['estrategia']) ? $_POST['estrategia'] : '';
 $semana_inicio = isset($_POST['semana_inicio']) ? $_POST['semana_inicio'] : null;
 $semana_fin = isset($_POST['semana_fin']) ? $_POST['semana_fin'] : null;
 
@@ -23,19 +24,20 @@ if (!$asignatura_codigo || !$nombre || !$numero_unidad) {
 
 try {
     $stmt = $pdo->prepare("INSERT INTO unidad 
-        (numero_unidad, nombre, objetivo_unidad, metodologia, actividades_recuperacion, recursos_didacticos, bibliografia, semana_inicio, semana_fin, asignatura_codigo) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (asignatura_codigo, numero_unidad, nombre, objetivo_unidad, bibliografia, metodologia, actividades_recuperacion, recursos_didacticos, estrategia_ensenanza_aprendizaje, semana_inicio, semana_fin) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
+        $asignatura_codigo,
         $numero_unidad,
         $nombre,
         $objetivo_unidad,
+        $bibliografia,
         $metodologia,
         $actividades_recuperacion,
         $recursos_didacticos,
-        $bibliografia,
+        $estrategia, // <--- Aquí se guarda en la columna correcta
         $semana_inicio,
-        $semana_fin,
-        $asignatura_codigo
+        $semana_fin
     ]);
     $unidad_id = $pdo->lastInsertId();
     echo json_encode(['success' => true, 'unidad_id' => $unidad_id]);

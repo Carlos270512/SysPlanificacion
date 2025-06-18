@@ -10,12 +10,14 @@ $bibliografia = isset($_POST['bibliografia']) ? $_POST['bibliografia'] : '';
 $metodologia = isset($_POST['metodologia']) ? $_POST['metodologia'] : '';
 $actividades_recuperacion = isset($_POST['actividades_recuperacion']) ? $_POST['actividades_recuperacion'] : '';
 $recursos_didacticos = isset($_POST['recursos_didacticos']) ? $_POST['recursos_didacticos'] : '';
+$estrategia = isset($_POST['estrategia']) ? $_POST['estrategia'] : '';
 
 // Validación básica
 if (!$id_unidad || !$nombre || !$numero_unidad) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios.']);
     exit;
 }
+
 
 try {
     $stmt = $pdo->prepare("UPDATE unidad SET 
@@ -25,7 +27,8 @@ try {
         bibliografia = ?, 
         metodologia = ?, 
         actividades_recuperacion = ?, 
-        recursos_didacticos = ?
+        recursos_didacticos = ?,
+        estrategia_ensenanza_aprendizaje = ?
         WHERE id_unidad = ?");
     $stmt->execute([
         $numero_unidad,
@@ -35,6 +38,7 @@ try {
         $metodologia,
         $actividades_recuperacion,
         $recursos_didacticos,
+        $estrategia,
         $id_unidad
     ]);
     echo json_encode(['success' => true]);
