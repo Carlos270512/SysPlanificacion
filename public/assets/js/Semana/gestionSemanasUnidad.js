@@ -5,42 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnNuevaSemana = document.getElementById('btnNuevaSemana');
     const formSemana = document.getElementById('formSemana');
 
-    // --- NUEVO: función para sumar días y calcular fecha de fin ---
-    //function sumarDias(fechaStr, dias) {
-    //    const fecha = new Date(fechaStr);
-    //    fecha.setDate(fecha.getDate() + dias);
-    //    return fecha.toISOString().slice(0, 10);
-    //}
-
-    // --- NUEVO: evento para calcular semana_fin automáticamente ---
-    //const inputSemanaInicio = document.getElementById('semana_inicio');
-    //const inputSemanaFin = document.getElementById('semana_fin');
-    //
-    //if (inputSemanaInicio && inputSemanaFin) {
-    //    inputSemanaInicio.addEventListener('change', async function () {
-    //        // Calcula automáticamente la fecha de fin
-    //        if (inputSemanaInicio.value) {
-    //            inputSemanaFin.value = sumarDias(inputSemanaInicio.value, 4);
-    //        } else {
-    //            inputSemanaFin.value = '';
-    //        }
-    //
-    //        // Guarda automáticamente la fecha de inicio si hay una semana cargada
-    //        if (window.idSemanaGuardada && inputSemanaInicio.value) {
-    //            try {
-    //                await fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
-    //                    method: 'POST',
-    //                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    //                    body: 'semana_id=' + encodeURIComponent(window.idSemanaGuardada) +
-    //                        '&campo=fecha_semana' +
-    //                        '&valor=' + encodeURIComponent(inputSemanaInicio.value)
-    //                });
-    //            } catch (e) {
-    //                // Manejo de error opcional
-    //            }
-    //        }
-    //    });
-    //}
     // 1. Cargar semanas de la unidad
     async function cargarSemanas() {
         tablaSemanas.innerHTML = '<div class="text-center">Cargando...</div>';
@@ -78,12 +42,111 @@ document.addEventListener('DOMContentLoaded', function () {
             tablaSemanas.innerHTML = '<div class="alert alert-danger mb-0">Error al cargar semanas.</div>';
         }
     }
+    // ...existing code...
+
+async function cargarSemanasLinea() {
+    tablaSemanas.innerHTML = '<div class="text-center">Cargando...</div>';
+    try {
+        const resp = await fetch(`/SysPlanificacion/app/SemanaLinea/listarSemanasLinea.php?id_unidad=${idUnidad}`);
+        const data = await resp.json();
+        if (data.success && data.semanas.length > 0) {
+            let html = `<table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha (sábado)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            data.semanas.forEach((semana, idx) => {
+                html += `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${semana.fecha_sabado || ''}</td>
+                    <td>
+                        <button class="btn btn-outline-secondary btn-sm btn-editar-semana-linea" data-id="${semana.id_semana_linea}">Editar</button>
+                        <button class="btn btn-outline-danger btn-sm btn-eliminar-semana-linea" data-id="${semana.id_semana_linea}">Eliminar</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            tablaSemanas.innerHTML = html;
+        } else {
+            tablaSemanas.innerHTML = '<div class="alert alert-warning mb-0">No hay semanas registradas para esta unidad.</div>';
+        }
+    } catch (e) {
+        tablaSemanas.innerHTML = '<div class="alert alert-danger mb-0">Error al cargar semanas.</div>';
+    }
+}
 
     // 2. Botón "Nueva semana"
-btnNuevaSemana.addEventListener('click', function () {
-    Swal.fire({
-        title: '¿Crear nueva semana?',
-        html: `
+    btnNuevaSemana.addEventListener('click', function () {
+        if (window.tipo_jornada === 'PL' || window.tipo_jornada === 'EL') {
+            // Modal solo para fecha sábado
+            Swal.fire({
+                title: 'Nueva semana (PL/EL)',
+                html: `
+            <div style="margin-top:10px;">
+                <label style="font-size:15px;">Fecha (sábado):</label>
+                <input type="date" id="swal_fecha_sabado" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+            </div>
+        `,
+                preConfirm: () => {
+                    const fechaSabado = document.getElementById('swal_fecha_sabado').value;
+                    if (!fechaSabado) {
+                        Swal.showValidationMessage('Debes ingresar la fecha del sábado');
+                    }
+                    return { fechaSabado };
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Sí, crear',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed && result.value) {
+                    // Limpiar formulario PL si existe
+                    const formPL = document.getElementById('formSemanaPL');
+                    if (formPL) formPL.reset();
+                    // Limpiar editores Quill PL si existen
+                    if (window.quill_editors_pl) {
+                        Object.values(window.quill_editors_pl).forEach(editor => editor.setContents([]));
+                    }
+                    // Oculta el acordeón antes de mostrarlo
+                    const acordeon = document.getElementById('acordeonPlanificacion');
+                    if (acordeon) acordeon.style.display = 'none';
+
+                    // Crear semana PL en la base de datos
+                    try {
+                        const resp = await fetch('/SysPlanificacion/app/SemanaLinea/createSemanaLinea.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'unidad_id=' + encodeURIComponent(idUnidad) +
+                                '&fecha_sabado=' + encodeURIComponent(result.value.fechaSabado)
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            // Muestra el acordeón y coloca la fecha en el campo
+                            if (acordeon) acordeon.style.display = 'block';
+                            const inputFecha = document.querySelector('input[name="fecha_sabado"]');
+                            if (inputFecha) {
+                                inputFecha.value = result.value.fechaSabado;
+                                inputFecha.disabled = true; // Deshabilita el campo
+                            }
+                            Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla.', 'success');
+                            // Recargar la tabla de semanas si tienes una para PL
+                            if (typeof cargarSemanas === 'function') cargarSemanas();
+                        } else {
+                            Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
+                        }
+                    } catch (e) {
+                        Swal.fire('Error', 'Error al crear la semana.', 'error');
+                    }
+                }
+            });
+        } else {
+            // Modal para jornadas normales (inicio y fin)
+            Swal.fire({
+                title: '¿Crear nueva semana?',
+                html: `
             <div style="margin-top:10px;">
                 <label style="font-size:15px;">Fecha de inicio:</label>
                 <input type="date" id="swal_fecha_semana_inicio" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
@@ -91,74 +154,75 @@ btnNuevaSemana.addEventListener('click', function () {
                 <input type="date" id="swal_fecha_semana_fin" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
             </div>
         `,
-        preConfirm: () => {
-            const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
-            const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
-            if (!fechaInicio || !fechaFin) {
-                Swal.showValidationMessage('Debes ingresar ambas fechas');
-            }
-            return { fechaInicio, fechaFin };
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Sí, crear',
-        cancelButtonText: 'Cancelar'
-    }).then(async (result) => {
-        if (result.isConfirmed && result.value) {
-            if (!formSemana) return;
-            formSemana.reset();
-            // Limpiar editores Quill si existen
-            if (window.quill_editors) {
-                Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
-            }
-            // Limpiar campos hidden y fechas
-            document.getElementById('semana_inicio').value = '';
-            document.getElementById('semana_fin').value = '';
-            window.idSemanaGuardada = null;
-            document.getElementById('id_semana').value = '';
-            // Oculta el botón guardar semana si existe
-            const btnGuardar = document.getElementById('btnGuardarSemana');
-            if (btnGuardar) {
-                btnGuardar.disabled = true;
-                btnGuardar.style.display = 'none';
-            }
-            document.getElementById('btnVisualizarPDF').disabled = true;
+                preConfirm: () => {
+                    const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
+                    const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
+                    if (!fechaInicio || !fechaFin) {
+                        Swal.showValidationMessage('Debes ingresar ambas fechas');
+                    }
+                    return { fechaInicio, fechaFin };
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Sí, crear',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed && result.value) {
+                    if (!formSemana) return;
+                    formSemana.reset();
+                    // Limpiar editores Quill si existen
+                    if (window.quill_editors) {
+                        Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
+                    }
+                    // Limpiar campos hidden y fechas
+                    document.getElementById('semana_inicio').value = '';
+                    document.getElementById('semana_fin').value = '';
+                    window.idSemanaGuardada = null;
+                    document.getElementById('id_semana').value = '';
+                    // Oculta el botón guardar semana si existe
+                    const btnGuardar = document.getElementById('btnGuardarSemana');
+                    if (btnGuardar) {
+                        btnGuardar.disabled = true;
+                        btnGuardar.style.display = 'none';
+                    }
+                    document.getElementById('btnVisualizarPDF').disabled = true;
 
-            // Crear semana vacía en la base de datos con ambas fechas
-            try {
-                const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'unidad_id=' + encodeURIComponent(idUnidad) +
-                        '&semana_inicio=' + encodeURIComponent(result.value.fechaInicio) +
-                        '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
-                });
-                const data = await resp.json();
-                if (data.success && data.semana_id) {
-                    window.idSemanaGuardada = data.semana_id;
-                    document.getElementById('id_semana').value = data.semana_id;
-                    document.getElementById('semana_inicio').value = result.value.fechaInicio;
-                    document.getElementById('semana_fin').value = result.value.fechaFin;
+                    // Crear semana vacía en la base de datos con ambas fechas
+                    try {
+                        const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'unidad_id=' + encodeURIComponent(idUnidad) +
+                                '&semana_inicio=' + encodeURIComponent(result.value.fechaInicio) +
+                                '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
+                        });
+                        const data = await resp.json();
+                        if (data.success && data.semana_id) {
+                            window.idSemanaGuardada = data.semana_id;
+                            document.getElementById('id_semana').value = data.semana_id;
+                            document.getElementById('semana_inicio').value = result.value.fechaInicio;
+                            document.getElementById('semana_fin').value = result.value.fechaFin;
 
-                    // Mostrar el acordeón
-                    const acordeon = document.getElementById('acordeonPlanificacion');
-                    if (acordeon) acordeon.style.display = 'block';
+                            // Mostrar el acordeón SOLO después de crear la semana
+                            const acordeon = document.getElementById('acordeonPlanificacion');
+                            if (acordeon) acordeon.style.display = 'block';
 
-                    // Habilitar el botón PDF
-                    document.getElementById('btnVisualizarPDF').disabled = false;
+                            // Habilitar el botón PDF
+                            document.getElementById('btnVisualizarPDF').disabled = false;
 
-                    // Recargar la tabla de semanas
-                    cargarSemanas();
+                            // Recargar la tabla de semanas
+                            cargarSemanas();
 
-                    Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla o visualizar el PDF.', 'success');
-                } else {
-                    Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
+                            Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla o visualizar el PDF.', 'success');
+                        } else {
+                            Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
+                        }
+                    } catch (e) {
+                        Swal.fire('Error', 'Error al crear la semana.', 'error');
+                    }
                 }
-            } catch (e) {
-                Swal.fire('Error', 'Error al crear la semana.', 'error');
-            }
+            });
         }
     });
-});
 
     // 3. Botón "Editar"
     tablaSemanas.addEventListener('click', async function (e) {
