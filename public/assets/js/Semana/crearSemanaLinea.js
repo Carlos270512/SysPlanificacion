@@ -139,6 +139,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (input) input.value = data.semana[field.name];
                         }
                     });
+
+                    // --- ABRIR EL ACCORDION DE SEMANA EN LÍNEA ---
+                    const collapseEl = document.getElementById('collapsePlanificacion'); // Cambia el id si es otro
+                    if (collapseEl) {
+                        // Bootstrap 5
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+                        bsCollapse.show();
+                    }
                 }
             });
     }
