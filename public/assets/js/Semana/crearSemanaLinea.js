@@ -22,20 +22,28 @@ document.addEventListener('DOMContentLoaded', function () {
     window.quill_editors_pl = {};
 
     // Inicializa Quill y sincroniza con los inputs hidden
-    quillFields.forEach(field => {
-        const el = document.getElementById(field.id);
-        if (el) {
-            window.quill_editors_pl[field.name] = new Quill(`#${field.id}`, {
-                theme: 'snow',
-                modules: { toolbar: quillToolbar }
-            });
-            window.quill_editors_pl[field.name].on('text-change', function () {
+quillFields.forEach(field => {
+    const el = document.getElementById(field.id);
+    if (el) {
+        window.quill_editors_pl[field.name] = new Quill(`#${field.id}`, {
+            theme: 'snow',
+            modules: { toolbar: quillToolbar }
+        });
+        // Sincroniza el contenido con el input hidden en cada cambio
+        window.quill_editors_pl[field.name].on('text-change', function () {
+            const input = form.querySelector(`input[name="${field.name}"]`);
+            if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
+            // No llamar autoGuardarSemanaPL aquí
+        });
+        // Auto-guardado y pintado en verde al perder el foco (igual que semana normal)
+        window.quill_editors_pl[field.name].on('selection-change', function(range, oldRange, source) {
+            if (oldRange && !range) { // blur
                 const input = form.querySelector(`input[name="${field.name}"]`);
-                if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
-                autoGuardarSemanaPL(input);
-            });
-        }
-    });
+                if (input) autoGuardarSemanaPL(input);
+            }
+        });
+    }
+});
 
     // Auto-guardado para inputs normales
     [
@@ -46,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ].forEach(name => {
         const input = form.querySelector(`input[name="${name}"]`);
         if (input) {
-            input.addEventListener('input', () => autoGuardarSemanaPL(input));
+            input.addEventListener('blur', () => autoGuardarSemanaPL(input));
         }
     });
     function pintarVerde(element) {
@@ -78,8 +86,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
                 msgDiv.innerHTML = '<div class="alert alert-success py-2 mb-2" style="font-size:15px;">¡Guardado automáticamente!</div>';
                 setTimeout(() => { msgDiv.innerHTML = ''; }, 1500);
-                // Pinta de verde el campo editado
-                if (inputEditado) pintarVerde(inputEditado);
+
+                // Pinta de verde el campo editado (input o editor Quill)
+                if (inputEditado) {
+                    pintarVerde(inputEditado);
+                    // Si es un input hidden de un Quill, pinta también el área del editor
+                    quillFields.forEach(field => {
+                        if (inputEditado.name === field.name && window.quill_editors_pl[field.name]) {
+                            pintarVerde(window.quill_editors_pl[field.name].root);
+                        }
+                    });
+                }
             }
         } catch (e) {
             // Manejo de error opcional
