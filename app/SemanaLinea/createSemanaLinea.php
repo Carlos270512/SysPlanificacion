@@ -20,11 +20,22 @@ try {
         (id_unidad, fecha_sabado, contenido, objetivo, actividades, tiempo_actividades, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, evaluacion_clase, equipo_herramientas_recursos, actividades_refuerzo)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
-        $id_unidad, $fecha_sabado, $contenido, $objetivo, $actividades, $tiempo_actividades,
-        $desarrollo, $tiempo_desarrollo, $cierre, $tiempo_cierre, $evaluacion_clase,
-        $equipo_herramientas_recursos, $actividades_refuerzo
+        $id_unidad,
+        $fecha_sabado,
+        $contenido,
+        $objetivo,
+        $actividades,
+        $tiempo_actividades,
+        $desarrollo,
+        $tiempo_desarrollo,
+        $cierre,
+        $tiempo_cierre,
+        $evaluacion_clase,
+        $equipo_herramientas_recursos,
+        $actividades_refuerzo
     ]);
-    echo json_encode(['success' => true]);
+    $id_semana_linea = $pdo->lastInsertId();
+    echo json_encode(['success' => true, 'id_semana_linea' => $id_semana_linea]);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
