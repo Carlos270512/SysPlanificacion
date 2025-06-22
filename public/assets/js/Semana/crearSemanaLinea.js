@@ -129,6 +129,8 @@ quillFields.forEach(field => {
         } catch (err) {
             msgDiv.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
         }
+
+        
     });
     // Cargar datos si ya existe una semana PL/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
@@ -168,3 +170,88 @@ quillFields.forEach(field => {
             });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Botón Visualizar PDF Línea (mantiene funcionalidad original) ---
+    const btnVisualizarPDFLinea = document.getElementById('btnVisualizarPDFLinea');
+    const formSemanaPL = document.getElementById('formSemanaPL');
+    if (btnVisualizarPDFLinea && formSemanaPL) {
+        btnVisualizarPDFLinea.addEventListener('click', function () {
+            const idSemanaLinea = document.getElementById('id_semana_linea').value;
+            if (!idSemanaLinea) {
+                alert('No hay semana seleccionada.');
+                return;
+            }
+            const iframe = document.getElementById('iframePDF');
+            if (iframe) {
+                iframe.src = `/SysPlanificacion/app/gestionPDFS/visualizarSemanLineaPDF.php?id_semana_linea=${idSemanaLinea}`;
+                const modal = new bootstrap.Modal(document.getElementById('modalVisualizarPDF'));
+                modal.show();
+            }
+        });
+    }
+
+    // --- Botón Guardar PDF con SweetAlert y guardado en guardarPlanificacion.php ---
+    const btnGuardarPDF = document.getElementById('btnGuardarPDF');
+    if (btnGuardarPDF) {
+        btnGuardarPDF.addEventListener('click', async function () {
+            // Obtén los datos necesarios
+            const nombreUnidad = window.nombreUnidad || '';
+            const idUnidad = document.querySelector('input[name="unidad_id"]')?.value || '';
+            const fechaCreacion = new Date().toLocaleString('es-EC');
+
+            // SweetAlert de confirmación
+            const result = await Swal.fire({
+                title: '¿Deseas guardar el PDF?',
+                html: `
+                    <div style="text-align:left;">
+                        <b>Nombre del Archivo:</b> ${nombreUnidad}<br>
+                        <b>ID de la Unidad:</b> ${idUnidad}<br>
+                        <b>Fecha de creación:</b> ${fechaCreacion}
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                // Obtén el PDF del iframe
+                const iframe = document.getElementById('iframePDF');
+                if (!iframe || !iframe.src) {
+                    Swal.fire('Error', 'No se encontró el PDF para guardar.', 'error');
+                    return;
+                }
+
+                try {
+                    // Descarga el PDF como blob
+                    const pdfResp = await fetch(iframe.src);
+                    if (!pdfResp.ok) throw new Error('No se pudo obtener el PDF');
+                    const pdfBlob = await pdfResp.blob();
+
+                    // Prepara FormData
+                    const formData = new FormData();
+                    formData.append('unidad_id', idUnidad);
+                    formData.append('nombre_archivo', nombreUnidad + '.pdf');
+                    formData.append('archivo_pdf', pdfBlob, nombreUnidad + '.pdf');
+
+                    // Envía a guardarPlanificacion.php
+                    const resp = await fetch('/SysPlanificacion/app/gestionPDFS/guardarPlanificacion.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        Swal.fire('¡Guardado!', data.message, 'success');
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo guardar el PDF', 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error', err.message || 'No se pudo guardar el PDF', 'error');
+                }
+            }
+        });
+    }
+});
+

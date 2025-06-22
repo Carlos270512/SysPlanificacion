@@ -61,4 +61,51 @@ class PlanificacionRepository
         $stmt->execute([$unidad_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC); // Devuelve ['codigo' => ..., 'nombre' => ...] o false
     }
+
+
+    public function getSemanaLinea($id_semana_linea)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM semana_linea WHERE id_semana_linea = ?");
+        $stmt->execute([$id_semana_linea]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Obtiene la unidad asociada a una semana en línea
+    public function getUnidadPorSemanaLinea($id_semana_linea)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT u.*
+            FROM semana_linea sl
+            JOIN unidad u ON sl.id_unidad = u.id_unidad
+            WHERE sl.id_semana_linea = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$id_semana_linea]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Obtiene la asignatura y docente asociada a una semana en línea
+    public function getAsignaturaConDocentePorSemanaLinea($id_semana_linea)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT a.*, d.nombre AS docente_nombre
+            FROM semana_linea sl
+            JOIN unidad u ON sl.id_unidad = u.id_unidad
+            JOIN asignatura a ON u.asignatura_codigo = a.codigo
+            LEFT JOIN docente d ON a.docente_codigo = d.codigo
+            WHERE sl.id_semana_linea = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$id_semana_linea]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getSemanasLineaPorUnidad($id_unidad)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM semana_linea WHERE id_unidad = ? ORDER BY fecha_sabado ASC");
+        $stmt->execute([$id_unidad]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
 }

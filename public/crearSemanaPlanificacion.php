@@ -132,7 +132,7 @@ $tipo_jornada = ($jornada === 'PL' || $jornada === 'EL') ? $jornada : '';
                                 <!-- Botones de acción para semana en línea -->
                                 <div class="mt-3 text-end">
                                     <button type="submit" class="btn btn-primary" id="btnGuardarSemana" style="display:none;">Guardar Semana</button>
-                                    <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
+                                    <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDFLinea">Visualizar PDF</button>
                                     <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?>" class="btn btn-secondary ms-2">
                                         &larr; Atrás
                                     </a>
@@ -292,7 +292,7 @@ $tipo_jornada = ($jornada === 'PL' || $jornada === 'EL') ? $jornada : '';
                     <iframe id="iframePDF" src="" style="width:100%;height:100%;border:none;"></iframe>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="btnGuardarPDF" disabled>Guardar PDF</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarPDF">Guardar PDF</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
