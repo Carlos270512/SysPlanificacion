@@ -12,7 +12,7 @@ if ($id_unidad) {
     $nombre_unidad = $row ? $row['nombre'] : '';
     $jornada = $row ? strtoupper($row['jornada']) : '';
 }
-$tipo_jornada = ($jornada === 'PL' || $jornada === 'EL') ? $jornada : '';
+$tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -59,7 +59,7 @@ $tipo_jornada = ($jornada === 'PL' || $jornada === 'EL') ? $jornada : '';
                 </h2>
                 <div id="collapsePlanificacion" class="accordion-collapse collapse show" aria-labelledby="headingPlanificacion" data-bs-parent="#acordeonPlanificacion">
                     <div class="accordion-body">
-                        <?php if ($tipo_jornada === 'EL'): ?>
+                        <?php if ($tipo_jornada === 'S' || $tipo_jornada === 'EL'): ?>
                             <!-- FORMULARIO SOLO PARA EL -->
                             <form id="formSemanaPL" method="post" action="/SysPlanificacion/app/SemanaLinea/createSemanaLinea.php">
                                 <input type="hidden" name="unidad_id" value="<?php echo htmlspecialchars($id_unidad); ?>">

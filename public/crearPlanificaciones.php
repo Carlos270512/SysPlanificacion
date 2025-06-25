@@ -45,10 +45,10 @@ switch ($jornada) {
     case 'V':
         $modalidad = 'VIRTUAL';
         break;
-    case 'S':
+    case 'Sl':
         $modalidad = 'SABADOS';
         break;
-    case 'PL':
+    case 'S':
     case 'EL': // <-- Agrega esta línea
         $modalidad = 'EN LINEA';
         break;
@@ -57,7 +57,7 @@ switch ($jornada) {
         break;
 }
 // Cambia aquí también:
-$soloCamposPL = ($jornada === 'PL' || $jornada === 'EL');
+$soloCamposPL = ($jornada === 'S' || $jornada === 'EL');
 
 // --- NUEVO: Cargar datos de la unidad si viene id_unidad ---
 $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : null;

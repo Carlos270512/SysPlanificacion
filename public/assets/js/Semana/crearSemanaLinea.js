@@ -122,7 +122,7 @@ quillFields.forEach(field => {
             });
             const data = await resp.json();
             if (data.success) {
-                msgDiv.innerHTML = '<div class="alert alert-success">¡Semana PL guardada correctamente!</div>';
+                msgDiv.innerHTML = '<div class="alert alert-success">¡Semana Semipresencial guardada correctamente!</div>';
             } else {
                 msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
             }
@@ -132,7 +132,7 @@ quillFields.forEach(field => {
 
         
     });
-    // Cargar datos si ya existe una semana PL/EL
+    // Cargar datos si ya existe una semana S/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
     if (idSemanaLineaInput && idSemanaLineaInput.value) {
         fetch(`/SysPlanificacion/app/SemanaLinea/getSemanaLineaById.php?id_semana_linea=${idSemanaLineaInput.value}`)
