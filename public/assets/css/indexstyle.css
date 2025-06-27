@@ -26,15 +26,21 @@ h3 {
 }
 
 .btn {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #8B5C2A;
+  border-color: #8B5C2A;
+  transition: background 0.2s, border 0.2s, transform 0.2s;
 }
 
 .btn:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  background-color: #7A4B1A;
+  border-color: #7A4B1A;
+  transform: translateY(-4px) scale(1.03);
 }
-
+.login-card .input-group-text {
+  background: #8B5C2A;
+  color: #fff;
+  border: none;
+}
 .container {
   max-width: 500px;
 }
@@ -51,7 +57,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #978f7b;
+  background: linear-gradient(180deg, rgb(44, 64, 115) 0%, #8B5C2A 100%);
 }
 .login-card {
   border-radius: 15px;
@@ -59,7 +65,7 @@ html {
   padding: 2.5rem 2rem;
   background: #fff;
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; 
 }
 .logo-efecto {
   display: block;

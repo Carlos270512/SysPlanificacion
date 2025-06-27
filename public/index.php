@@ -25,7 +25,6 @@ if (isset($_GET['error'])) {
 <body>
     <div class="bg-login">
         <div class="login-card">
-            <h2 class="text-center mb-4">Iniciar sesión</h2>
             <img src="assets/img/logotvn.png" alt="Logo Vida Nueva" class="logo-efecto">
             <?php echo $mensaje; ?>
             <form action="validar.php" method="POST" autocomplete="off">
