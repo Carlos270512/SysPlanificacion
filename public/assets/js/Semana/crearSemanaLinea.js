@@ -104,34 +104,50 @@ quillFields.forEach(field => {
     }
 
     // Al enviar el formulario manualmente
-    const msgDiv = document.getElementById('msgSemana');
-    form.addEventListener('submit', async function (e) {
-        quillFields.forEach(field => {
-            const input = form.querySelector(`input[name="${field.name}"]`);
-            if (input && window.quill_editors_pl[field.name]) {
-                input.value = window.quill_editors_pl[field.name].root.innerHTML;
-            }
-        });
-        e.preventDefault();
-        msgDiv.innerHTML = '';
-        const formData = new FormData(form);
-        try {
-            const resp = await fetch(form.action, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await resp.json();
-            if (data.success) {
-                msgDiv.innerHTML = '<div class="alert alert-success">¡Semana Semipresencial guardada correctamente!</div>';
-            } else {
-                msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
-            }
-        } catch (err) {
-            msgDiv.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
+   const msgDiv = document.getElementById('msgSemana');
+form.addEventListener('submit', async function (e) {
+    quillFields.forEach(field => {
+        const input = form.querySelector(`input[name="${field.name}"]`);
+        if (input && window.quill_editors_pl[field.name]) {
+            input.value = window.quill_editors_pl[field.name].root.innerHTML;
         }
-
-        
     });
+    e.preventDefault();
+    msgDiv.innerHTML = '';
+    const formData = new FormData(form);
+    try {
+        const resp = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await resp.json();
+        if (data.success) {
+            // SweetAlert de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '¡Semana Semipresencial guardada correctamente!',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            // SweetAlert de error (aquí se mostrarán las validaciones de fecha)
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Error al guardar',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (err) {
+        // SweetAlert de error de conexión
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo conectar con el servidor',
+            confirmButtonText: 'OK'
+        });
+    }
+});
     // Cargar datos si ya existe una semana S/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
     if (idSemanaLineaInput && idSemanaLineaInput.value) {
