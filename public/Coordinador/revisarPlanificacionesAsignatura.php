@@ -139,17 +139,17 @@ if (!$docente || !$asignatura) {
                         <?php if ($unidades): ?>
                             <?php foreach ($unidades as $unidad): ?>
                                 <?php
-                                    $semanas = getSemanasPorUnidad($pdo, $unidad['id_unidad']);
-                                    $collapseId = 'unidadCollapse' . $unidad['id_unidad'];
+                                $semanas = getSemanasPorUnidad($pdo, $unidad['id_unidad']);
+                                $collapseId = 'unidadCollapse' . $unidad['id_unidad'];
                                 ?>
                                 <li class="nav-item">
                                     <a class="nav-link px-4 unidad-link"
-                                       data-bs-toggle="collapse"
-                                       href="#<?= $collapseId ?>"
-                                       role="button"
-                                       aria-expanded="false"
-                                       aria-controls="<?= $collapseId ?>"
-                                       data-unidad-id="<?= $unidad['id_unidad'] ?>">
+                                        data-bs-toggle="collapse"
+                                        href="#<?= $collapseId ?>"
+                                        role="button"
+                                        aria-expanded="false"
+                                        aria-controls="<?= $collapseId ?>"
+                                        data-unidad-id="<?= $unidad['id_unidad'] ?>">
                                         <i class="bi bi-book me-2"></i> Unidad <?= htmlspecialchars($unidad['numero_unidad']); ?>: <?= htmlspecialchars($unidad['nombre']); ?>
                                     </a>
                                     <div class="collapse ms-2" id="<?= $collapseId ?>">
@@ -178,25 +178,65 @@ if (!$docente || !$asignatura) {
             <!-- Contenido principal -->
             <div class="col-md-9">
                 <div class="card shadow-sm p-4 bg-white">
-                    <h4>Planificación de la Semana</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">Planificación de la Semana</h4>
+                        <!-- Botón Observaciones -->
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalObservaciones">
+                            <i class="bi bi-chat-dots"></i> Observaciones
+                        </button>
+                    </div>
                     <iframe class="iframe-container" src="about:blank"></iframe>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.querySelectorAll('.unidad-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            var unidadId = this.getAttribute('data-unidad-id');
-            var iframe = document.querySelector('.iframe-container');
-            if (unidadId && iframe) {
-                iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
-            }
-        });
-    });
-    </script>
+            <!-- Modal Observaciones -->
+            <div class="modal fade" id="modalObservaciones" tabindex="-1" aria-labelledby="modalObservacionesLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form id="formObservaciones" method="post" action="../../app/RevisarPlanificaciones/guardarObservacion.php">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning">
+                                <h5 class="modal-title" id="modalObservacionesLabel"><i class="bi bi-chat-dots"></i> Enviar Observación al Docente</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="docente_codigo" value="<?= htmlspecialchars($docente['codigo'] ?? '') ?>">
+                                <input type="hidden" name="asignatura_codigo" value="<?= htmlspecialchars($asignatura['codigo'] ?? '') ?>">
+                                <div class="mb-3">
+                                    <label for="campo_corregir" class="form-label">¿Qué debe corregir?</label>
+                                    <select class="form-select" id="campo_corregir" name="campo_corregir" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="objetivo">Objetivo</option>
+                                        <option value="apertura">Apertura</option>
+                                        <option value="desarrollo">Desarrollo</option>
+                                        <option value="cierre">Cierre</option>
+                                        <option value="trabajo_autonomo">Trabajo autónomo</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="descripcion_observacion" class="form-label">Descripción de la observación</label>
+                                    <textarea class="form-control" id="descripcion_observacion" name="descripcion_observacion" rows="4" required placeholder="Describa lo que debe corregir el docente"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-warning">Enviar Observación</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+            <script>
+                document.querySelectorAll('.unidad-link').forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        var unidadId = this.getAttribute('data-unidad-id');
+                        var iframe = document.querySelector('.iframe-container');
+                        if (unidadId && iframe) {
+                            iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
+                        }
+                    });
+                });
+            </script>
 </body>
 
 </html>
