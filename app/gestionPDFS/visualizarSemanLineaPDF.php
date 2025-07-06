@@ -6,8 +6,31 @@ require_once __DIR__ . '/PlanificacionRepository.php';
 
 $mpdf = new \Mpdf\Mpdf([
     'mode' => 'utf-8',
-    'format' => 'A4-L' // Horizontal
+    'format' => 'A4-L', // Horizontal
+    'margin_top' => 35, // Deja espacio para el encabezado
+    'margin_header' => 5
 ]);
+
+// Configurar el encabezado con la imagen del instituto
+$imagePath = __DIR__ . '/../../public/assets/img/encabezadoPlani.png';
+if (file_exists($imagePath)) {
+    $imageData = base64_encode(file_get_contents($imagePath));
+    $imageSrc = 'data:image/png;base64,' . $imageData;
+} else {
+    $imageSrc = '';
+}
+
+$header = '
+<table width="100%" style="border-collapse: collapse;">
+    <tr>
+        <td width="100%" style="text-align: center;">
+            <img src="' . $imageSrc . '" style="max-width: 100%; height: auto; max-height: 80px; width: 95%;">
+        </td>
+    </tr>
+</table>';
+
+// Establecer el encabezado para todas las páginas
+$mpdf->SetHTMLHeader($header);
 
 $id_semana_linea = isset($_GET['id_semana_linea']) ? intval($_GET['id_semana_linea']) : null;
 
