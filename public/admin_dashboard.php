@@ -39,6 +39,10 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
                         <li><a class="dropdown-item" href="subirExcel.php" target="mainFrame">Cargar Datos</a></li>
                     </ul>
+
+                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
+                        <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestion de PLanificaciones</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item dropdown mx-2">
                     <a class="nav-link dropdown-toggle custom-nav-link" href="#" id="planificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
