@@ -1,6 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = trim($_POST['codigo'] ?? '');
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'rol' => $rol,
             'errores' => implode(', ', $errores)
         ];
-        header("Location: ../public/gestionUsuarios.php?errores=1");
+        header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
         exit();
     }
 
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'rol' => $rol,
             'errores' => 'Código o correo duplicado'
         ];
-        header("Location: ../public/gestionUsuarios.php?errores=1");
+        header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
         exit();
     }
 
@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("INSERT INTO docente (codigo, carrera, nombre, titulo, fecha_ingreso, rol, correo, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$codigo, $carrera, $nombre, $titulo, $fecha_ingreso, $rol, $correo, $passwordHash]);
 
-    header("Location: ../public/gestionUsuarios.php?exito=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1");
     exit();
 }
-header("Location: ../public/gestionUsuarios.php");
+header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php");
 exit();

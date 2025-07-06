@@ -1,6 +1,7 @@
 <?php
-require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config/conexion.php';
+
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -11,7 +12,7 @@ error_reporting(E_ALL);
 
 // Validar archivo recibido
 if (!isset($_FILES['archivo_excel']) || $_FILES['archivo_excel']['error'] !== UPLOAD_ERR_OK) {
-    header("Location: ../public/gestionUsuarios.php?error_subida=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?error_subida=1");
     exit();
 }
 
@@ -21,7 +22,7 @@ $archivo = $_FILES['archivo_excel']['tmp_name'];
 try {
     $documento = IOFactory::load($archivo);
 } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-    header("Location: ../public/gestionUsuarios.php?error_formato=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?error_formato=1");
     exit();
 }
 
@@ -45,7 +46,7 @@ $encabezadosArchivo = array_map(function ($valor) {
 }, $filas[1] ?? []);
 
 if (array_diff($encabezadosValidos, $encabezadosArchivo)) {
-    header("Location: ../public/gestionUsuarios.php?error_encabezados=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?error_encabezados=1");
     exit();
 }
 
@@ -55,7 +56,7 @@ $hashArchivo = hash_file('sha256', $archivo);
 // Verificar si el archivo ya fue subido
 session_start();
 if (isset($_SESSION['ultimo_hash']) && $_SESSION['ultimo_hash'] === $hashArchivo) {
-    header("Location: ../public/gestionUsuarios.php?archivo_subido=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?archivo_subido=1");
     exit();
 }
 
@@ -145,9 +146,9 @@ for ($i = 2; $i <= count($filas); $i++) {
 // Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
     $_SESSION['errores_excel'] = $filasConErrores;
-    header("Location: ../public/gestionUsuarios.php?errores=1");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
     exit();
 }
 
-header("Location: ../public/gestionUsuarios.php?exito=1");
+header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1");
 exit();

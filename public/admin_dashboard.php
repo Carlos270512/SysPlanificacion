@@ -29,7 +29,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                         <i class="fas fa-user-cog me-2"></i>Usuarios
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="usuariosDropdown">
-                        <li><a class="dropdown-item" href="gestionUsuarios.php" target="mainFrame">Gestión de Usuarios</a></li>
+                        <li><a class="dropdown-item" href="Administrador/gestionUsuarios.php" target="mainFrame">Gestión de Usuarios</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown mx-2">
@@ -37,7 +37,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                         <i class="fas fa-chalkboard-teacher me-2"></i>Datos
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
-                        <li><a class="dropdown-item" href="subirExcel.php" target="mainFrame">Cargar Datos</a></li>
+                        <li><a class="dropdown-item" href="Administrador/subirExcel.php" target="mainFrame">Cargar Datos</a></li>
                     </ul>
 
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">

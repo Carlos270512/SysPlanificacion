@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -29,7 +29,6 @@ $hayErrores = isset($_GET['errores']);
 <head>
     <meta charset="UTF-8">
     <title>Subir Excel</title>
-    <link rel="stylesheet" href="assets/css/subirExcelstyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -37,13 +36,13 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/Administrador/toast.js"></script>
-
+    <link rel="stylesheet" href="../assets/css/subirExcelstyles.css">
+    <script src="../assets/js/Administrador/toast.js"></script>
 </head>
 
 <body>
     <h2 class="mb-4">Subir archivo Excel</h2>
-    <form action="../app/procesarExcel.php" method="POST" enctype="multipart/form-data">
+    <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
             <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
@@ -69,7 +68,7 @@ $hayErrores = isset($_GET['errores']);
             </thead>
             <tbody>
                 <?php
-                require __DIR__ . '/../config/conexion.php';
+                require __DIR__ . '/../../config/conexion.php';
                 $stmt = $pdo->query("SELECT codigo, nombre_asignatura, horario, jornada, aula, nivel, fecha_inicio, fecha_fin, docente_codigo FROM asignatura");
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
@@ -81,7 +80,7 @@ $hayErrores = isset($_GET['errores']);
                         <td><?= htmlspecialchars($row['nivel']) ?></td>
                         <td><?= htmlspecialchars($row['fecha_inicio']) ?></td>
                         <td><?= htmlspecialchars($row['fecha_fin']) ?></td>
-                        <td><?= htmlspecialchars($row['docente_codigo']) ?></td>
+                        <td><?= htmlspecialchars($row['docente_codigo'] ?? '') ?></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -164,61 +163,61 @@ $hayErrores = isset($_GET['errores']);
             });
         });
     </script>
-     <?php if (!empty($mensaje)): ?>
-    <?php
-    // Determina los valores para el toast
-    $toastType = '';
-    $toastTitle = '';
-    $toastIconColor = '';
-    $toastPopupClass = '';
-    $toastTimer = 4000;
-
-    if (isset($_GET['exito'])) {
-        $toastType = 'success';
-        $toastTitle = 'Archivo Excel cargado correctamente.';
-        $toastIconColor = '#fff';
-        $toastPopupClass = 'bg-success text-white';
+    <?php if (!empty($mensaje)): ?>
+        <?php
+        // Determina los valores para el toast
+        $toastType = '';
+        $toastTitle = '';
+        $toastIconColor = '';
+        $toastPopupClass = '';
         $toastTimer = 4000;
-    } elseif (isset($_GET['error'])) {
-        $toastType = 'error';
-        $toastTitle = 'Hubo un error al procesar el archivo.';
-        $toastIconColor = '#fff';
-        $toastPopupClass = 'bg-danger text-white';
-        $toastTimer = 5000;
-    } elseif (isset($_GET['error_encabezados'])) {
-        $toastType = 'warning';
-        $toastTitle = 'Los encabezados del archivo no son válidos. Por favor, verifica el formato.';
-        $toastIconColor = '#664d03';
-        $toastPopupClass = 'bg-warning text-dark';
-        $toastTimer = 6000;
-    } elseif (isset($_GET['error_subida'])) {
-        $toastType = 'error';
-        $toastTitle = 'Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.';
-        $toastIconColor = '#fff';
-        $toastPopupClass = 'bg-danger text-white';
-        $toastTimer = 6000;
-    } elseif (isset($_GET['error_formato'])) {
-        $toastType = 'warning';
-        $toastTitle = 'El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.';
-        $toastIconColor = '#664d03';
-        $toastPopupClass = 'bg-warning text-dark';
-        $toastTimer = 6000;
-    } elseif (isset($_GET['archivo_duplicado'])) {
-        $toastType = 'info';
-        $toastTitle = 'Este archivo ya fue subido anteriormente.';
-        $toastIconColor = '#055160';
-        $toastPopupClass = 'bg-info text-dark';
-        $toastTimer = 5000;
-    }
-    ?>
-    <script>
-        window.toastType = "<?= $toastType ?>";
-        window.toastTitle = "<?= $toastTitle ?>";
-        window.toastIconColor = "<?= $toastIconColor ?>";
-        window.toastPopupClass = "<?= $toastPopupClass ?>";
-        window.toastTimer = <?= $toastTimer ?>;
-    </script>
-<?php endif; ?>
+
+        if (isset($_GET['exito'])) {
+            $toastType = 'success';
+            $toastTitle = 'Archivo Excel cargado correctamente.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-success text-white';
+            $toastTimer = 4000;
+        } elseif (isset($_GET['error'])) {
+            $toastType = 'error';
+            $toastTitle = 'Hubo un error al procesar el archivo.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-danger text-white';
+            $toastTimer = 5000;
+        } elseif (isset($_GET['error_encabezados'])) {
+            $toastType = 'warning';
+            $toastTitle = 'Los encabezados del archivo no son válidos. Por favor, verifica el formato.';
+            $toastIconColor = '#664d03';
+            $toastPopupClass = 'bg-warning text-dark';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['error_subida'])) {
+            $toastType = 'error';
+            $toastTitle = 'Error al subir el archivo. Asegúrate de que sea un archivo Excel válido.';
+            $toastIconColor = '#fff';
+            $toastPopupClass = 'bg-danger text-white';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['error_formato'])) {
+            $toastType = 'warning';
+            $toastTitle = 'El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.';
+            $toastIconColor = '#664d03';
+            $toastPopupClass = 'bg-warning text-dark';
+            $toastTimer = 6000;
+        } elseif (isset($_GET['archivo_duplicado'])) {
+            $toastType = 'info';
+            $toastTitle = 'Este archivo ya fue subido anteriormente.';
+            $toastIconColor = '#055160';
+            $toastPopupClass = 'bg-info text-dark';
+            $toastTimer = 5000;
+        }
+        ?>
+        <script>
+            window.toastType = "<?= $toastType ?>";
+            window.toastTitle = "<?= $toastTitle ?>";
+            window.toastIconColor = "<?= $toastIconColor ?>";
+            window.toastPopupClass = "<?= $toastPopupClass ?>";
+            window.toastTimer = <?= $toastTimer ?>;
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

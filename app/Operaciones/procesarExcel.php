@@ -1,7 +1,7 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 
 // Validar archivo recibido
 if (!isset($_FILES['archivo_excel']) || $_FILES['archivo_excel']['error'] !== UPLOAD_ERR_OK) {
-    header("Location: ../public/subirExcel.php?error_subida=1");
+    header("Location: /SysPlanificacion/public/Administrador/subirExcel.php?error_subida=1");
     exit();
 }
 
@@ -22,7 +22,7 @@ $archivo = $_FILES['archivo_excel']['tmp_name'];
 try {
     $documento = IOFactory::load($archivo);
 } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-    header("Location: ../public/subirExcel.php?error_formato=1");
+    header("Location:/SysPlanificacion/public/Administrador/subirExcel.php?error_formato=1");
     exit();
 }
 
@@ -41,7 +41,7 @@ $encabezadosArchivo = array_map(function ($valor) {
 }, $filas[1] ?? []);
 
 if (array_diff($encabezadosValidos, $encabezadosArchivo)) {
-    header("Location: ../public/subirExcel.php?error_encabezados=1");
+    header("Location: /SysPlanificacion/public/Administrador/subirExcel.php?error_encabezados=1");
     exit();
 }
 
@@ -51,7 +51,7 @@ $hashArchivo = hash_file('sha256', $archivo);
 // Verificar si el archivo ya fue subido
 session_start();
 if (isset($_SESSION['archivos_subidos']) && in_array($hashArchivo, $_SESSION['archivos_subidos'])) {
-    header("Location: ../public/subirExcel.php?archivo_duplicado=1");
+    header("Location: /SysPlanificacion/public/Administrador/subirExcel.php?archivo_duplicado=1");
     exit();
 }
 
@@ -141,10 +141,10 @@ for ($i = 2; $i <= count($filas); $i++) {
 // Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
     $_SESSION['errores_excel'] = $filasConErrores;
-    header("Location: ../public/subirExcel.php?exito=1&errores=1");
+    header("Location: /SysPlanificacion/public/Administrador/subirExcel.php?exito=1&errores=1");
     exit();
 }
 
 // Redirigir si todo fue exitoso
-header("Location: ../public/subirExcel.php?exito=1");
+header("Location: /SysPlanificacion/public/Administrador/subirExcel.php?exito=1");
 exit();

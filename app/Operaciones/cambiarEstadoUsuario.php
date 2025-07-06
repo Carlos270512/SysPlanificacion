@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
-    header("Location: ../public/gestionUsuarios.php");
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php");
     exit();
 }
-require __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 if (isset($_POST['codigo'], $_POST['estado'])) {
     $codigo = $_POST['codigo'];
@@ -14,5 +14,7 @@ if (isset($_POST['codigo'], $_POST['estado'])) {
     $stmt->execute([$nuevoEstado, $codigo]);
 }
 
-header("Location: ../public/gestionUsuarios.php");
+header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php");
 exit();
+
+

@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -28,7 +28,6 @@ $hayErrores = isset($_GET['errores']);
     <meta charset="UTF-8">
     <title>Gestión de Usuarios (Docentes)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/gestionUsuariosSytles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -36,13 +35,14 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/Administrador/toast.js"></script>
+    <link rel="stylesheet" href="../assets/css/gestionUsuariosSytles.css">
+    <script src="../assets/js/Administrador/toast.js"></script>
 </head>
 
 <body>
     <div class="container-fluid mt-5">
         <h2 class="mb-4">Importar Usuarios desde Excel</h2>
-        <form action="../app/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
+        <form action="../../app/Operaciones/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
                 <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
@@ -56,7 +56,7 @@ $hayErrores = isset($_GET['errores']);
         <!-- Modal Registrar Docente -->
         <div class="modal fade" id="registrarDocenteModal" tabindex="-1" aria-labelledby="registrarDocenteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <form class="modal-content" action="../app/registrarDocenteManual.php" method="POST">
+                <form class="modal-content" action="../../app/Operaciones/registrarDocenteManual.php" method="POST">
                     <div class="modal-header">
                         <h5 class="modal-title" id="registrarDocenteModalLabel">Registrar Docente</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -134,7 +134,7 @@ $hayErrores = isset($_GET['errores']);
                 </thead>
                 <tbody>
                     <?php
-                    require __DIR__ . '/../config/conexion.php';
+                    require __DIR__ . '/../../config/conexion.php';
                     $estadoFiltro = isset($_GET['estado']) && $_GET['estado'] === 'INACTIVO' ? 'INACTIVO' : 'ACTIVO';
                     $stmt = $pdo->prepare("SELECT codigo, carrera, titulo, nombre, correo, rol, estado FROM docente WHERE estado = ?");
                     $stmt->execute([$estadoFiltro]);
@@ -152,7 +152,7 @@ $hayErrores = isset($_GET['errores']);
                                 </span>
                             </td>
                             <td>
-                                <form action="../app/cambiarEstadoUsuario.php" method="POST" style="display:inline;">
+                                <form action="../../app/Operaciones/cambiarEstadoUsuario.php" method="POST" style="display:inline;">
                                     <input type="hidden" name="codigo" value="<?= htmlspecialchars($row['codigo']) ?>">
                                     <input type="hidden" name="estado" value="<?= $row['estado'] === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO' ?>">
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -236,8 +236,8 @@ $hayErrores = isset($_GET['errores']);
             });
         });
     </script>
-    
-        <?php if (!empty($mensaje)): ?>
+
+    <?php if (!empty($mensaje)): ?>
         <?php
         // Determina los valores para el toast
         $toastType = '';
@@ -291,7 +291,7 @@ $hayErrores = isset($_GET['errores']);
             window.toastPopupClass = "<?= $toastPopupClass ?>";
             window.toastTimer = <?= $toastTimer ?>;
         </script>
-        <?php endif; ?>
+    <?php endif; ?>
 </body>
 
 </html>
