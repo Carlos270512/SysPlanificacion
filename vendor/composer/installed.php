@@ -3,7 +3,7 @@
         'name' => 'user/sys-planificacion',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'd2f89f06b920b9b08e9290fa47a3ce9416a84aa4',
+        'reference' => 'b8c5c083c1d9363bfa5e7400824d2e34c44ac44f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -127,6 +127,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'phpmailer/phpmailer' => array(
+            'pretty_version' => 'v6.10.0',
+            'version' => '6.10.0.0',
+            'reference' => 'bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpmailer/phpmailer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'phpoffice/phpspreadsheet' => array(
             'pretty_version' => '4.2.0',
             'version' => '4.2.0.0',
@@ -211,7 +220,7 @@
         'user/sys-planificacion' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'd2f89f06b920b9b08e9290fa47a3ce9416a84aa4',
+            'reference' => 'b8c5c083c1d9363bfa5e7400824d2e34c44ac44f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
