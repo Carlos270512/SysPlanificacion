@@ -22,41 +22,70 @@ document.addEventListener('DOMContentLoaded', function () {
     window.quill_editors_pl = {};
 
     // Inicializa Quill y sincroniza con los inputs hidden
-quillFields.forEach(field => {
-    const el = document.getElementById(field.id);
-    if (el) {
-        window.quill_editors_pl[field.name] = new Quill(`#${field.id}`, {
-            theme: 'snow',
-            modules: { toolbar: quillToolbar }
-        });
-        // Sincroniza el contenido con el input hidden en cada cambio
-        window.quill_editors_pl[field.name].on('text-change', function () {
-            const input = form.querySelector(`input[name="${field.name}"]`);
-            if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
-            // No llamar autoGuardarSemanaPL aquí
-        });
-        // Auto-guardado y pintado en verde al perder el foco (igual que semana normal)
-        window.quill_editors_pl[field.name].on('selection-change', function(range, oldRange, source) {
-            if (oldRange && !range) { // blur
+    quillFields.forEach(field => {
+        const el = document.getElementById(field.id);
+        if (el) {
+            window.quill_editors_pl[field.name] = new Quill(`#${field.id}`, {
+                theme: 'snow',
+                modules: { toolbar: quillToolbar }
+            });
+            // Sincroniza el contenido con el input hidden en cada cambio
+            window.quill_editors_pl[field.name].on('text-change', function () {
                 const input = form.querySelector(`input[name="${field.name}"]`);
-                if (input) autoGuardarSemanaPL(input);
+                if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
+                // No llamar autoGuardarSemanaPL aquí
+            });
+            // Auto-guardado y pintado en verde al perder el foco (igual que semana normal)
+            window.quill_editors_pl[field.name].on('selection-change', function (range, oldRange, source) {
+                if (oldRange && !range) { // blur
+                    const input = form.querySelector(`input[name="${field.name}"]`);
+                    if (input) autoGuardarSemanaPL(input);
+                }
+            });
+        }
+    });
+
+    // Auto-guardado para inputs normales
+let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
+
+[
+    'tiempo_actividades',
+    'tiempo_desarrollo',
+    'tiempo_cierre',
+    'fecha_sabado'
+].forEach(name => {
+    const input = form.querySelector(`input[name="${name}"]`);
+    if (input) {
+        // Guardar el valor anterior al hacer focus (solo para fecha_sabado)
+        if (name === 'fecha_sabado') {
+            input.addEventListener('focus', () => {
+                fechaSabadoAnterior = input.value;
+            });
+        }
+        input.addEventListener('blur', async () => {
+            if (name === 'fecha_sabado' && input.value) {
+                const fechaSeleccionada = new Date(input.value);
+                const hoy = new Date();
+                // Compara año y mes
+                if (
+                    fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
+                    (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
+                ) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'Solo puede seleccionar fechas del mes actual.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaSabadoAnterior; // Restaura el valor anterior
+                    input.focus();
+                    return;
+                }
             }
+            autoGuardarSemanaPL(input);
         });
     }
 });
-
-    // Auto-guardado para inputs normales
-    [
-        'tiempo_actividades',
-        'tiempo_desarrollo',
-        'tiempo_cierre',
-        'fecha_sabado'
-    ].forEach(name => {
-        const input = form.querySelector(`input[name="${name}"]`);
-        if (input) {
-            input.addEventListener('blur', () => autoGuardarSemanaPL(input));
-        }
-    });
     function pintarVerde(element) {
         const original = element.style.backgroundColor;
         element.style.backgroundColor = '#b6fcb6';
@@ -104,50 +133,50 @@ quillFields.forEach(field => {
     }
 
     // Al enviar el formulario manualmente
-   const msgDiv = document.getElementById('msgSemana');
-form.addEventListener('submit', async function (e) {
-    quillFields.forEach(field => {
-        const input = form.querySelector(`input[name="${field.name}"]`);
-        if (input && window.quill_editors_pl[field.name]) {
-            input.value = window.quill_editors_pl[field.name].root.innerHTML;
-        }
-    });
-    e.preventDefault();
-    msgDiv.innerHTML = '';
-    const formData = new FormData(form);
-    try {
-        const resp = await fetch(form.action, {
-            method: 'POST',
-            body: formData
+    const msgDiv = document.getElementById('msgSemana');
+    form.addEventListener('submit', async function (e) {
+        quillFields.forEach(field => {
+            const input = form.querySelector(`input[name="${field.name}"]`);
+            if (input && window.quill_editors_pl[field.name]) {
+                input.value = window.quill_editors_pl[field.name].root.innerHTML;
+            }
         });
-        const data = await resp.json();
-        if (data.success) {
-            // SweetAlert de éxito
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: '¡Semana Semipresencial guardada correctamente!',
-                confirmButtonText: 'OK'
+        e.preventDefault();
+        msgDiv.innerHTML = '';
+        const formData = new FormData(form);
+        try {
+            const resp = await fetch(form.action, {
+                method: 'POST',
+                body: formData
             });
-        } else {
-            // SweetAlert de error (aquí se mostrarán las validaciones de fecha)
+            const data = await resp.json();
+            if (data.success) {
+                // SweetAlert de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '¡Semana Semipresencial guardada correctamente!',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                // SweetAlert de error (aquí se mostrarán las validaciones de fecha)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Error al guardar',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (err) {
+            // SweetAlert de error de conexión
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: data.message || 'Error al guardar',
+                title: 'Error de conexión',
+                text: 'No se pudo conectar con el servidor',
                 confirmButtonText: 'OK'
             });
         }
-    } catch (err) {
-        // SweetAlert de error de conexión
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de conexión',
-            text: 'No se pudo conectar con el servidor',
-            confirmButtonText: 'OK'
-        });
-    }
-});
+    });
     // Cargar datos si ya existe una semana S/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
     if (idSemanaLineaInput && idSemanaLineaInput.value) {

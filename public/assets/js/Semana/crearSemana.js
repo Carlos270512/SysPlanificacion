@@ -4,6 +4,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const semanaFin = document.querySelector('input[name="semana_fin"]');
     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
+    // Guardar el valor anterior
+    let semanaInicioPrev = semanaInicio ? semanaInicio.value : '';
+    let semanaFinPrev = semanaFin ? semanaFin.value : '';
+
+    function validarMesActual(input, prevValue) {
+        if (!input.value) return true;
+        const fecha = new Date(input.value);
+        const hoy = new Date();
+        const mesActual = hoy.getMonth();
+        const anioActual = hoy.getFullYear();
+        if (fecha.getFullYear() < anioActual || (fecha.getFullYear() === anioActual && fecha.getMonth() < mesActual)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fecha inválida',
+                text: 'No puedes seleccionar una fecha de un mes anterior al actual.',
+            });
+            input.value = prevValue;
+            input.focus();
+            return false;
+        }
+        return true;
+    }
+
+    if (semanaInicio) {
+        semanaInicio.addEventListener('focus', function () {
+            semanaInicioPrev = semanaInicio.value;
+        });
+        semanaInicio.addEventListener('change', function () {
+            validarMesActual(semanaInicio, semanaInicioPrev);
+        });
+    }
+    if (semanaFin) {
+        semanaFin.addEventListener('focus', function () {
+            semanaFinPrev = semanaFin.value;
+        });
+        semanaFin.addEventListener('change', function () {
+            validarMesActual(semanaFin, semanaFinPrev);
+        });
+    }
+
     // --- Auto-save para semana_inicio y semana_fin ---
     if (semanaInicio) {
         semanaInicio.addEventListener('blur', async function () {
@@ -33,53 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-    //if (semanaInicio) {
-    //    semanaInicio.addEventListener('change', async function () {
-    //        if (!semanaInicio.value) return;
-    //        const [anio, mes, dia] = semanaInicio.value.split('-').map(Number);
-    //        const fecha = new Date(anio, mes - 1, dia);
-//
-    //        const viernes = new Date(fecha);
-    //        viernes.setDate(fecha.getDate() + 4);
-    //        semanaFin.value = viernes.toISOString().slice(0, 10);
-//
-    //        // Guarda automáticamente semana_fin si ya existe una semana guardada
-    //        const semanaId = window.idSemanaGuardada || idSemanaGuardada;
-    //        if (semanaId) {
-    //            fetch('/SysPlanificacion/app/Semana/updateSemana.php', {
-    //                method: 'POST',
-    //                body: new URLSearchParams({
-    //                    semana_id: semanaId,
-    //                    campo: 'semana_fin',
-    //                    valor: semanaFin.value
-    //                })
-    //            });
-    //        }
-    //        dias.forEach((diaNombre, idx) => {
-    //            const th = document.getElementById('th_' + diaNombre);
-    //            if (th) {
-    //                const d = new Date(fecha);
-    //                d.setDate(fecha.getDate() + idx);
-    //                const diaNum = ("0" + d.getDate()).slice(-2);
-    //                const mesNum = ("0" + (d.getMonth() + 1)).slice(-2);
-    //                const anio = d.getFullYear();
-    //                th.textContent = th.dataset.nombre + ' - ' + diaNum + '/' + mesNum + '/' + anio;
-    //            }
-    //            let input = document.querySelector('input[name="fecha_' + diaNombre + '"]');
-    //            if (!input) {
-    //                input = document.createElement('input');
-    //                input.type = 'hidden';
-    //                input.name = 'fecha_' + diaNombre;
-    //                semanaInicio.form.appendChild(input);
-    //            }
-    //            const d = new Date(fecha);
-    //            d.setDate(fecha.getDate() + idx);
-    //            input.value = d.toISOString().slice(0, 10);
-    //        });
-    //    });
-    //}
-
-    // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
+      // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
     const quillToolbar = [
         ['bold', 'italic', 'underline'],
         [{ 'list': 'ordered' }, { 'list': 'bullet' }]

@@ -94,15 +94,32 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 title: 'Nueva semana (S/EL)',
                 html: `
-            <div style="margin-top:10px;">
-                <label style="font-size:15px;">Fecha (sábado):</label>
-                <input type="date" id="swal_fecha_sabado" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
-            </div>
-        `,
+                <div style="margin-top:10px;">
+                    <label style="font-size:15px;">Fecha (sábado):</label>
+                    <input type="date" id="swal_fecha_sabado" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+                </div>
+            `,
                 preConfirm: () => {
                     const fechaSabado = document.getElementById('swal_fecha_sabado').value;
+
+                    // Validación de mes actual
+                    function esMesActual(fechaStr) {
+                        if (!fechaStr) return false;
+                        const fecha = new Date(fechaStr);
+                        const hoy = new Date();
+                        return (
+                            fecha.getFullYear() === hoy.getFullYear() &&
+                            fecha.getMonth() === hoy.getMonth()
+                        );
+                    }
+
                     if (!fechaSabado) {
                         Swal.showValidationMessage('Debes ingresar la fecha del sábado');
+                        return false;
+                    }
+                    if (!esMesActual(fechaSabado)) {
+                        Swal.showValidationMessage('La fecha debe ser del mes actual.');
+                        return false;
                     }
                     return { fechaSabado };
                 },
@@ -158,18 +175,39 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 title: '¿Crear nueva semana?',
                 html: `
-            <div style="margin-top:10px;">
-                <label style="font-size:15px;">Fecha de inicio:</label>
-                <input type="date" id="swal_fecha_semana_inicio" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
-                <label style="font-size:15px;">Fecha de fin:</label>
-                <input type="date" id="swal_fecha_semana_fin" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
-            </div>
-        `,
+        <div style="margin-top:10px;">
+            <label style="font-size:15px;">Fecha de inicio:</label>
+            <input type="date" id="swal_fecha_semana_inicio" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+            <label style="font-size:15px;">Fecha de fin:</label>
+            <input type="date" id="swal_fecha_semana_fin" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
+        </div>
+    `,
                 preConfirm: () => {
                     const fechaInicio = document.getElementById('swal_fecha_semana_inicio').value;
                     const fechaFin = document.getElementById('swal_fecha_semana_fin').value;
+
+                    // Validación de mes actual
+                    function esMesActual(fechaStr) {
+                        if (!fechaStr) return false;
+                        const fecha = new Date(fechaStr);
+                        const hoy = new Date();
+                        return (
+                            fecha.getFullYear() === hoy.getFullYear() &&
+                            fecha.getMonth() === hoy.getMonth()
+                        );
+                    }
+
                     if (!fechaInicio || !fechaFin) {
                         Swal.showValidationMessage('Debes ingresar ambas fechas');
+                        return false;
+                    }
+                    if (!esMesActual(fechaInicio)) {
+                        Swal.showValidationMessage('La fecha de inicio debe ser del mes actual.');
+                        return false;
+                    }
+                    if (!esMesActual(fechaFin)) {
+                        Swal.showValidationMessage('La fecha de fin debe ser del mes actual.');
+                        return false;
                     }
                     return { fechaInicio, fechaFin };
                 },
