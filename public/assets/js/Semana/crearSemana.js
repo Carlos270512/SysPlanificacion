@@ -323,7 +323,27 @@ if (btnGuardarPDF) {
             if (data.success) pintarVerde(input);
         });
     });
-
+document.querySelectorAll('input[type="date"][name^="entrega_"]').forEach(function(input) {
+    let prevValue = input.value;
+    input.addEventListener('focus', function() {
+        prevValue = input.value;
+    });
+    input.addEventListener('change', function() {
+        const fecha = new Date(input.value);
+        const hoy = new Date();
+        const mesActual = hoy.getMonth();
+        const anioActual = hoy.getFullYear();
+        if (input.value && (fecha.getFullYear() < anioActual || (fecha.getFullYear() === anioActual && fecha.getMonth() < mesActual))) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fecha inválida',
+                text: 'Solo puedes seleccionar fechas del mes actual o posteriores.',
+            });
+            input.value = prevValue;
+            input.focus();
+        }
+    });
+});
     // Auto-save para campos Quill
     Object.keys(window.quill_editors).forEach(key => {
         const quill = window.quill_editors[key];
