@@ -127,41 +127,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const msgDiv = document.getElementById('msgSemana');
     let idSemanaGuardada = null; // Aquí guardamos el id de la semana
 
-    if (form) {
-        form.addEventListener('submit', async function (e) {
-            // Copia el contenido de cada Quill al input hidden correspondiente
-            Object.keys(window.quill_editors).forEach(key => {
-                const input = document.querySelector(`input[name="${key}"]`);
-                if (input) {
-                    input.value = window.quill_editors[key].root.innerHTML;
-                }
-            });
-
+if (form) {
+    form.addEventListener('submit', async function (e) {
+        // Validar fechas antes de enviar
+        let valido = true;
+        if (semanaInicio && !validarMesActual(semanaInicio, '')) valido = false;
+        if (semanaFin && !validarMesActual(semanaFin, '')) valido = false;
+        if (!valido) {
             e.preventDefault();
-            msgDiv.innerHTML = '';
-            const formData = new FormData(form);
-            try {
-                const resp = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    msgDiv.innerHTML = '<div class="alert alert-success">¡Semana guardada correctamente!</div>';
-                    //const btnGuardar = document.getElementById('btnGuardarSemana');
-                    const btnPDF = document.getElementById('btnVisualizarPDF');
-                    //if (btnGuardar) btnGuardar.disabled = true;
-                    if (btnPDF) btnPDF.disabled = false;
-                    idSemanaGuardada = data.semana_id; // <-- Guardamos el id correcto del backend
-                    window.idSemanaGuardada = idSemanaGuardada; // Para acceso global
-                } else {
-                    msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
-                }
-            } catch (err) {
-                msgDiv.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
+            return;
+        }
+
+        // Copia el contenido de cada Quill al input hidden correspondiente
+        Object.keys(window.quill_editors).forEach(key => {
+            const input = document.querySelector(`input[name="${key}"]`);
+            if (input) {
+                input.value = window.quill_editors[key].root.innerHTML;
             }
         });
-    }
+
+        e.preventDefault();
+        msgDiv.innerHTML = '';
+        const formData = new FormData(form);
+        try {
+            const resp = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await resp.json();
+            if (data.success) {
+                msgDiv.innerHTML = '<div class="alert alert-success">¡Semana guardada correctamente!</div>';
+                //const btnGuardar = document.getElementById('btnGuardarSemana');
+                const btnPDF = document.getElementById('btnVisualizarPDF');
+                //if (btnGuardar) btnGuardar.disabled = true;
+                if (btnPDF) btnPDF.disabled = false;
+                idSemanaGuardada = data.semana_id; // <-- Guardamos el id correcto del backend
+                window.idSemanaGuardada = idSemanaGuardada; // Para acceso global
+            } else {
+                msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error al guardar') + '</div>';
+            }
+        } catch (err) {
+            msgDiv.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
+        }
+    });
+}
 
     // --- Evento para el botón Visualizar PDF ---
     const btnPDF = document.getElementById('btnVisualizarPDF');

@@ -61,11 +61,27 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
             input.addEventListener('focus', () => {
                 fechaSabadoAnterior = input.value;
             });
+            // Validación para solo sábado
+            input.addEventListener('change', async () => {
+                if (input.value) {
+                    const fechaSeleccionada = new Date(input.value);
+                    if (fechaSeleccionada.getDay() !== 6) { // 6 = Sábado
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: 'Fecha inválida',
+                            text: 'Solo puede seleccionar días sábado.',
+                            confirmButtonText: 'OK'
+                        });
+                        input.value = fechaSabadoAnterior; // Restaura el valor anterior
+                        input.focus();
+                        return;
+                    }
+                }
+            });
         }
         input.addEventListener('blur', async () => {
             if (name === 'fecha_sabado' && input.value) {
                 const fechaSeleccionada = new Date(input.value);
-                const hoy = new Date();
                 // Compara año y mes
                 if (
                     fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
@@ -78,6 +94,18 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
                         confirmButtonText: 'OK'
                     });
                     input.value = fechaSabadoAnterior; // Restaura el valor anterior
+                    input.focus();
+                    return;
+                }
+                // Validación para solo sábado también en blur
+                if (fechaSeleccionada.getDay() !== 6) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'Solo puede seleccionar días sábado.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaSabadoAnterior;
                     input.focus();
                     return;
                 }
