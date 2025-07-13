@@ -51,6 +51,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionesDropdown">
                         <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
                         <li><a class="dropdown-item" href="planificaciones.php" target="mainFrame">Planificaciones</a></li>
+                        <li><a class="dropdown-item" href="nuevoPeriodoAcademico.php" target="mainFrame">Comenzar Nuevo Período </a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-2">
