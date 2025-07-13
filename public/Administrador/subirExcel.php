@@ -50,7 +50,7 @@ $hayErrores = isset($_GET['errores']);
         <button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>
     </form>
 
-    <!-- Tabla para mostrar los datos subidos -->
+    <!-- Tabla para mostrar los datos subidos (agregada columna Periodo Lectivo) -->
     <div class="table-responsive">
         <table id="asignaturasTable" class="table table-striped table-bordered">
             <thead>
@@ -59,6 +59,7 @@ $hayErrores = isset($_GET['errores']);
                     <th>Asignatura</th>
                     <th>Horario</th>
                     <th>Jornada</th>
+                    <th>Periodo Lectivo</th>
                     <th>Aula</th>
                     <th>Nivel</th>
                     <th>Fecha Inicio</th>
@@ -69,13 +70,14 @@ $hayErrores = isset($_GET['errores']);
             <tbody>
                 <?php
                 require __DIR__ . '/../../config/conexion.php';
-                $stmt = $pdo->query("SELECT codigo, nombre_asignatura, horario, jornada, aula, nivel, fecha_inicio, fecha_fin, docente_codigo FROM asignatura");
+                $stmt = $pdo->query("SELECT codigo, nombre_asignatura, horario, jornada, periodo_academico, aula, nivel, fecha_inicio, fecha_fin, docente_codigo FROM asignatura");
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
                         <td><?= htmlspecialchars($row['codigo']) ?></td>
                         <td><?= htmlspecialchars($row['nombre_asignatura']) ?></td>
                         <td><?= htmlspecialchars($row['horario']) ?></td>
                         <td><?= htmlspecialchars($row['jornada']) ?></td>
+                        <td><?= htmlspecialchars($row['periodo_academico']) ?></td>
                         <td><?= htmlspecialchars($row['aula']) ?></td>
                         <td><?= htmlspecialchars($row['nivel']) ?></td>
                         <td><?= htmlspecialchars($row['fecha_inicio']) ?></td>
@@ -106,6 +108,7 @@ $hayErrores = isset($_GET['errores']);
                                         <th>Asignatura</th>
                                         <th>Horario</th>
                                         <th>Jornada</th>
+                                        <th>Periodo Lectivo</th>
                                         <th>Aula</th>
                                         <th>Nivel</th>
                                         <th>Fecha Inicio</th>
@@ -121,6 +124,7 @@ $hayErrores = isset($_GET['errores']);
                                             <td><?= htmlspecialchars($err['asignatura']) ?></td>
                                             <td><?= htmlspecialchars($err['horario']) ?></td>
                                             <td><?= htmlspecialchars($err['jornada']) ?></td>
+                                            <td><?= htmlspecialchars($err['periodo_lectivo']) ?></td>
                                             <td><?= htmlspecialchars($err['aula']) ?></td>
                                             <td><?= htmlspecialchars($err['nivel']) ?></td>
                                             <td><?= htmlspecialchars($err['fecha_inicio']) ?></td>

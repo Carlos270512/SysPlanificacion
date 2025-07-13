@@ -29,9 +29,9 @@ try {
 $hoja = $documento->getActiveSheet();
 $filas = $hoja->toArray(null, true, true, true);
 
-// Encabezados esperados
+// Encabezados esperados (agregado PERIODO LECTIVO)
 $encabezadosValidos = [
-    'CODIGO', 'ASIGNATURA', 'HORARIO', 'JORNADA', 'AULA', 'NIVEL',
+    'CODIGO', 'ASIGNATURA', 'HORARIO', 'JORNADA', 'PERIODO LECTIVO', 'AULA', 'NIVEL',
     'FECHA INICIO', 'FECHA FIN', 'PROFESOR'
 ];
 
@@ -81,11 +81,13 @@ for ($i = 2; $i <= count($filas); $i++) {
     $codigoAsignatura = isset($indices['CODIGO']) ? trim((string)($fila[$indices['CODIGO']] ?? '')) : '';
     $nombreAsignatura = isset($indices['ASIGNATURA']) ? trim((string)($fila[$indices['ASIGNATURA']] ?? '')) : '';
     $profesorRaw = isset($indices['PROFESOR']) ? trim((string)($fila[$indices['PROFESOR']] ?? '')) : '';
+    $periodoLectivo = isset($indices['PERIODO LECTIVO']) ? trim((string)($fila[$indices['PERIODO LECTIVO']] ?? '')) : '';
 
-    // Validar datos obligatorios
+    // Validar datos obligatorios (agregada validación de periodo lectivo)
     if (!$codigoAsignatura) $erroresFila[] = 'Falta el código de la asignatura';
     if (!$nombreAsignatura) $erroresFila[] = 'Falta el nombre de la asignatura';
     if (!$profesorRaw) $erroresFila[] = 'Falta el profesor';
+    if (!$periodoLectivo) $erroresFila[] = 'Falta el periodo lectivo';
 
     if (!empty($erroresFila)) {
         $filasConErrores[] = [
@@ -93,6 +95,7 @@ for ($i = 2; $i <= count($filas); $i++) {
             'asignatura' => $nombreAsignatura,
             'horario' => $fila[$indices['HORARIO']] ?? '',
             'jornada' => $fila[$indices['JORNADA']] ?? '',
+            'periodo_lectivo' => $periodoLectivo,
             'aula' => $fila[$indices['AULA']] ?? '',
             'nivel' => $fila[$indices['NIVEL']] ?? '',
             'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
@@ -104,11 +107,11 @@ for ($i = 2; $i <= count($filas); $i++) {
     }
 
     try {
-        // Insertar asignatura
+        // Insertar asignatura (agregado periodo_academico)
         $stmtInsertAsignatura = $pdo->prepare("
             INSERT INTO asignatura (
-                codigo, nombre_asignatura, horario, jornada, aula, nivel, fecha_inicio, fecha_fin, docente_codigo
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                codigo, nombre_asignatura, horario, jornada, periodo_academico, aula, nivel, fecha_inicio, fecha_fin, docente_codigo
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmtInsertAsignatura->execute([
@@ -116,6 +119,7 @@ for ($i = 2; $i <= count($filas); $i++) {
             $nombreAsignatura,
             $fila[$indices['HORARIO']] ?? null,
             $fila[$indices['JORNADA']] ?? null,
+            $periodoLectivo,
             $fila[$indices['AULA']] ?? null,
             $fila[$indices['NIVEL']] ?? null,
             date('Y-m-d', strtotime($fila[$indices['FECHA INICIO']] ?? '')),
@@ -128,6 +132,7 @@ for ($i = 2; $i <= count($filas); $i++) {
             'asignatura' => $nombreAsignatura,
             'horario' => $fila[$indices['HORARIO']] ?? '',
             'jornada' => $fila[$indices['JORNADA']] ?? '',
+            'periodo_lectivo' => $periodoLectivo,
             'aula' => $fila[$indices['AULA']] ?? '',
             'nivel' => $fila[$indices['NIVEL']] ?? '',
             'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
