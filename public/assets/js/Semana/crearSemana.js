@@ -133,6 +133,31 @@ if (form) {
         let valido = true;
         if (semanaInicio && !validarMesActual(semanaInicio, '')) valido = false;
         if (semanaFin && !validarMesActual(semanaFin, '')) valido = false;
+
+        // Validar rango de 7 días entre semanaInicio y semanaFin
+        if (semanaInicio.value && semanaFin.value) {
+            const inicio = new Date(semanaInicio.value);
+            const fin = new Date(semanaFin.value);
+            const diffMs = fin - inicio;
+            const diffDias = diffMs / (1000 * 60 * 60 * 24);
+            if (diffDias < 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fechas inválidas',
+                    text: 'La fecha de fin no puede ser anterior a la fecha de inicio.',
+                });
+                valido = false;
+            }
+            if (diffDias > 7) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Rango de fechas inválido',
+                    text: 'Solo puedes seleccionar hasta 7 días entre la fecha de inicio y la fecha de fin.',
+                });
+                valido = false;
+            }
+        }
+
         if (!valido) {
             e.preventDefault();
             return;
@@ -206,7 +231,38 @@ if (btnPDF) {
             });
     });
 }
-
+if (semanaFin && semanaInicio) {
+    let semanaFinPrev = semanaFin.value;
+    semanaFin.addEventListener('focus', function () {
+        semanaFinPrev = semanaFin.value;
+    });
+    semanaFin.addEventListener('change', function () {
+        if (!semanaInicio.value || !semanaFin.value) return;
+        const inicio = new Date(semanaInicio.value);
+        const fin = new Date(semanaFin.value);
+        const diffMs = fin - inicio;
+        const diffDias = diffMs / (1000 * 60 * 60 * 24);
+        if (diffDias < 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fechas inválidas',
+                text: 'La fecha de fin no puede ser anterior a la fecha de inicio.',
+            });
+            semanaFin.value = semanaFinPrev;
+            semanaFin.focus();
+            return;
+        }
+        if (diffDias > 7) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Rango de fechas inválido',
+                text: 'Solo puedes seleccionar hasta 7 días entre la fecha de inicio y la fecha de fin.',
+            });
+            semanaFin.value = semanaFinPrev;
+            semanaFin.focus();
+        }
+    });
+}
 
 //botn para procesar el pdf 
 

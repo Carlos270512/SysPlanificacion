@@ -209,6 +209,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         Swal.showValidationMessage('La fecha de fin debe ser del mes actual.');
                         return false;
                     }
+
+                    // Validación de rango máximo de 7 días
+                    const inicio = new Date(fechaInicio);
+                    const fin = new Date(fechaFin);
+                    const diffMs = fin - inicio;
+                    const diffDias = diffMs / (1000 * 60 * 60 * 24);
+                    if (diffDias < 0) {
+                        Swal.showValidationMessage('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                        return false;
+                    }
+                    if (diffDias > 7) {
+                        Swal.showValidationMessage('Solo puedes seleccionar hasta 7 días entre la fecha de inicio y la fecha de fin.');
+                        return false;
+                    }
+
                     return { fechaInicio, fechaFin };
                 },
                 showCancelButton: true,
