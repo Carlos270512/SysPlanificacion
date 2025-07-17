@@ -42,24 +42,23 @@ $hayErrores = isset($_GET['errores']);
 </head>
 
 <body>
-    <h2 class="mb-4">Subir archivo Excel</h2>
+    <h2 class="mb-4">Subir Asignaturas</h2>
 
     <!-- Botones de acción -->
-    <div class="d-flex gap-2 mb-4">
-        <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data" class="d-inline-flex gap-2 align-items-end">
-            <div>
-                <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
-                <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
-            </div>
-            <button class="btn btn-cafe" type="submit" name="submit">
-                <i class="fas fa-upload me-1"></i>Subir Excel
-            </button>
-        </form>
-
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" style="height: fit-content; align-self: end;">
+<div class="mb-4">
+    <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
+            <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
+        </div>
+        <button class="btn btn-cafe mb-2" type="submit" name="submit">
+            <i class="fas fa-upload me-1"></i>Subir Excel
+        </button>
+        <button class="btn btn-success mb-2 ms-2" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" type="button">
             <i class="fas fa-plus me-1"></i>Nueva Asignatura
         </button>
-    </div>
+    </form>
+</div>
 
     <!-- Tabla para mostrar los datos subidos -->
     <div class="table-responsive">

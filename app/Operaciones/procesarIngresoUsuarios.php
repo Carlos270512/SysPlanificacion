@@ -55,9 +55,9 @@ $hashArchivo = hash_file('sha256', $archivo);
 
 // Verificar si el archivo ya fue subido
 session_start();
+$archivoDuplicado = false;
 if (isset($_SESSION['ultimo_hash']) && $_SESSION['ultimo_hash'] === $hashArchivo) {
-    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?archivo_subido=1");
-    exit();
+    $archivoDuplicado = true;
 }
 
 // Actualizar el hash en la sesión
@@ -131,6 +131,12 @@ for ($i = 2; $i <= count($filas); $i++) {
             $codigo, $carrera, $nombre, $titulo, $rol, $correo, $password
         ]);
     } catch (PDOException $e) {
+        $mensajeError = '';
+        if (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+            $mensajeError = 'Código o correo duplicado';
+        } else {
+            $mensajeError = 'No se pudo registrar el usuario. Verifique los datos.';
+        }
         $filasConErrores[] = [
             'codigo' => $codigo,
             'carrera' => $carrera,
@@ -138,7 +144,7 @@ for ($i = 2; $i <= count($filas); $i++) {
             'nombre' => $nombre,
             'correo' => $correo,
             'rol' => $rol,
-            'errores' => 'Error en base de datos'
+            'errores' => $mensajeError
         ];
     }
 }
@@ -146,9 +152,17 @@ for ($i = 2; $i <= count($filas); $i++) {
 // Guardar errores en la sesión y redirigir
 if (!empty($filasConErrores)) {
     $_SESSION['errores_excel'] = $filasConErrores;
-    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
+    if ($archivoDuplicado) {
+        header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1&archivo_subido=1");
+    } else {
+        header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
+    }
     exit();
 }
 
-header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1");
+if ($archivoDuplicado) {
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1&archivo_subido=1");
+} else {
+    header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1");
+}
 exit();

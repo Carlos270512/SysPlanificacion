@@ -17,7 +17,7 @@ if (isset($_GET['exito'])) {
 } elseif (isset($_GET['error_formato'])) {
     $mensaje = '<div class="alert alert-danger">El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.</div>';
 } elseif (isset($_GET['archivo_subido'])) {
-    $mensaje = '<div class="alert alert-warning">Ya se subió este archivo anteriormente. Por favor, selecciona un archivo diferente.</div>';
+    //$mensaje = '<div class="alert alert-warning">Ya se subió este archivo anteriormente. Por favor, selecciona un archivo diferente.</div>';
 }
 $hayErrores = isset($_GET['errores']);
 ?>
@@ -41,15 +41,17 @@ $hayErrores = isset($_GET['errores']);
 
 <body>
     <div class="container-fluid mt-5">
-        <h2 class="mb-4">Importar Usuarios desde Excel</h2>
+        <h2 class="mb-4">Subir Docentes</h2>
         <form action="../../app/Operaciones/procesarIngresoUsuarios.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
                 <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
             </div>
-            <button class="btn btn-cafe mb-4" type="submit" name="submit">Subir</button>
+            <button class="btn btn-cafe mb-4" type="submit" name="submit">
+                <i class="fas fa-upload me-1"></i> Subir
+            </button>
             <button type="button" class="btn btn-success mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#registrarDocenteModal">
-                Registrar
+                <i class="fas fa-user-plus me-1"></i> Registrar
             </button>
         </form>
 
@@ -207,6 +209,9 @@ $hayErrores = isset($_GET['errores']);
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <a href="../../app/Operaciones/descargarErroresUsuariosExcel.php" class="btn btn-success">
+                            <i class="fas fa-file-excel me-1"></i> Descargar errores en Excel
+                        </a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
@@ -224,7 +229,8 @@ $hayErrores = isset($_GET['errores']);
                 erroresModal.show();
             });
         </script>
-        <?php unset($_SESSION['errores_excel']); ?>
+        <?php // unset($_SESSION['errores_excel']); 
+        ?>
     <?php endif; ?>
 
     <script>
