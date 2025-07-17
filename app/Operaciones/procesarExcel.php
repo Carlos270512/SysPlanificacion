@@ -82,12 +82,24 @@ for ($i = 2; $i <= count($filas); $i++) {
     $nombreAsignatura = isset($indices['ASIGNATURA']) ? trim((string)($fila[$indices['ASIGNATURA']] ?? '')) : '';
     $profesorRaw = isset($indices['PROFESOR']) ? trim((string)($fila[$indices['PROFESOR']] ?? '')) : '';
     $periodoLectivo = isset($indices['PERIODO LECTIVO']) ? trim((string)($fila[$indices['PERIODO LECTIVO']] ?? '')) : '';
+    $aula = isset($indices['AULA']) ? trim((string)($fila[$indices['AULA']] ?? '')) : '';
 
-    // Validar datos obligatorios (agregada validación de periodo lectivo)
+    // Validar datos obligatorios
     if (!$codigoAsignatura) $erroresFila[] = 'Falta el código de la asignatura';
     if (!$nombreAsignatura) $erroresFila[] = 'Falta el nombre de la asignatura';
     if (!$profesorRaw) $erroresFila[] = 'Falta el profesor';
     if (!$periodoLectivo) $erroresFila[] = 'Falta el periodo lectivo';
+    if (!$aula) $erroresFila[] = 'Falta el aula';
+
+    // Validar que el profesor exista
+    $codigoProfesor = explode('-', $profesorRaw)[0] ?? '';
+    if ($codigoProfesor) {
+        $stmtDocente = $pdo->prepare("SELECT COUNT(*) FROM docente WHERE codigo = ?");
+        $stmtDocente->execute([$codigoProfesor]);
+        if ($stmtDocente->fetchColumn() == 0) {
+            $erroresFila[] = "El código de profesor '$codigoProfesor' no existe";
+        }
+    }
 
     if (!empty($erroresFila)) {
         $filasConErrores[] = [
@@ -96,7 +108,7 @@ for ($i = 2; $i <= count($filas); $i++) {
             'horario' => $fila[$indices['HORARIO']] ?? '',
             'jornada' => $fila[$indices['JORNADA']] ?? '',
             'periodo_lectivo' => $periodoLectivo,
-            'aula' => $fila[$indices['AULA']] ?? '',
+            'aula' => $aula,
             'nivel' => $fila[$indices['NIVEL']] ?? '',
             'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
             'fecha_fin' => $fila[$indices['FECHA FIN']] ?? '',
@@ -107,7 +119,6 @@ for ($i = 2; $i <= count($filas); $i++) {
     }
 
     try {
-        // Insertar asignatura (agregado periodo_academico)
         $stmtInsertAsignatura = $pdo->prepare("
             INSERT INTO asignatura (
                 codigo, nombre_asignatura, horario, jornada, periodo_academico, aula, nivel, fecha_inicio, fecha_fin, docente_codigo
@@ -120,11 +131,11 @@ for ($i = 2; $i <= count($filas); $i++) {
             $fila[$indices['HORARIO']] ?? null,
             $fila[$indices['JORNADA']] ?? null,
             $periodoLectivo,
-            $fila[$indices['AULA']] ?? null,
+            $aula,
             $fila[$indices['NIVEL']] ?? null,
             date('Y-m-d', strtotime($fila[$indices['FECHA INICIO']] ?? '')),
             date('Y-m-d', strtotime($fila[$indices['FECHA FIN']] ?? '')),
-            explode('-', $profesorRaw)[0] ?? null
+            $codigoProfesor
         ]);
     } catch (PDOException $e) {
         $filasConErrores[] = [
@@ -133,12 +144,12 @@ for ($i = 2; $i <= count($filas); $i++) {
             'horario' => $fila[$indices['HORARIO']] ?? '',
             'jornada' => $fila[$indices['JORNADA']] ?? '',
             'periodo_lectivo' => $periodoLectivo,
-            'aula' => $fila[$indices['AULA']] ?? '',
+            'aula' => $aula,
             'nivel' => $fila[$indices['NIVEL']] ?? '',
             'fecha_inicio' => $fila[$indices['FECHA INICIO']] ?? '',
             'fecha_fin' => $fila[$indices['FECHA FIN']] ?? '',
             'profesor' => $profesorRaw,
-            'errores' => 'Error en la base de datos'
+            'errores' => 'Error en la base de datos: ' . $e->getMessage()
         ];
     }
 }

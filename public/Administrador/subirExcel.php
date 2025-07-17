@@ -17,7 +17,7 @@ if (isset($_GET['exito'])) {
 } elseif (isset($_GET['error_formato'])) {
     $mensaje = '<div class="alert alert-danger">El archivo subido no es un archivo Excel válido. Por favor, verifica el formato.</div>';
 } elseif (isset($_GET['archivo_duplicado'])) {
-    $mensaje = '<div class="alert alert-warning">Este archivo ya fue subido anteriormente.</div>';
+    //$mensaje = '<div class="alert alert-warning">Este archivo ya fue subido anteriormente.</div>';
 }
 
 $hayErrores = isset($_GET['errores']);
@@ -43,7 +43,7 @@ $hayErrores = isset($_GET['errores']);
 
 <body>
     <h2 class="mb-4">Subir archivo Excel</h2>
-    
+
     <!-- Botones de acción -->
     <div class="d-flex gap-2 mb-4">
         <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data" class="d-inline-flex gap-2 align-items-end">
@@ -55,7 +55,7 @@ $hayErrores = isset($_GET['errores']);
                 <i class="fas fa-upload me-1"></i>Subir Excel
             </button>
         </form>
-        
+
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" style="height: fit-content; align-self: end;">
             <i class="fas fa-plus me-1"></i>Nueva Asignatura
         </button>
@@ -97,14 +97,14 @@ $hayErrores = isset($_GET['errores']);
                         <td><?= htmlspecialchars($row['docente_codigo'] ?? '') ?></td>
                         <td>
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-primary btn-sm" 
-                                        onclick="editarAsignatura('<?= $row['codigo'] ?>')" 
-                                        title="Editar">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                    onclick="editarAsignatura('<?= $row['codigo'] ?>')"
+                                    title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm" 
-                                        onclick="eliminarAsignatura('<?= $row['codigo'] ?>', '<?= htmlspecialchars($row['nombre_asignatura']) ?>')" 
-                                        title="Eliminar">
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    onclick="eliminarAsignatura('<?= $row['codigo'] ?>', '<?= htmlspecialchars($row['nombre_asignatura']) ?>')"
+                                    title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -358,6 +358,9 @@ $hayErrores = isset($_GET['errores']);
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <a href="../../app/Operaciones/descargarErroresExcel.php" class="btn btn-success">
+                            <i class="fas fa-file-excel me-1"></i> Descargar errores en Excel
+                        </a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
@@ -375,7 +378,7 @@ $hayErrores = isset($_GET['errores']);
                 erroresModal.show();
             });
         </script>
-        <?php unset($_SESSION['errores_excel']); ?>
+        <?php /* unset($_SESSION['errores_excel']); */?>
     <?php endif; ?>
 
     <script>
@@ -390,7 +393,7 @@ $hayErrores = isset($_GET['errores']);
         // Función para crear nueva asignatura
         $('#formNuevaAsignatura').on('submit', function(e) {
             e.preventDefault();
-            
+
             $.ajax({
                 url: '../../app/Operaciones/crudAsignatura.php',
                 type: 'POST',
@@ -431,7 +434,10 @@ $hayErrores = isset($_GET['errores']);
             $.ajax({
                 url: '../../app/Operaciones/crudAsignatura.php',
                 type: 'POST',
-                data: { accion: 'obtener', codigo: codigo },
+                data: {
+                    accion: 'obtener',
+                    codigo: codigo
+                },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
@@ -447,7 +453,7 @@ $hayErrores = isset($_GET['errores']);
                         $('#edit_fecha_inicio').val(data.fecha_inicio);
                         $('#edit_fecha_fin').val(data.fecha_fin);
                         $('#edit_docente_codigo').val(data.docente_codigo);
-                        
+
                         $('#editarAsignaturaModal').modal('show');
                     } else {
                         Swal.fire({
@@ -463,7 +469,7 @@ $hayErrores = isset($_GET['errores']);
         // Función para actualizar asignatura
         $('#formEditarAsignatura').on('submit', function(e) {
             e.preventDefault();
-            
+
             $.ajax({
                 url: '../../app/Operaciones/crudAsignatura.php',
                 type: 'POST',
@@ -508,7 +514,10 @@ $hayErrores = isset($_GET['errores']);
                     $.ajax({
                         url: '../../app/Operaciones/crudAsignatura.php',
                         type: 'POST',
-                        data: { accion: 'eliminar', codigo: codigo },
+                        data: {
+                            accion: 'eliminar',
+                            codigo: codigo
+                        },
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
