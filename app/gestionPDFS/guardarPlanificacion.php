@@ -28,7 +28,7 @@ try {
     $asignatura = $datosUnidad ? $datosUnidad['asignatura'] : null;
     $periodo_lectivo = $datosUnidad ? $datosUnidad['periodo_lectivo'] : date('Y');
 
-    // Iniciar transacción para mantener consistencia
+    // Iniciar transacción para mantener consistencia 
     $pdo->beginTransaction();
 
     // Verificar si ya existe una planificación para esa unidad

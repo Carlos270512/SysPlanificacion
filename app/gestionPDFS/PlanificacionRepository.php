@@ -111,12 +111,11 @@ class PlanificacionRepository
     try {
         $stmt = $this->pdo->prepare("
             SELECT 
-                u.nombre_unidad,
+                u.nombre as nombre_unidad,
                 a.nombre_asignatura as asignatura,
-                pl.nombre_periodo as periodo_lectivo
-            FROM unidades u
-            LEFT JOIN asignaturas a ON u.asignatura_id = a.id_asignatura
-            LEFT JOIN periodos_lectivos pl ON u.periodo_lectivo_id = pl.id_periodo
+                a.periodo_academico as periodo_lectivo
+            FROM unidad u
+            LEFT JOIN asignatura a ON u.asignatura_codigo = a.codigo
             WHERE u.id_unidad = ?
         ");
         $stmt->execute([$unidad_id]);
