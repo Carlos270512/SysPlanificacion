@@ -116,3 +116,56 @@ html, body {
 .navbar-brand {
     margin-left: 0 !important;
 }
+
+
+
+/* Botón flotante redondo con logo */
+.floating-logo-btn {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    z-index: 1000; /* Reducido para que no tape el navbar */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgb(44, 64, 115);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    padding: 8px;
+    transition: all 0.3s ease;
+    transform: translateY(-50%);
+    margin-top: 36px; /* Ajuste para que no tape el navbar */
+}
+
+.floating-logo-btn:hover {
+    background: #8B5C2A;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.floating-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* Personalización del offcanvas */
+.offcanvas {
+    border: none;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1055; /* Asegurar que el offcanvas esté por encima */
+}
+
+.offcanvas-header {
+    background: rgb(44, 64, 115);
+    color: white;
+}
+
+.offcanvas-title {
+    color: white;
+}
+
+.btn-close {
+    filter: invert(1);
+}

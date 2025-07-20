@@ -16,7 +16,25 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     <link rel="stylesheet" href="assets/css/adminstyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
+    <!-- Botón flotante redondo con logo -->
+    <button class="btn floating-logo-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#logoOffcanvas" aria-controls="logoOffcanvas">
+        <img src="assets/img/logotvn.png" alt="Logo" class="floating-logo-img">
+    </button>
+
+    <!-- Canvas de Bootstrap -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="logoOffcanvas" aria-labelledby="logoOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="logoOffcanvasLabel">Menú Principal</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Aquí pondrás el contenido que quieras en el canvas -->
+            <p>Contenido del canvas...</p>
+        </div>
+    </div>
+
     <nav class="navbar navbar-dark bg-dark w-100 navbar-expand-lg">
         <div class="container-fluid d-flex justify-content-between">
             <a href="admin_dashboard.php" class="navbar-brand d-flex align-items-center ms-auto">
@@ -38,10 +56,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
                         <li><a class="dropdown-item" href="Administrador/subirExcel.php" target="mainFrame">Cargar Datos</a></li>
-                    </ul>
-
-                    <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
-                        <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestion de PLanificaciones</a></li>
+                        <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown mx-2">
@@ -83,4 +98,5 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
