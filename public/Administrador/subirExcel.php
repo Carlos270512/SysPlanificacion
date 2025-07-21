@@ -134,6 +134,7 @@ $hayErrores = isset($_GET['errores']);
                                 <div class="mb-3">
                                     <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="codigo" name="codigo" required>
+                                    <small id="error_codigo" class="form-text text-danger d-none">Solo se aceptan números</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -241,6 +242,7 @@ $hayErrores = isset($_GET['errores']);
                                 <div class="mb-3">
                                     <label for="edit_codigo" class="form-label">Código <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="edit_codigo" name="codigo" required>
+                                    <small id="error_edit_codigo" class="form-text text-danger d-none">Solo se aceptan números</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -406,70 +408,91 @@ $hayErrores = isset($_GET['errores']);
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
                 }
             });
-        });
 
-        // Función para crear nueva asignatura
-        $('#formNuevaAsignatura').on('submit', function(e) {
-            e.preventDefault();
+            // Validación en tiempo real para solo números en código
+            $('#codigo').on('input', function() {
+                let valor = $(this).val();
+                if (!/^\d*$/.test(valor)) {
+                    $('#codigo').addClass('is-invalid');
+                    $('#error_codigo').removeClass('d-none');
+                } else {
+                    $('#codigo').removeClass('is-invalid');
+                    $('#error_codigo').addClass('d-none');
+                }
+            });
 
-            // Validación de fechas
-            let valido = true;
+            // Función para crear nueva asignatura
+            $('#formNuevaAsignatura').on('submit', function(e) {
+                e.preventDefault();
 
-            // Fecha inicio
-            if (!$('#fecha_inicio').val()) {
-                $('#fecha_inicio').addClass('is-invalid');
-                $('#error_fecha_inicio').removeClass('d-none');
-                valido = false;
-            } else {
-                $('#fecha_inicio').removeClass('is-invalid');
-                $('#error_fecha_inicio').addClass('d-none');
-            }
+                let valido = true;
 
-            // Fecha fin
-            if (!$('#fecha_fin').val()) {
-                $('#fecha_fin').addClass('is-invalid');
-                $('#error_fecha_fin').removeClass('d-none');
-                valido = false;
-            } else {
-                $('#fecha_fin').removeClass('is-invalid');
-                $('#error_fecha_fin').addClass('d-none');
-            }
+                // Validación solo números en código
+                let codigoVal = $('#codigo').val();
+                if (!/^\d+$/.test(codigoVal)) {
+                    $('#codigo').addClass('is-invalid');
+                    $('#error_codigo').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#codigo').removeClass('is-invalid');
+                    $('#error_codigo').addClass('d-none');
+                }
 
-            if (!valido) return;
+                // Validación de fechas
+                if (!$('#fecha_inicio').val()) {
+                    $('#fecha_inicio').addClass('is-invalid');
+                    $('#error_fecha_inicio').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#fecha_inicio').removeClass('is-invalid');
+                    $('#error_fecha_inicio').addClass('d-none');
+                }
 
-            // Si todo está bien, sigue con el AJAX
-            $.ajax({
-                url: '../../app/Operaciones/crudAsignatura.php',
-                type: 'POST',
-                data: $(this).serialize() + '&accion=crear',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#nuevaAsignaturaModal').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: 'Asignatura creada correctamente',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
+                if (!$('#fecha_fin').val()) {
+                    $('#fecha_fin').addClass('is-invalid');
+                    $('#error_fecha_fin').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#fecha_fin').removeClass('is-invalid');
+                    $('#error_fecha_fin').addClass('d-none');
+                }
+
+                if (!valido) return;
+
+                // Si todo está bien, sigue con el AJAX
+                $.ajax({
+                    url: '../../app/Operaciones/crudAsignatura.php',
+                    type: 'POST',
+                    data: $(this).serialize() + '&accion=crear',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#nuevaAsignaturaModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Éxito',
+                                text: 'Asignatura creada correctamente',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Error al crear la asignatura'
+                            });
+                        }
+                    },
+                    error: function() {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: response.message || 'Error al crear la asignatura'
+                            text: 'Error de conexión'
                         });
                     }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error de conexión'
-                    });
-                }
+                });
             });
         });
 
@@ -516,9 +539,35 @@ $hayErrores = isset($_GET['errores']);
             });
         }
 
+        // Validación en tiempo real para solo números en código (editar)
+        $('#edit_codigo').on('input', function() {
+            let valor = $(this).val();
+            if (!/^\d*$/.test(valor)) {
+                $('#edit_codigo').addClass('is-invalid');
+                $('#error_edit_codigo').removeClass('d-none');
+            } else {
+                $('#edit_codigo').removeClass('is-invalid');
+                $('#error_edit_codigo').addClass('d-none');
+            }
+        });
+
         // Función para actualizar asignatura
         $('#formEditarAsignatura').on('submit', function(e) {
             e.preventDefault();
+
+            let valido = true;
+            // Validación solo números en código
+            let codigoVal = $('#edit_codigo').val();
+            if (!/^\d+$/.test(codigoVal)) {
+                $('#edit_codigo').addClass('is-invalid');
+                $('#error_edit_codigo').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_codigo').removeClass('is-invalid');
+                $('#error_edit_codigo').addClass('d-none');
+            }
+
+            if (!valido) return;
 
             $.ajax({
                 url: '../../app/Operaciones/crudAsignatura.php',
