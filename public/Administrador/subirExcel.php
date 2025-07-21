@@ -133,14 +133,14 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="codigo" name="codigo" required>
+                                    <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Ej: 2425101" required>
                                     <small id="error_codigo" class="form-text text-danger d-none">Solo se aceptan números</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="nombre_asignatura" class="form-label">Asignatura <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="nombre_asignatura" name="nombre_asignatura" required>
+                                    <input type="text" class="form-control" id="nombre_asignatura" name="nombre_asignatura"  placeholder="Ej: Matemáticas" required>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +148,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="horario" class="form-label">Horario</label>
-                                    <input type="text" class="form-control" id="horario" name="horario">
+                                    <input type="text" class="form-control" id="horario" name="horario" placeholder="Ej: 08-10">
+                                    <small id="error_horario" class="form-text text-danger d-none">Formato válido: 08-10</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -256,7 +257,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_horario" class="form-label">Horario</label>
-                                    <input type="text" class="form-control" id="edit_horario" name="horario">
+                                    <input type="text" class="form-control" id="edit_horario" name="horario" placeholder="Ej: 08-10">
+                                    <small id="error_edit_horario" class="form-text text-danger d-none">Formato válido: 08-10</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -387,6 +389,17 @@ $hayErrores = isset($_GET['errores']);
             </div>
         </div>
         <script>
+        // Validación en tiempo real para formato horario (editar)
+        $('#edit_horario').on('input', function() {
+            let valor = $(this).val();
+            if (!/^\d{2}-\d{2}$/.test(valor)) {
+                $('#edit_horario').addClass('is-invalid');
+                $('#error_edit_horario').removeClass('d-none');
+            } else {
+                $('#edit_horario').removeClass('is-invalid');
+                $('#error_edit_horario').addClass('d-none');
+            }
+        });
             $(document).ready(function() {
                 $('#tablaErroresExcel').DataTable({
                     language: {
@@ -421,11 +434,24 @@ $hayErrores = isset($_GET['errores']);
                 }
             });
 
+            // Validación en tiempo real para formato horario (ej: 08-10)
+            $('#horario').on('input', function() {
+                let valor = $(this).val();
+                if (!/^\d{2}-\d{2}$/.test(valor)) {
+                    $('#horario').addClass('is-invalid');
+                    $('#error_horario').removeClass('d-none');
+                } else {
+                    $('#horario').removeClass('is-invalid');
+                    $('#error_horario').addClass('d-none');
+                }
+            });
+
             // Función para crear nueva asignatura
             $('#formNuevaAsignatura').on('submit', function(e) {
                 e.preventDefault();
 
                 let valido = true;
+
 
                 // Validación solo números en código
                 let codigoVal = $('#codigo').val();
@@ -436,6 +462,17 @@ $hayErrores = isset($_GET['errores']);
                 } else {
                     $('#codigo').removeClass('is-invalid');
                     $('#error_codigo').addClass('d-none');
+                }
+
+                // Validación formato horario
+                let horarioVal = $('#horario').val();
+                if (horarioVal && !/^\d{2}-\d{2}$/.test(horarioVal)) {
+                    $('#horario').addClass('is-invalid');
+                    $('#error_horario').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#horario').removeClass('is-invalid');
+                    $('#error_horario').addClass('d-none');
                 }
 
                 // Validación de fechas
@@ -565,6 +602,17 @@ $hayErrores = isset($_GET['errores']);
             } else {
                 $('#edit_codigo').removeClass('is-invalid');
                 $('#error_edit_codigo').addClass('d-none');
+            }
+
+            // Validación formato horario
+            let horarioVal = $('#edit_horario').val();
+            if (horarioVal && !/^\d{2}-\d{2}$/.test(horarioVal)) {
+                $('#edit_horario').addClass('is-invalid');
+                $('#error_edit_horario').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_horario').removeClass('is-invalid');
+                $('#error_edit_horario').addClass('d-none');
             }
 
             if (!valido) return;
