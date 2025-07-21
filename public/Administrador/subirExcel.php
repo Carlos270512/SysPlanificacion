@@ -168,13 +168,14 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="periodo_academico" class="form-label">Periodo Lectivo <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="periodo_academico" name="periodo_academico" required>
+                                    <input type="text" class="form-control" id="periodo_academico" name="periodo_academico" placeholder="Ej: 2025-2025" required>
+                                    <small id="error_periodo_academico" class="form-text text-danger d-none">Formato válido: 2025-2025</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="aula" class="form-label">Aula</label>
-                                    <input type="text" class="form-control" id="aula" name="aula">
+                                    <input type="text" class="form-control" id="aula" name="aula" placeholder="Ej: B1">
                                 </div>
                             </div>
                         </div>
@@ -182,7 +183,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="nivel" class="form-label">Nivel</label>
-                                    <input type="text" class="form-control" id="nivel" name="nivel">
+                                    <input type="text" class="form-control" id="nivel" name="nivel" maxlength="2"  placeholder="Ej: 2">
+                                    <small id="error_nivel" class="form-text text-danger d-none">Solo se aceptan números de hasta 2 dígitos</small>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -277,7 +279,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_periodo_academico" class="form-label">Periodo Lectivo <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="edit_periodo_academico" name="periodo_academico" required>
+                                    <input type="text" class="form-control" id="edit_periodo_academico" name="periodo_academico" placeholder="Ej: 2025-2025" required>
+                                    <small id="error_edit_periodo_academico" class="form-text text-danger d-none">Formato válido: 2025-2025</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -291,7 +294,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="edit_nivel" class="form-label">Nivel</label>
-                                    <input type="text" class="form-control" id="edit_nivel" name="nivel">
+                                    <input type="text" class="form-control" id="edit_nivel" name="nivel" maxlength="2" placeholder="Ej: 2">
+                                    <small id="error_edit_nivel" class="form-text text-danger d-none">Solo se aceptan números de hasta 2 dígitos</small>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -446,12 +450,35 @@ $hayErrores = isset($_GET['errores']);
                 }
             });
 
+            // Validación en tiempo real para formato periodo académico (ej: 2025-2025)
+            $('#periodo_academico').on('input', function() {
+                let valor = $(this).val();
+                if (!/^\d{4}-\d{4}$/.test(valor)) {
+                    $('#periodo_academico').addClass('is-invalid');
+                    $('#error_periodo_academico').removeClass('d-none');
+                } else {
+                    $('#periodo_academico').removeClass('is-invalid');
+                    $('#error_periodo_academico').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para solo números de hasta 2 dígitos en nivel
+            $('#nivel').on('input', function() {
+                let valor = $(this).val();
+                if (!/^\d{1,2}$/.test(valor)) {
+                    $('#nivel').addClass('is-invalid');
+                    $('#error_nivel').removeClass('d-none');
+                } else {
+                    $('#nivel').removeClass('is-invalid');
+                    $('#error_nivel').addClass('d-none');
+                }
+            });
+
             // Función para crear nueva asignatura
             $('#formNuevaAsignatura').on('submit', function(e) {
                 e.preventDefault();
 
                 let valido = true;
-
 
                 // Validación solo números en código
                 let codigoVal = $('#codigo').val();
@@ -464,6 +491,17 @@ $hayErrores = isset($_GET['errores']);
                     $('#error_codigo').addClass('d-none');
                 }
 
+                // Validación solo números de hasta 2 dígitos en nivel
+                let nivelVal = $('#nivel').val();
+                if (!/^\d{1,2}$/.test(nivelVal)) {
+                    $('#nivel').addClass('is-invalid');
+                    $('#error_nivel').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#nivel').removeClass('is-invalid');
+                    $('#error_nivel').addClass('d-none');
+                }
+
                 // Validación formato horario
                 let horarioVal = $('#horario').val();
                 if (horarioVal && !/^\d{2}-\d{2}$/.test(horarioVal)) {
@@ -473,6 +511,17 @@ $hayErrores = isset($_GET['errores']);
                 } else {
                     $('#horario').removeClass('is-invalid');
                     $('#error_horario').addClass('d-none');
+                }
+
+                // Validación formato periodo académico
+                let periodoVal = $('#periodo_academico').val();
+                if (!/^\d{4}-\d{4}$/.test(periodoVal)) {
+                    $('#periodo_academico').addClass('is-invalid');
+                    $('#error_periodo_academico').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#periodo_academico').removeClass('is-invalid');
+                    $('#error_periodo_academico').addClass('d-none');
                 }
 
                 // Validación de fechas
@@ -576,6 +625,7 @@ $hayErrores = isset($_GET['errores']);
             });
         }
 
+
         // Validación en tiempo real para solo números en código (editar)
         $('#edit_codigo').on('input', function() {
             let valor = $(this).val();
@@ -586,6 +636,35 @@ $hayErrores = isset($_GET['errores']);
                 $('#edit_codigo').removeClass('is-invalid');
                 $('#error_edit_codigo').addClass('d-none');
             }
+        });
+
+        // Validación en tiempo real para solo números de hasta 2 dígitos en nivel (editar)
+        $('#edit_nivel').on('input', function() {
+            let valor = $(this).val();
+            if (!/^\d{1,2}$/.test(valor)) {
+                $('#edit_nivel').addClass('is-invalid');
+                $('#error_edit_nivel').removeClass('d-none');
+            } else {
+                $('#edit_nivel').removeClass('is-invalid');
+                $('#error_edit_nivel').addClass('d-none');
+            }
+        });
+
+        // Validación en tiempo real para formato periodo académico (editar)
+        $('#edit_periodo_academico').on('input', function() {
+            let valor = $(this).val();
+            if (!/^\d{4}-\d{4}$/.test(valor)) {
+                $('#edit_periodo_academico').addClass('is-invalid');
+                $('#error_edit_periodo_academico').removeClass('d-none');
+            } else {
+                $('#edit_periodo_academico').removeClass('is-invalid');
+                $('#error_edit_periodo_academico').addClass('d-none');
+            }
+        });
+
+        // Forzar validación al abrir el modal de edición (por si el valor ya está mal cargado)
+        $('#editarAsignaturaModal').on('shown.bs.modal', function() {
+            $('#edit_periodo_academico').trigger('input');
         });
 
         // Función para actualizar asignatura
@@ -604,6 +683,17 @@ $hayErrores = isset($_GET['errores']);
                 $('#error_edit_codigo').addClass('d-none');
             }
 
+            // Validación solo números de hasta 2 dígitos en nivel
+            let nivelVal = $('#edit_nivel').val();
+            if (!/^\d{1,2}$/.test(nivelVal)) {
+                $('#edit_nivel').addClass('is-invalid');
+                $('#error_edit_nivel').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_nivel').removeClass('is-invalid');
+                $('#error_edit_nivel').addClass('d-none');
+            }
+
             // Validación formato horario
             let horarioVal = $('#edit_horario').val();
             if (horarioVal && !/^\d{2}-\d{2}$/.test(horarioVal)) {
@@ -613,6 +703,17 @@ $hayErrores = isset($_GET['errores']);
             } else {
                 $('#edit_horario').removeClass('is-invalid');
                 $('#error_edit_horario').addClass('d-none');
+            }
+
+            // Validación formato periodo académico
+            let periodoVal = $('#edit_periodo_academico').val();
+            if (!/^\d{4}-\d{4}$/.test(periodoVal)) {
+                $('#edit_periodo_academico').addClass('is-invalid');
+                $('#error_edit_periodo_academico').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_periodo_academico').removeClass('is-invalid');
+                $('#error_edit_periodo_academico').addClass('d-none');
             }
 
             if (!valido) return;
