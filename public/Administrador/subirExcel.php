@@ -140,7 +140,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="nombre_asignatura" class="form-label">Asignatura <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="nombre_asignatura" name="nombre_asignatura"  placeholder="Ej: Matemáticas" required>
+                                    <input type="text" class="form-control" id="nombre_asignatura" name="nombre_asignatura" placeholder="Ej: MATEMÁTICAS" required>
+                                    <small id="error_nombre_asignatura" class="form-text text-danger d-none">Solo se aceptan letras y espacios</small>
                                 </div>
                             </div>
                         </div>
@@ -251,7 +252,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_nombre_asignatura" class="form-label">Asignatura <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="edit_nombre_asignatura" name="nombre_asignatura" required>
+                                    <input type="text" class="form-control" id="edit_nombre_asignatura" name="nombre_asignatura" required placeholder="Ej: MATEMÁTICAS">
+                                    <small id="error_edit_nombre_asignatura" class="form-text text-danger d-none">Solo se aceptan letras y espacios</small>
                                 </div>
                             </div>
                         </div>
@@ -438,6 +440,21 @@ $hayErrores = isset($_GET['errores']);
                 }
             });
 
+            // Validación y transformación a mayúsculas para nombre_asignatura (crear)
+            $('#nombre_asignatura').on('input', function() {
+                let valor = $(this).val();
+                // Solo letras y espacios
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#nombre_asignatura').addClass('is-invalid');
+                    $('#error_nombre_asignatura').removeClass('d-none');
+                } else {
+                    $('#nombre_asignatura').removeClass('is-invalid');
+                    $('#error_nombre_asignatura').addClass('d-none');
+                }
+                // Transformar a mayúsculas
+                $(this).val(valor.toUpperCase());
+            });
+
             // Validación en tiempo real para formato horario (ej: 08-10)
             $('#horario').on('input', function() {
                 let valor = $(this).val();
@@ -479,6 +496,18 @@ $hayErrores = isset($_GET['errores']);
                 e.preventDefault();
 
                 let valido = true;
+
+
+                // Validación solo letras y espacios en nombre_asignatura
+                let nombreVal = $('#nombre_asignatura').val();
+                if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(nombreVal)) {
+                    $('#nombre_asignatura').addClass('is-invalid');
+                    $('#error_nombre_asignatura').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#nombre_asignatura').removeClass('is-invalid');
+                    $('#error_nombre_asignatura').addClass('d-none');
+                }
 
                 // Validación solo números en código
                 let codigoVal = $('#codigo').val();
@@ -626,6 +655,21 @@ $hayErrores = isset($_GET['errores']);
         }
 
 
+        // Validación y transformación a mayúsculas para nombre_asignatura (editar)
+        $('#edit_nombre_asignatura').on('input', function() {
+            let valor = $(this).val();
+            // Solo letras y espacios
+            if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                $('#edit_nombre_asignatura').addClass('is-invalid');
+                $('#error_edit_nombre_asignatura').removeClass('d-none');
+            } else {
+                $('#edit_nombre_asignatura').removeClass('is-invalid');
+                $('#error_edit_nombre_asignatura').addClass('d-none');
+            }
+            // Transformar a mayúsculas
+            $(this).val(valor.toUpperCase());
+        });
+
         // Validación en tiempo real para solo números en código (editar)
         $('#edit_codigo').on('input', function() {
             let valor = $(this).val();
@@ -672,6 +716,18 @@ $hayErrores = isset($_GET['errores']);
             e.preventDefault();
 
             let valido = true;
+
+            // Validación solo letras y espacios en nombre_asignatura (editar)
+            let nombreVal = $('#edit_nombre_asignatura').val();
+            if (!/^[A-ZÁÉÍÓÚÑ ]+$/.test(nombreVal)) {
+                $('#edit_nombre_asignatura').addClass('is-invalid');
+                $('#error_edit_nombre_asignatura').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_nombre_asignatura').removeClass('is-invalid');
+                $('#error_edit_nombre_asignatura').addClass('d-none');
+            }
+
             // Validación solo números en código
             let codigoVal = $('#edit_codigo').val();
             if (!/^\d+$/.test(codigoVal)) {
