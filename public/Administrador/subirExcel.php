@@ -4,6 +4,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     header("Location: ../index.php");
     exit();
 }
+require __DIR__ . '/../../config/conexion.php';
+$stmtDocentes = $pdo->query("SELECT codigo, nombre FROM docente WHERE estado = 'ACTIVO' ORDER BY nombre ASC");
+$docentes = $stmtDocentes->fetchAll(PDO::FETCH_ASSOC);
 
 $mensaje = '';
 if (isset($_GET['exito'])) {
@@ -45,20 +48,20 @@ $hayErrores = isset($_GET['errores']);
     <h2 class="mb-4">Subir Asignaturas</h2>
 
     <!-- Botones de acción -->
-<div class="mb-4">
-    <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
-            <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
-        </div>
-        <button class="btn btn-cafe mb-2" type="submit" name="submit">
-            <i class="fas fa-upload me-1"></i>Subir Excel
-        </button>
-        <button class="btn btn-success mb-2 ms-2" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" type="button">
-            <i class="fas fa-plus me-1"></i>Nueva Asignatura
-        </button>
-    </form>
-</div>
+    <div class="mb-4">
+        <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="archivo_excel" class="form-label">Selecciona el archivo Excel:</label>
+                <input class="form-control" type="file" name="archivo_excel" id="archivo_excel" accept=".xlsx, .xls" required>
+            </div>
+            <button class="btn btn-cafe mb-2" type="submit" name="submit">
+                <i class="fas fa-upload me-1"></i>Subir Excel
+            </button>
+            <button class="btn btn-success mb-2 ms-2" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" type="button">
+                <i class="fas fa-plus me-1"></i>Nueva Asignatura
+            </button>
+        </form>
+    </div>
 
     <!-- Tabla para mostrar los datos subidos -->
     <div class="table-responsive">
@@ -184,18 +187,27 @@ $hayErrores = isset($_GET['errores']);
                                 <div class="mb-3">
                                     <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
                                     <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+                                    <small id="error_fecha_inicio" class="form-text text-danger d-none">Rellenar este campo</small>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="fecha_fin" class="form-label">Fecha Fin</label>
                                     <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                                    <small id="error_fecha_fin" class="form-text text-danger d-none">Rellenar este campo</small>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="docente_codigo" class="form-label">Código Profesor</label>
-                            <input type="text" class="form-control" id="docente_codigo" name="docente_codigo">
+                            <select class="form-control" id="docente_codigo" name="docente_codigo" required>
+                                <option value="">Seleccionar...</option>
+                                <?php foreach ($docentes as $doc): ?>
+                                    <option value="<?= htmlspecialchars($doc['codigo']) ?>">
+                                        <?= htmlspecialchars($doc['codigo']) ?> - <?= htmlspecialchars($doc['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -293,7 +305,14 @@ $hayErrores = isset($_GET['errores']);
                         </div>
                         <div class="mb-3">
                             <label for="edit_docente_codigo" class="form-label">Código Profesor</label>
-                            <input type="text" class="form-control" id="edit_docente_codigo" name="docente_codigo">
+                            <select class="form-control" id="edit_docente_codigo" name="docente_codigo" required>
+                                <option value="">Seleccionar...</option>
+                                <?php foreach ($docentes as $doc): ?>
+                                    <option value="<?= htmlspecialchars($doc['codigo']) ?>">
+                                        <?= htmlspecialchars($doc['codigo']) ?> - <?= htmlspecialchars($doc['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -377,7 +396,7 @@ $hayErrores = isset($_GET['errores']);
                 erroresModal.show();
             });
         </script>
-        <?php /* unset($_SESSION['errores_excel']); */?>
+        <?php /* unset($_SESSION['errores_excel']); */ ?>
     <?php endif; ?>
 
     <script>
@@ -393,6 +412,32 @@ $hayErrores = isset($_GET['errores']);
         $('#formNuevaAsignatura').on('submit', function(e) {
             e.preventDefault();
 
+            // Validación de fechas
+            let valido = true;
+
+            // Fecha inicio
+            if (!$('#fecha_inicio').val()) {
+                $('#fecha_inicio').addClass('is-invalid');
+                $('#error_fecha_inicio').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#fecha_inicio').removeClass('is-invalid');
+                $('#error_fecha_inicio').addClass('d-none');
+            }
+
+            // Fecha fin
+            if (!$('#fecha_fin').val()) {
+                $('#fecha_fin').addClass('is-invalid');
+                $('#error_fecha_fin').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#fecha_fin').removeClass('is-invalid');
+                $('#error_fecha_fin').addClass('d-none');
+            }
+
+            if (!valido) return;
+
+            // Si todo está bien, sigue con el AJAX
             $.ajax({
                 url: '../../app/Operaciones/crudAsignatura.php',
                 type: 'POST',
@@ -445,7 +490,13 @@ $hayErrores = isset($_GET['errores']);
                         $('#edit_codigo').val(data.codigo);
                         $('#edit_nombre_asignatura').val(data.nombre_asignatura);
                         $('#edit_horario').val(data.horario);
-                        $('#edit_jornada').val(data.jornada);
+                        let jornada = (data.jornada || '').toUpperCase().trim();
+                        $('#edit_jornada option').each(function() {
+                            if ($(this).val().toUpperCase().trim() === jornada) {
+                                $(this).prop('selected', true);
+                            }
+                        });
+                        $('#edit_jornada').trigger('change');
                         $('#edit_periodo_academico').val(data.periodo_academico);
                         $('#edit_aula').val(data.aula);
                         $('#edit_nivel').val(data.nivel);

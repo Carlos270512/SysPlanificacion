@@ -31,8 +31,16 @@ $filas = $hoja->toArray(null, true, true, true);
 
 // Encabezados esperados (agregado PERIODO LECTIVO)
 $encabezadosValidos = [
-    'CODIGO', 'ASIGNATURA', 'HORARIO', 'JORNADA', 'PERIODO LECTIVO', 'AULA', 'NIVEL',
-    'FECHA INICIO', 'FECHA FIN', 'PROFESOR'
+    'CODIGO',
+    'ASIGNATURA',
+    'HORARIO',
+    'JORNADA',
+    'PERIODO LECTIVO',
+    'AULA',
+    'NIVEL',
+    'FECHA INICIO',
+    'FECHA FIN',
+    'PROFESOR'
 ];
 
 // Validar encabezados
@@ -92,6 +100,7 @@ for ($i = 2; $i <= count($filas); $i++) {
     if (!$aula) $erroresFila[] = 'Falta el aula';
 
     // Validar que el profesor exista
+
     $codigoProfesor = explode('-', $profesorRaw)[0] ?? '';
     if ($codigoProfesor) {
         $stmtDocente = $pdo->prepare("SELECT COUNT(*) FROM docente WHERE codigo = ?");
@@ -99,6 +108,8 @@ for ($i = 2; $i <= count($filas); $i++) {
         if ($stmtDocente->fetchColumn() == 0) {
             $erroresFila[] = "El código de profesor '$codigoProfesor' no existe";
         }
+    } else {
+        $erroresFila[] = "El código de profesor es obligatorio";
     }
 
     if (!empty($erroresFila)) {
@@ -120,10 +131,10 @@ for ($i = 2; $i <= count($filas); $i++) {
 
     try {
         $stmtInsertAsignatura = $pdo->prepare("
-            INSERT INTO asignatura (
-                codigo, nombre_asignatura, horario, jornada, periodo_academico, aula, nivel, fecha_inicio, fecha_fin, docente_codigo
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
+        INSERT INTO asignatura (
+            codigo, nombre_asignatura, horario, jornada, periodo_academico, aula, nivel, fecha_inicio, fecha_fin, docente_codigo
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
 
         $stmtInsertAsignatura->execute([
             $codigoAsignatura,
