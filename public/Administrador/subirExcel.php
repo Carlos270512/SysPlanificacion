@@ -176,7 +176,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="aula" class="form-label">Aula</label>
-                                    <input type="text" class="form-control" id="aula" name="aula" placeholder="Ej: B1">
+                                    <input type="text" class="form-control" id="aula" name="aula" maxlength="8" placeholder="Ej: B1">
+                                    <small id="error_aula" class="form-text text-danger d-none">Máximo 5 letras mayúsculas y 3 números</small>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +289,8 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_aula" class="form-label">Aula</label>
-                                    <input type="text" class="form-control" id="edit_aula" name="aula">
+                                    <input type="text" class="form-control" id="edit_aula" name="aula" maxlength="8">
+                                    <small id="error_edit_aula" class="form-text text-danger d-none">Máximo 5 letras mayúsculas y 3 números</small>
                                 </div>
                             </div>
                         </div>
@@ -455,16 +457,22 @@ $hayErrores = isset($_GET['errores']);
                 $(this).val(valor.toUpperCase());
             });
 
-            // Validación en tiempo real para formato horario (ej: 08-10)
-            $('#horario').on('input', function() {
-                let valor = $(this).val();
-                if (!/^\d{2}-\d{2}$/.test(valor)) {
-                    $('#horario').addClass('is-invalid');
-                    $('#error_horario').removeClass('d-none');
+
+            // Validación en tiempo real para aula (máx 5 letras mayúsculas y 3 números)
+            $('#aula').on('input', function() {
+                let valor = $(this).val().toUpperCase();
+                // Contar letras y números
+                let letras = (valor.match(/[A-Z]/g) || []).length;
+                let numeros = (valor.match(/[0-9]/g) || []).length;
+                // Solo letras mayúsculas y números, máximo 5 letras y 3 números
+                if (!/^[A-Z0-9]*$/.test(valor) || letras > 5 || numeros > 3) {
+                    $('#aula').addClass('is-invalid');
+                    $('#error_aula').removeClass('d-none');
                 } else {
-                    $('#horario').removeClass('is-invalid');
-                    $('#error_horario').addClass('d-none');
+                    $('#aula').removeClass('is-invalid');
+                    $('#error_aula').addClass('d-none');
                 }
+                $(this).val(valor);
             });
 
             // Validación en tiempo real para formato periodo académico (ej: 2025-2025)
@@ -529,6 +537,20 @@ $hayErrores = isset($_GET['errores']);
                 } else {
                     $('#nivel').removeClass('is-invalid');
                     $('#error_nivel').addClass('d-none');
+                }
+
+
+                // Validación aula: máximo 5 letras mayúsculas y 3 números
+                let aulaVal = $('#aula').val();
+                let letrasAula = (aulaVal.match(/[A-Z]/g) || []).length;
+                let numerosAula = (aulaVal.match(/[0-9]/g) || []).length;
+                if (aulaVal && (!/^[A-Z0-9]*$/.test(aulaVal) || letrasAula > 5 || numerosAula > 3)) {
+                    $('#aula').addClass('is-invalid');
+                    $('#error_aula').removeClass('d-none');
+                    valido = false;
+                } else {
+                    $('#aula').removeClass('is-invalid');
+                    $('#error_aula').addClass('d-none');
                 }
 
                 // Validación formato horario
@@ -670,16 +692,20 @@ $hayErrores = isset($_GET['errores']);
             $(this).val(valor.toUpperCase());
         });
 
-        // Validación en tiempo real para solo números en código (editar)
-        $('#edit_codigo').on('input', function() {
-            let valor = $(this).val();
-            if (!/^\d*$/.test(valor)) {
-                $('#edit_codigo').addClass('is-invalid');
-                $('#error_edit_codigo').removeClass('d-none');
+
+        // Validación en tiempo real para aula (editar, máx 5 letras mayúsculas y 3 números)
+        $('#edit_aula').on('input', function() {
+            let valor = $(this).val().toUpperCase();
+            let letras = (valor.match(/[A-Z]/g) || []).length;
+            let numeros = (valor.match(/[0-9]/g) || []).length;
+            if (!/^[A-Z0-9]*$/.test(valor) || letras > 5 || numeros > 3) {
+                $('#edit_aula').addClass('is-invalid');
+                $('#error_edit_aula').removeClass('d-none');
             } else {
-                $('#edit_codigo').removeClass('is-invalid');
-                $('#error_edit_codigo').addClass('d-none');
+                $('#edit_aula').removeClass('is-invalid');
+                $('#error_edit_aula').addClass('d-none');
             }
+            $(this).val(valor);
         });
 
         // Validación en tiempo real para solo números de hasta 2 dígitos en nivel (editar)
@@ -748,6 +774,20 @@ $hayErrores = isset($_GET['errores']);
             } else {
                 $('#edit_nivel').removeClass('is-invalid');
                 $('#error_edit_nivel').addClass('d-none');
+            }
+
+
+            // Validación aula: máximo 5 letras mayúsculas y 3 números
+            let aulaVal = $('#edit_aula').val();
+            let letrasAula = (aulaVal.match(/[A-Z]/g) || []).length;
+            let numerosAula = (aulaVal.match(/[0-9]/g) || []).length;
+            if (aulaVal && (!/^[A-Z0-9]*$/.test(aulaVal) || letrasAula > 5 || numerosAula > 3)) {
+                $('#edit_aula').addClass('is-invalid');
+                $('#error_edit_aula').removeClass('d-none');
+                valido = false;
+            } else {
+                $('#edit_aula').removeClass('is-invalid');
+                $('#error_edit_aula').addClass('d-none');
             }
 
             // Validación formato horario
