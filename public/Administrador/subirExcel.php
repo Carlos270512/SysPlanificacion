@@ -121,7 +121,7 @@ $hayErrores = isset($_GET['errores']);
     <div class="modal fade" id="nuevaAsignaturaModal" tabindex="-1" aria-labelledby="nuevaAsignaturaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header modal-header-asignatura text-white">
                     <h5 class="modal-title" id="nuevaAsignaturaModalLabel">
                         <i class="fas fa-plus me-2"></i>Nueva Asignatura
                     </h5>
@@ -185,7 +185,7 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="nivel" class="form-label">Nivel</label>
-                                    <input type="text" class="form-control" id="nivel" name="nivel" maxlength="2"  placeholder="Ej: 2">
+                                    <input type="text" class="form-control" id="nivel" name="nivel" maxlength="2" placeholder="Ej: 2">
                                     <small id="error_nivel" class="form-text text-danger d-none">Solo se aceptan números de hasta 2 dígitos</small>
                                 </div>
                             </div>
@@ -220,7 +220,7 @@ $hayErrores = isset($_GET['errores']);
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Cancelar
                         </button>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-guardar-cafe">
                             <i class="fas fa-save me-1"></i>Guardar
                         </button>
                     </div>
@@ -397,17 +397,17 @@ $hayErrores = isset($_GET['errores']);
             </div>
         </div>
         <script>
-        // Validación en tiempo real para formato horario (editar)
-        $('#edit_horario').on('input', function() {
-            let valor = $(this).val();
-            if (!/^\d{2}-\d{2}$/.test(valor)) {
-                $('#edit_horario').addClass('is-invalid');
-                $('#error_edit_horario').removeClass('d-none');
-            } else {
-                $('#edit_horario').removeClass('is-invalid');
-                $('#error_edit_horario').addClass('d-none');
-            }
-        });
+            // Validación en tiempo real para formato horario (editar)
+            $('#edit_horario').on('input', function() {
+                let valor = $(this).val();
+                if (!/^\d{2}-\d{2}$/.test(valor)) {
+                    $('#edit_horario').addClass('is-invalid');
+                    $('#error_edit_horario').removeClass('d-none');
+                } else {
+                    $('#edit_horario').removeClass('is-invalid');
+                    $('#error_edit_horario').addClass('d-none');
+                }
+            });
             $(document).ready(function() {
                 $('#tablaErroresExcel').DataTable({
                     language: {
