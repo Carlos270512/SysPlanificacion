@@ -31,6 +31,8 @@ if (!$docente || !$asignatura) {
     <title>Planificación de Clase</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background: #f8f9fa;
@@ -188,55 +190,164 @@ if (!$docente || !$asignatura) {
                     <iframe class="iframe-container" src="about:blank"></iframe>
                 </div>
             </div>
+        </div>
 
-            <!-- Modal Observaciones -->
-            <div class="modal fade" id="modalObservaciones" tabindex="-1" aria-labelledby="modalObservacionesLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form id="formObservaciones" method="post" action="../../app/RevisarPlanificaciones/guardarObservacion.php">
-                        <div class="modal-content">
-                            <div class="modal-header bg-warning">
-                                <h5 class="modal-title" id="modalObservacionesLabel"><i class="bi bi-chat-dots"></i> Enviar Observación al Docente</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <!-- Modal Observaciones -->
+        <div class="modal fade" id="modalObservaciones" tabindex="-1" aria-labelledby="modalObservacionesLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="formObservaciones" method="post" action="../../app/RevisarPlanificaciones/guardarObservacion.php">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning">
+                            <h5 class="modal-title" id="modalObservacionesLabel"><i class="bi bi-chat-dots"></i> Enviar Observación al Docente</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- CORREGIDO: Ahora debe tener el codigo -->
+                            <input type="hidden" name="docente_codigo" value="<?= htmlspecialchars($docente['codigo'] ?? '') ?>">
+                            <input type="hidden" name="asignatura_codigo" value="<?= htmlspecialchars($asignatura['codigo'] ?? '') ?>">
+                            <div class="mb-3">
+                                <label for="campo_corregir" class="form-label">¿Qué debe corregir?</label>
+                                <select class="form-select" id="campo_corregir" name="campo_corregir" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="objetivo">Objetivo</option>
+                                    <option value="apertura">Apertura</option>
+                                    <option value="desarrollo">Desarrollo</option>
+                                    <option value="cierre">Cierre</option>
+                                    <option value="trabajo_autonomo">Trabajo autónomo</option>
+                                    <option value="metodologia">Metodología</option>
+                                    <option value="recursos">Recursos didácticos</option>
+                                    <option value="bibliografia">Bibliografía</option>
+                                    <option value="actividades_recuperacion">Actividades de recuperación</option>
+                                    <option value="evaluacion">Evaluación</option>
+                                    <option value="general">Observación general</option>
+                                </select>
                             </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="docente_codigo" value="<?= htmlspecialchars($docente['codigo'] ?? '') ?>">
-                                <input type="hidden" name="asignatura_codigo" value="<?= htmlspecialchars($asignatura['codigo'] ?? '') ?>">
-                                <div class="mb-3">
-                                    <label for="campo_corregir" class="form-label">¿Qué debe corregir?</label>
-                                    <select class="form-select" id="campo_corregir" name="campo_corregir" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="objetivo">Objetivo</option>
-                                        <option value="apertura">Apertura</option>
-                                        <option value="desarrollo">Desarrollo</option>
-                                        <option value="cierre">Cierre</option>
-                                        <option value="trabajo_autonomo">Trabajo autónomo</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="descripcion_observacion" class="form-label">Descripción de la observación</label>
-                                    <textarea class="form-control" id="descripcion_observacion" name="descripcion_observacion" rows="4" required placeholder="Describa lo que debe corregir el docente"></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-warning">Enviar Observación</button>
+                            <div class="mb-3">
+                                <label for="descripcion_observacion" class="form-label">Descripción de la observación</label>
+                                <textarea class="form-control" id="descripcion_observacion" name="descripcion_observacion" rows="4" required placeholder="Describa lo que debe corregir el docente"></textarea>
                             </div>
                         </div>
-                    </form>
-                </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Enviar Observación</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-            <script>
-                document.querySelectorAll('.unidad-link').forEach(function(link) {
-                    link.addEventListener('click', function(e) {
-                        var unidadId = this.getAttribute('data-unidad-id');
-                        var iframe = document.querySelector('.iframe-container');
-                        if (unidadId && iframe) {
-                            iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cargar planificación al hacer clic en unidad
+        document.querySelectorAll('.unidad-link').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                var unidadId = this.getAttribute('data-unidad-id');
+                var iframe = document.querySelector('.iframe-container');
+                if (unidadId && iframe) {
+                    iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
+                }
+            });
+        });
+
+        // Validación del formulario de observaciones con AJAX
+        document.getElementById('formObservaciones').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var campo = document.getElementById('campo_corregir').value;
+            var descripcion = document.getElementById('descripcion_observacion').value.trim();
+            
+            if (!campo || !descripcion) {
+                Swal.fire({
+                    title: '¡Campos requeridos!',
+                    text: 'Por favor complete todos los campos requeridos.',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#ffc107'
+                });
+                return false;
+            }
+            
+            if (descripcion.length < 10) {
+                Swal.fire({
+                    title: '¡Descripción muy corta!',
+                    text: 'La descripción debe tener al menos 10 caracteres.',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#ffc107'
+                });
+                return false;
+            }
+            
+            // Confirmación con SweetAlert
+            Swal.fire({
+                title: '¿Enviar observación?',
+                text: '¿Está seguro de enviar esta observación al docente?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar loading
+                    Swal.fire({
+                        title: 'Enviando...',
+                        text: 'Por favor espere',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
                         }
                     });
-                });
-            </script>
+                    
+                    // Enviar con AJAX
+                    var formData = new FormData(this);
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.close();
+                        
+                        if (data.success) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'Entendido',
+                                confirmButtonColor: '#198754'
+                            }).then(() => {
+                                // Cerrar modal y limpiar formulario
+                                document.getElementById('modalObservaciones').querySelector('[data-bs-dismiss="modal"]').click();
+                                this.reset();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: '¡Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Entendido',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '¡Error!',
+                            text: 'Error de conexión: ' + error.message,
+                            icon: 'error',
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

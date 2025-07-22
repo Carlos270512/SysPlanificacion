@@ -1,7 +1,7 @@
 <?php
 function getDocenteYAsignatura($pdo, $docente_codigo, $asignatura_codigo) {
-    // Obtener datos del docente
-    $stmtDoc = $pdo->prepare("SELECT nombre FROM docente WHERE codigo = ?");
+    // Obtener datos del docente - CORREGIDO: incluir codigo
+    $stmtDoc = $pdo->prepare("SELECT codigo, nombre FROM docente WHERE codigo = ?");
     $stmtDoc->execute([$docente_codigo]);
     $docente = $stmtDoc->fetch(PDO::FETCH_ASSOC);
 
