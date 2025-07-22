@@ -55,7 +55,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                         <i class="fas fa-chalkboard-teacher me-2"></i>Datos
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosDropdown">
-                        <li><a class="dropdown-item" href="Administrador/subirExcel.php" target="mainFrame">Cargar Datos</a></li>
+                        <li><a class="dropdown-item" href="Administrador/subirExcel.php" target="mainFrame">Cargar Asignaturas</a></li>
                         <li><a class="dropdown-item" href="Gestionplanificaciones.php" target="mainFrame">Gestión de Planificaciones</a></li>
                     </ul>
                 </li>
