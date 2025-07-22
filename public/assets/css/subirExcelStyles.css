@@ -18,9 +18,15 @@
 .table tbody tr:hover {
   background-color: #fff9e1 !important; /* Amarillo suave al pasar el mouse */
 }
-.card-header {
-    background: rgb(44, 64, 115) !important;
+.card > .card-header,
+.card-header,
+div.card-header,
+.card-header.text-white,
+.card-header.bg-primary,
+.card-header.bg-success {
+    background-color: rgb(44, 64, 115) !important;
     color: #fff !important;
+    border-bottom: 1px solid #8B5C2A !important;
 }
 .modal-header-asignatura {
     background: rgb(44, 64, 115) !important;

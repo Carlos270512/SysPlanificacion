@@ -54,13 +54,22 @@ if ($asignaturaFiltro || $periodoFiltro) {
                         <label for="asignatura" class="form-label fw-semibold">Filtrar por Asignatura</label>
                         <input type="text" class="form-control" id="asignatura" name="asignatura"
                             placeholder="Ingrese nombre de asignatura..."
+                            autocomplete="off"
                             value="<?php echo htmlspecialchars($asignaturaFiltro ?? ''); ?>">
+                        <div id="error_asignatura" class="invalid-feedback d-none">
+                            Solo se permiten letras y espacios.
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label for="periodo" class="form-label fw-semibold">Filtrar por Período</label>
                         <input type="text" class="form-control" id="periodo" name="periodo"
-                            placeholder="Ingrese período lectivo..."
+                            placeholder="Ej: 2025-2025"
+                            pattern="^\d{4}\s*-\s*\d{4}$"
+                            title="Ingrese el período en formato: 2025 - 2025"
                             value="<?php echo htmlspecialchars($periodoFiltro ?? ''); ?>">
+                        <div id="error_periodo" class="invalid-feedback d-none">
+                            Ingrese el período en formato: 2025 - 2025
+                        </div>
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-filtrar-custom me-2">
@@ -145,9 +154,58 @@ if ($asignaturaFiltro || $periodoFiltro) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // ...
+        // Validación en tiempo real para el campo asignatura
+        $('#asignatura').on('input', function() {
+            let valor = $(this).val();
+            // Solo letras y espacios
+            if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                $(this).addClass('is-invalid');
+                $('#error_asignatura').removeClass('d-none');
+            } else {
+                $(this).removeClass('is-invalid');
+                $('#error_asignatura').addClass('d-none');
+            }
+            // Transformar a mayúsculas
+            $(this).val(valor.toUpperCase());
+        });
+
+        // Validación al enviar el formulario para asignatura
+        $('form').on('submit', function(e) {
+            let asignatura = $('#asignatura').val();
+            if (asignatura && !/^[A-ZÁÉÍÓÚÑ ]+$/.test(asignatura)) {
+                $('#asignatura').addClass('is-invalid');
+                $('#error_asignatura').removeClass('d-none');
+                e.preventDefault();
+            }
+        });
+
+        // Validación en tiempo real para el campo periodo
+        $('#periodo').on('input', function() {
+            let valor = $(this).val();
+            if (valor && !/^\d{4}\s*-\s*\d{4}$/.test(valor)) {
+                $(this).addClass('is-invalid');
+                $('#error_periodo').removeClass('d-none');
+            } else {
+                $(this).removeClass('is-invalid');
+                $('#error_periodo').addClass('d-none');
+            }
+        });
+
+        // Validación al enviar el formulario
+        $('form').on('submit', function(e) {
+            let periodo = $('#periodo').val();
+            if (periodo && !/^\d{4}\s*-\s*\d{4}$/.test(periodo)) {
+                $('#periodo').addClass('is-invalid');
+                $('#error_periodo').removeClass('d-none');
+                e.preventDefault();
+            }
+        });
+
         $(document).ready(function() {
             $('#tablaPlanificaciones').DataTable({
                 "language": {

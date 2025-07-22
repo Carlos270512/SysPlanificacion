@@ -40,7 +40,7 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
     <title>Gestión de Planificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="assets/css/subirExcelstyles.css">
+<link rel="stylesheet" href="assets/css/subirExcelstyles.css?v=2">
 </head>
 
 <body class="bg-light">
