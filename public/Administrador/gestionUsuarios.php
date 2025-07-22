@@ -68,26 +68,27 @@ $hayErrores = isset($_GET['errores']);
                             <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label for="codigo" class="form-label">Código</label>
-                                    <input type="text" class="form-control" name="codigo" id="codigo" required>
+                                    <input type="text" class="form-control" name="codigo" id="codigo" placeholder="Ej: AMPU" required>
+                                    <small id="error_codigo" class="form-text text-danger d-none">Solo se permiten letras</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="carrera" class="form-label">Carrera</label>
-                                    <input type="text" class="form-control" name="carrera" id="carrera" required>
+                                    <input type="text" class="form-control" name="carrera" id="carrera" placeholder="Ej: Desarrollo de Software" required>
+                                    <small id="error_carrera" class="form-text text-danger d-none">Solo se permiten letras</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="nombre" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" name="nombre" id="nombre" required>
+                                    <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Ej: Juan Pérez" required>
+                                    <small id="error_nombre" class="form-text text-danger d-none">Solo se permiten letras</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="titulo" class="form-label">Título</label>
-                                    <input type="text" class="form-control" name="titulo" id="titulo" required>
+                                    <input type="text" class="form-control" name="titulo" id="titulo" placeholder="Ej: Ingeniero" required>
+                                    <small id="error_titulo" class="form-text text-danger d-none">Solo se permiten letras</small>
                                 </div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <div class="mb-3">
-                                    <label for="fecha_ingreso" class="form-label">Fecha de Ingreso</label>
-                                    <input type="date" class="form-control" name="fecha_ingreso" id="fecha_ingreso" required>
-                                </div>
+
                                 <div class="mb-3">
                                     <label for="rol" class="form-label">Rol</label>
                                     <select class="form-control" name="rol" id="rol" required>
@@ -99,11 +100,12 @@ $hayErrores = isset($_GET['errores']);
                                 </div>
                                 <div class="mb-3">
                                     <label for="correo" class="form-label">Correo</label>
-                                    <input type="email" class="form-control" name="correo" id="correo" required>
+                                    <input type="email" class="form-control" name="correo" id="correo" placeholder="Ej: juan@istvidanueva.edu.ec" required>
+                                    <small id="error_correo" class="form-text text-danger d-none">Ingrese un correo electrónico válido</small>
                                 </div>
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Contraseña</label>
-                                    <input type="password" class="form-control" name="password" id="password" required>
+                                    <input type="password" class="form-control" name="password" id="password" placeholder="Ej: 1234" required>
                                 </div>
                             </div>
                         </div>
@@ -238,6 +240,71 @@ $hayErrores = isset($_GET['errores']);
             $('#usuariosTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                }
+            });
+
+            // Validación en tiempo real para solo letras en código (Registrar Docente)
+            $('#codigo').on('input', function() {
+                let valor = $(this).val();
+                // Solo letras (mayúsculas/minúsculas, tildes y ñ)
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ]*$/.test(valor)) {
+                    $('#codigo').addClass('is-invalid');
+                    $('#error_codigo').removeClass('d-none');
+                } else {
+                    $('#codigo').removeClass('is-invalid');
+                    $('#error_codigo').addClass('d-none');
+                }
+                // Transformar a mayúsculas
+                $(this).val(valor.toUpperCase());
+            });
+
+            // Validación en tiempo real para solo letras en carrera (mayúsculas y minúsculas, sin transformar)
+            $('#carrera').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#carrera').addClass('is-invalid');
+                    $('#error_carrera').removeClass('d-none');
+                } else {
+                    $('#carrera').removeClass('is-invalid');
+                    $('#error_carrera').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para solo letras en nombre (mayúsculas y minúsculas, sin transformar)
+            $('#nombre').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#nombre').addClass('is-invalid');
+                    $('#error_nombre').removeClass('d-none');
+                } else {
+                    $('#nombre').removeClass('is-invalid');
+                    $('#error_nombre').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para solo letras en título (mayúsculas y minúsculas, sin transformar)
+            $('#titulo').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#titulo').addClass('is-invalid');
+                    $('#error_titulo').removeClass('d-none');
+                } else {
+                    $('#titulo').removeClass('is-invalid');
+                    $('#error_titulo').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para correo electrónico válido
+            $('#correo').on('input', function() {
+                let valor = $(this).val();
+                // Expresión regular básica para validar correo
+                let correoValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!correoValido.test(valor)) {
+                    $('#correo').addClass('is-invalid');
+                    $('#error_correo').removeClass('d-none');
+                } else {
+                    $('#correo').removeClass('is-invalid');
+                    $('#error_correo').addClass('d-none');
                 }
             });
         });
