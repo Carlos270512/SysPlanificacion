@@ -18,7 +18,41 @@
 .table tbody tr:hover {
   background-color: #fff9e1 !important; /* Amarillo suave al pasar el mouse */
 }
-.card-header {
+.card > .card-header,
+.card-header,
+div.card-header,
+.card-header.text-white,
+.card-header.bg-primary,
+.card-header.bg-success {
+    background-color: rgb(44, 64, 115) !important;
+    color: #fff !important;
+    border-bottom: 1px solid #8B5C2A !important;
+}
+.modal-header-asignatura {
     background: rgb(44, 64, 115) !important;
+    color: #fff !important;
+    border-bottom: 1px solid #8B5C2A !important;
+}
+.modal-header-asignatura .modal-title {
+    color: #fff !important;
+}
+.modal-footer {
+    background-color: #f5e9da !important;
+    border-top: 1px solid #e0c9a6 !important;
+}
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+/*Estilo para los botones del modal de nueva asignatura */
+.btn-guardar-cafe {
+    background-color: #6B3F13 !important;   /* Café oscuro */
+    color: #fff !important;
+    border-color: #6B3F13 !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+.btn-guardar-cafe:hover,
+.btn-guardar-cafe:focus {
+    background-color: #8B5C2A !important;   /* Café claro */
+    border-color: #8B5C2A !important;
     color: #fff !important;
 }
