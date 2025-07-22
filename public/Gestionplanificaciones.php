@@ -40,12 +40,13 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
     <title>Gestión de Planificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="assets/css/subirExcelstyles.css">
 </head>
 
 <body class="bg-light">
     <div class="container py-5">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header text-white">
                 <h4 class="mb-0"><i class="fas fa-search me-2"></i>Gestión de Planificaciones</h4>
             </div>
             <div class="card-body">
@@ -197,7 +198,6 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
         //este igual mover a assts en una carpeta de gestion
         function toggleSelectAll() {
             const selectAll = document.getElementById('selectAll');
@@ -349,8 +349,6 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                 }
             });
         }
-
-        
     </script>
 </body>
 

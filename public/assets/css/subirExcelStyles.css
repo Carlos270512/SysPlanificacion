@@ -18,3 +18,7 @@
 .table tbody tr:hover {
   background-color: #fff9e1 !important; /* Amarillo suave al pasar el mouse */
 }
+.card-header {
+    background: rgb(44, 64, 115) !important;
+    color: #fff !important;
+}

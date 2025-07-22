@@ -32,16 +32,17 @@ if ($asignaturaFiltro || $periodoFiltro) {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../assets/css/planificaciontyle.css">
 </head>
 
 <body class="bg-light">
     <div class="container-fluid py-4">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header text-white">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-archive me-2"></i>Repositorio de Planificaciones</h4>
-                    <button type="button" class="btn btn-success" id="btnDescargarSeleccionados" 
-                            onclick="descargarSeleccionados()" disabled>
+                    <button type="button" class="btn btn-descargar-cafe" id="btnDescargarSeleccionados"
+                        onclick="descargarSeleccionados()" disabled>
                         <i class="fas fa-download me-2"></i>Descargar Seleccionados
                     </button>
                 </div>
@@ -51,18 +52,18 @@ if ($asignaturaFiltro || $periodoFiltro) {
                 <form method="get" class="row g-3 mb-4">
                     <div class="col-md-4">
                         <label for="asignatura" class="form-label fw-semibold">Filtrar por Asignatura</label>
-                        <input type="text" class="form-control" id="asignatura" name="asignatura" 
-                               placeholder="Ingrese nombre de asignatura..."
-                               value="<?php echo htmlspecialchars($asignaturaFiltro ?? ''); ?>">
+                        <input type="text" class="form-control" id="asignatura" name="asignatura"
+                            placeholder="Ingrese nombre de asignatura..."
+                            value="<?php echo htmlspecialchars($asignaturaFiltro ?? ''); ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="periodo" class="form-label fw-semibold">Filtrar por Período</label>
-                        <input type="text" class="form-control" id="periodo" name="periodo" 
-                               placeholder="Ingrese período lectivo..."
-                               value="<?php echo htmlspecialchars($periodoFiltro ?? ''); ?>">
+                        <input type="text" class="form-control" id="periodo" name="periodo"
+                            placeholder="Ingrese período lectivo..."
+                            value="<?php echo htmlspecialchars($periodoFiltro ?? ''); ?>">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success me-2">
+                        <button type="submit" class="btn btn-filtrar-custom me-2">
                             <i class="fas fa-filter"></i> Filtrar
                         </button>
                         <a href="?" class="btn btn-secondary">
@@ -85,9 +86,9 @@ if ($asignaturaFiltro || $periodoFiltro) {
                                 <th>Usuario Creación</th>
                                 <th>Acciones</th>
                                 <th>
-                                    Seleccionar 
-                                    <input type="checkbox" id="selectAll" class="form-check-input ms-2" 
-                                           title="Seleccionar todos" onchange="toggleSelectAll()">
+                                    Seleccionar
+                                    <input type="checkbox" id="selectAll" class="form-check-input ms-2"
+                                        title="Seleccionar todos" onchange="toggleSelectAll()">
                                 </th>
                             </tr>
                         </thead>
@@ -102,7 +103,7 @@ if ($asignaturaFiltro || $periodoFiltro) {
                                     <td><?php echo date('d/m/Y H:i', strtotime($planificacion['fecha_creacion'])); ?></td>
                                     <td><?php echo htmlspecialchars($planificacion['usuario_creacion'] ?? 'N/A'); ?></td>
                                     <td>
-                                        <button type="button" class="btn btn-info btn-sm"
+                                        <button type="button" class="btn btn-ver-cafe btn-sm"
                                             onclick="verPlanificacion(<?php echo $planificacion['id_repository']; ?>)"
                                             title="Ver Planificación">
                                             <i class="fas fa-eye"></i>
@@ -175,7 +176,9 @@ if ($asignaturaFiltro || $periodoFiltro) {
                 },
                 "pageLength": 25,
                 "responsive": true,
-                "order": [[0, "desc"]],
+                "order": [
+                    [0, "desc"]
+                ],
                 "columnDefs": [{
                     "targets": [7, 8], // Columnas de acciones y checkbox
                     "orderable": false
@@ -187,11 +190,11 @@ if ($asignaturaFiltro || $periodoFiltro) {
         function toggleSelectAll() {
             const selectAll = document.getElementById('selectAll');
             const checkboxes = document.querySelectorAll('.planificacion-checkbox');
-            
+
             checkboxes.forEach(checkbox => {
                 checkbox.checked = selectAll.checked;
             });
-            
+
             actualizarBotonDescarga();
         }
 
@@ -199,7 +202,7 @@ if ($asignaturaFiltro || $periodoFiltro) {
         function actualizarBotonDescarga() {
             const selected = obtenerSeleccionados();
             const btnDescargar = document.getElementById('btnDescargarSeleccionados');
-            
+
             if (selected.length > 0) {
                 btnDescargar.disabled = false;
                 btnDescargar.innerHTML = `<i class="fas fa-download me-2"></i>Descargar Seleccionados (${selected.length})`;
@@ -230,7 +233,7 @@ if ($asignaturaFiltro || $periodoFiltro) {
         // Función para descargar planificaciones seleccionadas
         function descargarSeleccionados() {
             const selected = obtenerSeleccionados();
-            
+
             if (selected.length === 0) {
                 Swal.fire({
                     icon: 'warning',

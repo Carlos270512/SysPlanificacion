@@ -13,47 +13,47 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset_database' && isset($_POST['confirm_reset'])) {
     $transactionStarted = false;
-    
+
     try {
         // Verificar que PDO esté disponible
         if (!$pdo) {
             throw new Exception("No se pudo conectar a la base de datos");
         }
-        
+
         // Iniciar transacción
         $result = $pdo->beginTransaction();
         if (!$result) {
             throw new Exception("No se pudo iniciar la transacción");
         }
         $transactionStarted = true;
-        
+
         // Obtener el código del administrador actual para NO eliminarlo
         $admin_actual = $_SESSION['usuario']['codigo'] ?? null;
-        
+
         // Deshabilitar verificación de claves foráneas temporalmente
         $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
-        
+
         // ORDEN CORRECTO DE ELIMINACIÓN (respetando dependencias):
-        
+
         // 1. Eliminar semana_linea (depende de unidad)
         $pdo->exec("DELETE FROM semana_linea");
         //$pdo->exec("ALTER TABLE semana_linea AUTO_INCREMENT = 1");
-        
+
         // 2. Eliminar planificaciones (depende de unidad) - NO planificaciones_repository
         $pdo->exec("DELETE FROM planificaciones");
         //$pdo->exec("ALTER TABLE planificaciones AUTO_INCREMENT = 1");
-        
+
         // 3. Eliminar semana (depende de unidad)
         $pdo->exec("DELETE FROM semana");
         //$pdo->exec("ALTER TABLE semana AUTO_INCREMENT = 1");
-        
+
         // 4. Eliminar unidad (depende de asignatura)
         $pdo->exec("DELETE FROM unidad");
         //$pdo->exec("ALTER TABLE unidad AUTO_INCREMENT = 1");
-        
+
         // 5. Eliminar asignatura (depende de docente)
         $pdo->exec("DELETE FROM asignatura");
-        
+
         // 6. Eliminar docentes EXCEPTO el administrador actual
         if ($admin_actual) {
             $stmt = $pdo->prepare("DELETE FROM docente WHERE codigo != ?");
@@ -62,18 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Si no hay código específico, eliminar todos los docentes que NO sean ADMIN
             $pdo->exec("DELETE FROM docente WHERE rol != 'ADMIN'");
         }
-        
+
         // Rehabilitar verificación de claves foráneas
         $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
-        
+
         // Confirmar transacción
         if ($transactionStarted) {
             $pdo->commit();
             $transactionStarted = false;
         }
-        
+
         $message = "¡Nuevo período académico iniciado exitosamente! Se eliminaron todas las planificaciones activas y unidades. Se conservó su cuenta de administrador y el repositorio histórico.";
-        
     } catch (Exception $e) {
         // Solo hacer rollback si la transacción fue iniciada y está activa
         if ($transactionStarted) {
@@ -86,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 error_log("Error en rollback: " . $rollbackError->getMessage());
             }
         }
-        
+
         // Asegurar que las claves foráneas estén habilitadas
         try {
             if ($pdo) {
@@ -96,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Ignorar errores de FK
             error_log("Error al rehabilitar FK: " . $fkError->getMessage());
         }
-        
+
         $error = "Error al limpiar la base de datos: " . $e->getMessage();
     }
 }
@@ -104,37 +103,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuevo Período Académico - Sistema de Planificación</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/planificaciontyle.css">
     <style>
         .danger-zone {
             border: 2px solid #dc3545;
             border-radius: 10px;
             background-color: #fff5f5;
         }
+
         .warning-icon {
             color: #dc3545;
             font-size: 3rem;
         }
+
         .btn-danger-custom {
             background-color: #dc3545;
             border-color: #dc3545;
             font-weight: 600;
             padding: 12px 30px;
         }
+
         .btn-danger-custom:hover {
             background-color: #c82333;
             border-color: #bd2130;
         }
+
         .corporate-header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
             padding: 2rem 0;
         }
+
         .safe-zone {
             border: 2px solid #28a745;
             border-radius: 10px;
@@ -142,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     </style>
 </head>
+
 <body class="bg-light">
     <!-- Header Corporativo -->
     <div class="corporate-header">
@@ -178,14 +185,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-lg">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white">
                         <h3 class="card-title mb-0">
                             <i class="fas fa-sync-alt me-2"></i>Iniciar Nuevo Período Académico
                         </h3>
                     </div>
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
-                            <i class="fas fa-calendar-alt text-primary" style="font-size: 4rem;"></i>
+                            <i class="fas fa-calendar-alt" style="font-size: 4rem; color: #8B5C2A;"></i>
                             <h4 class="mt-3">Preparar Sistema para Nuevo Semestre</h4>
                             <p class="text-muted">Esta acción limpiará los datos académicos actuales preservando información crítica del sistema.</p>
                         </div>
@@ -245,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <p class="text-danger fw-bold mb-4">
                                     Esta acción eliminará permanentemente todos los datos académicos del período actual, incluyendo unidades y planificaciones activas.
                                 </p>
-                                
+
                                 <form method="POST" id="resetForm" class="d-inline">
                                     <input type="hidden" name="action" value="reset_database">
                                     <div class="form-check mb-3">
@@ -290,8 +297,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <strong>Se conservarán:</strong> Su cuenta y el repositorio histórico
                     </div>
                     <p class="text-muted">Para confirmar, escriba: <strong>ELIMINAR TODO</strong></p>
-                    <input type="text" class="form-control form-control-lg text-center mb-3" 
-                           id="confirmText" placeholder="Escriba: ELIMINAR TODO">
+                    <input type="text" class="form-control form-control-lg text-center mb-3"
+                        id="confirmText" placeholder="Escriba: ELIMINAR TODO">
                     <div class="text-danger mb-3" id="confirmError" style="display: none;">
                         El texto no coincide. Debe escribir exactamente: ELIMINAR TODO
                     </div>
@@ -316,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 alert('Debe marcar la casilla de confirmación primero.');
                 return;
             }
-            
+
             const modal = new bootstrap.Modal(document.getElementById('finalConfirmModal'));
             modal.show();
         }
@@ -324,21 +331,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         function executeReset() {
             const confirmText = document.getElementById('confirmText').value;
             const errorDiv = document.getElementById('confirmError');
-            
+
             if (confirmText !== 'ELIMINAR TODO') {
                 errorDiv.style.display = 'block';
                 return;
             }
-            
+
             // Ocultar modal y enviar formulario
             const modal = bootstrap.Modal.getInstance(document.getElementById('finalConfirmModal'));
             modal.hide();
-            
+
             // Mostrar loading
             const btn = document.querySelector('button[onclick="executeReset()"]');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
             btn.disabled = true;
-            
+
             setTimeout(() => {
                 document.getElementById('resetForm').submit();
             }, 1000);
@@ -351,4 +358,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         });
     </script>
 </body>
+
 </html>

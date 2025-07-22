@@ -112,3 +112,52 @@
 .flecha-carrusel {
   z-index: 10;
 }
+
+/* Estilos para el encabezado de la tarjeta Repositorio de Planificaciones */
+.card-header.bg-primary,
+.card-header {
+    background: rgb(44, 64, 115) !important;
+    color: #fff !important;
+}
+.table-dark th,
+.table-dark {
+    background-color: rgb(44, 64, 115) !important;
+    color: #fff !important;
+}
+/* Botón Filtrar: café oscuro y hover café claro */
+.btn-filtrar-custom {
+    background-color: #6B3F13 !important;
+    color: #fff !important;
+    border-color: #6B3F13 !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+.btn-filtrar-custom:hover,
+.btn-filtrar-custom:focus {
+    background-color: #8b5c2a !important;
+    border-color: #8b5c2a !important;
+    color: #fff !important;
+}
+.btn-ver-cafe {
+    background-color: #6B3F13 !important;   /* Café oscuro */
+    color: #fff !important;
+    border-color: #6B3F13 !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+.btn-ver-cafe:hover,
+.btn-ver-cafe:focus {
+    background-color: #8B5C2A !important;   /* Café más claro */
+    border-color: #8B5C2A !important;
+    color: #fff !important;
+}
+.btn-descargar-cafe {
+    background-color: #6B3F13 !important;   /* Café oscuro */
+    color: #fff !important;
+    border-color: #6B3F13 !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+.btn-descargar-cafe:hover,
+.btn-descargar-cafe:focus {
+    background-color: #8B5C2A !important;   /* Café más claro */
+    border-color: #8B5C2A !important;
+    color: #fff !important;
+}
