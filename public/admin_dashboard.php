@@ -30,8 +30,44 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <!-- Aquí pondrás el contenido que quieras en el canvas -->
-            <p>Contenido del canvas...</p>
+            <!-- Imagen redonda centrada -->
+            <div class="text-center mb-4">
+                <img src="assets/img/logotvn.png" alt="Imagen Principal" class="rounded-circle offcanvas-main-img" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #dee2e6;">
+            </div>
+
+            <!-- Enlaces de redirección -->
+            <div class="d-grid gap-2">
+                <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-start">
+                    <i class="fas fa-graduation-cap me-3"></i>
+                    <span>SIGA TVN</span>
+                </a>
+
+                <a href="#" class="btn btn-outline-success d-flex align-items-center justify-content-start">
+                    <i class="fas fa-globe me-3"></i>
+                    <span>Portal Web</span>
+                </a>
+
+                <a href="#" class="btn btn-outline-info d-flex align-items-center justify-content-start">
+                    <i class="fas fa-envelope me-3"></i>
+                    <span>Correo Institucional</span>
+                </a>
+
+                <a href="#" class="btn btn-outline-warning d-flex align-items-center justify-content-start">
+                    <i class="fas fa-calendar-alt me-3"></i>
+                    <span>Calendario Académico</span>
+                </a>
+
+                <a href="#" class="btn btn-outline-secondary d-flex align-items-center justify-content-start">
+                    <i class="fas fa-book-open me-3"></i>
+                    <span>Biblioteca Virtual</span>
+                </a>
+            </div>
+
+            <!-- Información adicional -->
+            <hr class="my-4">
+            <div class="text-center">
+                <small class="text-muted">Accesos Rápidos - Sistema de Planificación</small>
+            </div>
         </div>
     </div>
 
