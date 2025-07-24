@@ -89,8 +89,8 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                     </div>
                     <div class="card-body">
                         <div class="row mb-2">
-                            <div class="col-md-6"><strong>Nombre:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['nombre_asignatura']); ?></div>
-                            <div class="col-md-6"><strong>Código:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['codigo']); ?></div>
+                            <div class="col-md-4"><strong>Nombre:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['nombre_asignatura']); ?></div>
+                            <div class="col-md-4"><strong>Código:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['codigo']); ?></div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-md-4"><strong>Horario:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['horario']); ?></div>

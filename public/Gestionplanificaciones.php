@@ -40,7 +40,7 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
     <title>Gestión de Planificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<link rel="stylesheet" href="assets/css/subirExcelstyles.css?v=2">
+    <link rel="stylesheet" href="assets/css/subirExcelStyles.css?v=2">
 </head>
 
 <body class="bg-light">
@@ -87,8 +87,8 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                         </div>
                         <div class="card-body">
                             <div class="row mb-2">
-                                <div class="col-md-6"><strong>Nombre:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['nombre_asignatura']); ?></div>
-                                <div class="col-md-6"><strong>Código:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['codigo']); ?></div>
+                                <div class="col-md-4"><strong>Nombre:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['nombre_asignatura']); ?></div>
+                                <div class="col-md-4"><strong>Código:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['codigo']); ?></div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-4"><strong>Horario:</strong> <?php echo htmlspecialchars($asignaturaSeleccionada['horario']); ?></div>
@@ -142,7 +142,7 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                                                     <td><?php echo $planificacion['fecha_actualizacion'] ? date('d/m/Y H:i', strtotime($planificacion['fecha_actualizacion'])) : 'N/A'; ?></td>
                                                     <td><?php echo htmlspecialchars($planificacion['usuario_creacion'] ?? 'N/A'); ?></td>
                                                     <td>
-                                                        <button type="button" class="btn btn-info btn-sm me-1"
+                                                        <button type="button" class="btn btn-ver-cafe btn-sm me-1"
                                                             onclick="verArchivo(<?php echo $planificacion['id_planificacion']; ?>)"
                                                             title="Ver Archivo">
                                                             <i class="fas fa-eye"></i>

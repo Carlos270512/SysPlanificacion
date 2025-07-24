@@ -56,3 +56,16 @@ div.card-header,
     border-color: #8B5C2A !important;
     color: #fff !important;
 }
+/* Botón "Ver Archivo" color café oscuro y hover café claro */
+.btn-ver-cafe {
+    background-color: #6B3F13 !important;   /* Café oscuro */
+    color: #fff !important;
+    border-color: #6B3F13 !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+.btn-ver-cafe:hover,
+.btn-ver-cafe:focus {
+    background-color: #8B5C2A !important;   /* Café claro */
+    border-color: #8B5C2A !important;
+    color: #fff !important;
+}
