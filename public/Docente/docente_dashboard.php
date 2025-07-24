@@ -39,7 +39,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
                     <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Generar Reportes</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i>Acerca del Sistema</a>
+                    <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
 
 
@@ -143,9 +143,11 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
 
             if (notificaciones.length === 0) {
                 lista.innerHTML = `
-                    <li class="notification-empty">
-                        <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
-                        <div>¡No tienes observaciones pendientes!</div>
+                    <li class="notification-empty text-center">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-3">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <div>¡No tienes observaciones pendientes!</div>
+                        </div>
                     </li>
                 `;
                 return;
