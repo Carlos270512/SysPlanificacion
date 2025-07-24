@@ -112,7 +112,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
         // Función para cargar notificaciones
         async function cargarNotificaciones() {
             try {
-                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=obtener');
+                const response = await fetch('../../app/Notificaciones/NotificacionesService.php?action=obtener');
                 const data = await response.json();
 
                 if (data.success) {
@@ -200,7 +200,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
         // Marcar todas como leídas
         async function marcarTodasLeidas() {
             try {
-                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=marcarLeidas', {
+                const response = await fetch('../../app/Notificaciones/NotificacionesService.php?action=marcarLeidas', {
                     method: 'POST'
                 });
                 const data = await response.json();

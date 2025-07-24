@@ -167,7 +167,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     <script>
         // Variables globales
         let notificacionesInterval;
-        
+
         // Cargar notificaciones al iniciar
         document.addEventListener('DOMContentLoaded', function() {
             cargarNotificaciones();
@@ -178,9 +178,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
         // Función para cargar notificaciones
         async function cargarNotificaciones() {
             try {
-                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=obtener');
+                const response = await fetch('../app/Notificaciones/NotificacionesService.php?action=obtener');
                 const data = await response.json();
-                
+
                 if (data.success) {
                     actualizarBadge(data.total);
                     mostrarNotificaciones(data.notificaciones);
@@ -206,7 +206,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
         // Mostrar lista de notificaciones
         function mostrarNotificaciones(notificaciones) {
             const lista = document.getElementById('lista-notificaciones');
-            
+
             if (notificaciones.length === 0) {
                 lista.innerHTML = `
                     <li class="notification-empty">
@@ -234,7 +234,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
                     </li>
                 `;
             });
-            
+
             lista.innerHTML = html;
         }
 
@@ -243,11 +243,11 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
             const ahora = new Date();
             const fechaObservacion = new Date(fecha);
             const diferencia = ahora - fechaObservacion;
-            
+
             const minutos = Math.floor(diferencia / (1000 * 60));
             const horas = Math.floor(diferencia / (1000 * 60 * 60));
             const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-            
+
             if (minutos < 60) {
                 return `Hace ${minutos} min`;
             } else if (horas < 24) {
@@ -266,11 +266,11 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
         // Marcar todas como leídas
         async function marcarTodasLeidas() {
             try {
-                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=marcarLeidas', {
+                const response = await fetch('../app/Notificaciones/NotificacionesService.php?action=marcarLeidas', {
                     method: 'POST'
                 });
                 const data = await response.json();
-                
+
                 if (data.success) {
                     actualizarBadge(0);
                     mostrarNotificaciones([]);
