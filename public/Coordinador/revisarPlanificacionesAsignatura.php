@@ -154,20 +154,7 @@ if (!$docente || !$asignatura) {
                                         data-unidad-id="<?= $unidad['id_unidad'] ?>">
                                         <i class="bi bi-book me-2"></i> Unidad <?= htmlspecialchars($unidad['numero_unidad']); ?>: <?= htmlspecialchars($unidad['nombre']); ?>
                                     </a>
-                                    <div class="collapse ms-2" id="<?= $collapseId ?>">
-                                        <?php if ($semanas): ?>
-                                            <ul class="list-group list-group-flush">
-                                                <?php foreach ($semanas as $semana): ?>
-                                                    <li class="list-group-item py-1">
-                                                        <i class="bi bi-calendar-week"></i>
-                                                        Semana: <?= date('d/m/Y', strtotime($semana['fecha_semana'])) ?> - <?= date('d/m/Y', strtotime($semana['semana_fin'])) ?>
-                                                    </li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        <?php else: ?>
-                                            <div class="text-white-50 small ms-4">No hay semanas registradas.</div>
-                                        <?php endif; ?>
-                                    </div>
+                                    
                                 </li>
                             <?php endforeach; ?>
                         <?php else: ?>
