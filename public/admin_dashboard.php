@@ -4,6 +4,9 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     header("Location: index.php");
     exit();
 }
+
+// Verificar si necesita cambiar contraseña (fecha_ingreso es NULL)
+$necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,6 +21,62 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
 </head>
 
 <body>
+    <!-- Modal obligatorio para cambio de contraseña -->
+    <div class="modal fade" id="modalCambiarPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalCambiarPasswordLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="modalCambiarPasswordLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Cambio de Contraseña Requerido
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Por seguridad, debe cambiar su contraseña antes de continuar.
+                    </div>
+                    <form id="formCambiarPassword">
+                        <div class="mb-3">
+                            <label for="passwordActual" class="form-label">Contraseña Actual:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="passwordActual" name="passwordActual" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passwordActual')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordNueva" class="form-label">Nueva Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="passwordNueva" name="passwordNueva" required minlength="6">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passwordNueva')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Mínimo 6 caracteres</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordConfirmar" class="form-label">Confirmar Nueva Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="passwordConfirmar" name="passwordConfirmar" required minlength="6">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passwordConfirmar')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="mensajeError" class="alert alert-danger d-none"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="cambiarPassword()">
+                        <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Botón flotante redondo con logo -->
     <button class="btn floating-logo-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#logoOffcanvas" aria-controls="logoOffcanvas">
         <img src="assets/img/logotvn.png" alt="Logo" class="floating-logo-img">
@@ -163,17 +222,117 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Agregar SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // Variables globales
         let notificacionesInterval;
+        const necesitaCambiarPassword = <?php echo json_encode($necesitaCambiarPassword); ?>;
 
         // Cargar notificaciones al iniciar
         document.addEventListener('DOMContentLoaded', function() {
-            cargarNotificaciones();
-            // Actualizar cada 30 segundos
-            notificacionesInterval = setInterval(cargarNotificaciones, 30000);
+            // Si necesita cambiar contraseña, mostrar modal inmediatamente
+            if (necesitaCambiarPassword) {
+                const modal = new bootstrap.Modal(document.getElementById('modalCambiarPassword'));
+                modal.show();
+            } else {
+                cargarNotificaciones();
+                // Actualizar cada 30 segundos
+                notificacionesInterval = setInterval(cargarNotificaciones, 30000);
+            }
         });
+
+        // Función para mostrar/ocultar contraseñas
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.nextElementSibling.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                button.classList.remove('fa-eye');
+                button.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                button.classList.remove('fa-eye-slash');
+                button.classList.add('fa-eye');
+            }
+        }
+
+        // Función para cambiar contraseña
+        async function cambiarPassword() {
+            const passwordActual = document.getElementById('passwordActual').value;
+            const passwordNueva = document.getElementById('passwordNueva').value;
+            const passwordConfirmar = document.getElementById('passwordConfirmar').value;
+            const mensajeError = document.getElementById('mensajeError');
+
+            // Limpiar mensajes anteriores
+            mensajeError.classList.add('d-none');
+
+            // Validaciones
+            if (!passwordActual || !passwordNueva || !passwordConfirmar) {
+                mostrarError('Todos los campos son obligatorios');
+                return;
+            }
+
+            if (passwordNueva.length < 6) {
+                mostrarError('La nueva contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            if (passwordNueva !== passwordConfirmar) {
+                mostrarError('Las contraseñas no coinciden');
+                return;
+            }
+
+            if (passwordActual === passwordNueva) {
+                mostrarError('La nueva contraseña debe ser diferente a la actual');
+                return;
+            }
+
+            try {
+                const response = await fetch('../app/Operaciones/cambiar_password.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        passwordActual: passwordActual,
+                        passwordNueva: passwordNueva
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Cerrar modal y recargar página
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalCambiarPassword'));
+                    modal.hide();
+                    
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Contraseña cambiada!',
+                        text: 'Su contraseña ha sido actualizada correctamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    mostrarError(data.message || 'Error al cambiar la contraseña');
+                }
+            } catch (error) {
+                mostrarError('Error de conexión. Intente nuevamente.');
+                console.error('Error:', error);
+            }
+        }
+
+        function mostrarError(mensaje) {
+            const mensajeError = document.getElementById('mensajeError');
+            mensajeError.textContent = mensaje;
+            mensajeError.classList.remove('d-none');
+        }
 
         // Función para cargar notificaciones
         async function cargarNotificaciones() {
@@ -260,7 +419,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'ADMIN') {
         // Ver observación específica
         function verObservacion(planificacionId) {
             // Redirigir a la página de planificaciones con filtro
-            document.getElementById('mainFrame').src = `revisarPlanficaciones.php?planificacion=${planificacionId}`;
+            document.getElementById('mainFrame').src = `./planificaciones.php?highlight_planificacion=${planificacionId}`;
         }
 
         // Marcar todas como leídas
