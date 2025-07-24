@@ -151,7 +151,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                     <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Cambiar Contraseña</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
+                    <a class="nav-link custom-nav-link" href="../Acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
 
                 <li class="nav-item dropdown mx-2">
