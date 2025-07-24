@@ -41,6 +41,37 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
                 <li class="nav-item mx-2">
                     <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i>Acerca del Sistema</a>
                 </li>
+
+
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link custom-nav-link position-relative" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span id="badge-notificaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7em; display: none;">
+                            0
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="notificacionesDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                        <li class="dropdown-header">
+                            <strong>Observaciones Pendientes</strong>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <div id="lista-notificaciones">
+                            <li class="text-center p-3">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </li>
+                        </div>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li class="text-center p-2">
+                            <a href="#" class="btn btn-sm btn-outline-primary" onclick="marcarTodasLeidas()">Marcar todas como leídas</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <div class="dropdown">
                 <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -66,5 +97,123 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variables globales
+        let notificacionesInterval;
+
+        // Cargar notificaciones al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarNotificaciones();
+            // Actualizar cada 30 segundos
+            notificacionesInterval = setInterval(cargarNotificaciones, 30000);
+        });
+
+        // Función para cargar notificaciones
+        async function cargarNotificaciones() {
+            try {
+                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=obtener');
+                const data = await response.json();
+
+                if (data.success) {
+                    actualizarBadge(data.total);
+                    mostrarNotificaciones(data.notificaciones);
+                }
+            } catch (error) {
+                console.error('Error al cargar notificaciones:', error);
+            }
+        }
+
+        // Actualizar badge de notificaciones
+        function actualizarBadge(total) {
+            const badge = document.getElementById('badge-notificaciones');
+            if (total > 0) {
+                badge.textContent = total > 99 ? '99+' : total;
+                badge.style.display = 'block';
+                badge.classList.add('notification-badge');
+            } else {
+                badge.style.display = 'none';
+                badge.classList.remove('notification-badge');
+            }
+        }
+
+        // Mostrar lista de notificaciones
+        function mostrarNotificaciones(notificaciones) {
+            const lista = document.getElementById('lista-notificaciones');
+
+            if (notificaciones.length === 0) {
+                lista.innerHTML = `
+                    <li class="notification-empty">
+                        <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                        <div>¡No tienes observaciones pendientes!</div>
+                    </li>
+                `;
+                return;
+            }
+
+            let html = '';
+            notificaciones.forEach(notif => {
+                html += `
+                    <li class="notification-item" onclick="verObservacion(${notif.planificacion_id})">
+                        <div class="notification-title">
+                            ${notif.asignatura} - ${notif.unidad}
+                        </div>
+                        <div class="notification-content">
+                            ${notif.observacion.substring(0, 80)}${notif.observacion.length > 80 ? '...' : ''}
+                        </div>
+                        <div class="notification-time">
+                            <i class="fas fa-clock me-1"></i>
+                            ${formatearTiempo(notif.fecha_observacion)}
+                        </div>
+                    </li>
+                `;
+            });
+
+            lista.innerHTML = html;
+        }
+
+        // Formatear tiempo relativo
+        function formatearTiempo(fecha) {
+            const ahora = new Date();
+            const fechaObservacion = new Date(fecha);
+            const diferencia = ahora - fechaObservacion;
+
+            const minutos = Math.floor(diferencia / (1000 * 60));
+            const horas = Math.floor(diferencia / (1000 * 60 * 60));
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+
+            if (minutos < 60) {
+                return `Hace ${minutos} min`;
+            } else if (horas < 24) {
+                return `Hace ${horas}h`;
+            } else {
+                return `Hace ${dias}d`;
+            }
+        }
+
+        // Ver observación específica
+        function verObservacion(planificacionId) {
+            // Redirigir a la página de planificaciones con filtro
+            document.getElementById('mainFrame').src = `revisarPlanficaciones.php?planificacion=${planificacionId}`;
+        }
+
+        // Marcar todas como leídas
+        async function marcarTodasLeidas() {
+            try {
+                const response = await fetch('../../app/notificaciones/NotificacionesController.php?action=marcarLeidas', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    actualizarBadge(0);
+                    mostrarNotificaciones([]);
+                }
+            } catch (error) {
+                console.error('Error al marcar como leídas:', error);
+            }
+        }
+    </script>
 </body>
+
 </html>
