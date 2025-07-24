@@ -163,11 +163,89 @@ $hayErrores = isset($_GET['errores']);
                                         <?= $row['estado'] === 'ACTIVO' ? 'Inactivar' : 'Activar' ?>
                                     </button>
                                 </form>
+                                <!-- Botón Editar -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-sm btn-primary btn-editar-docente"
+                                    data-codigo="<?= htmlspecialchars($row['codigo']) ?>"
+                                    data-carrera="<?= htmlspecialchars($row['carrera']) ?>"
+                                    data-titulo="<?= htmlspecialchars($row['titulo']) ?>"
+                                    data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
+                                    data-correo="<?= htmlspecialchars($row['correo']) ?>"
+                                    data-rol="<?= htmlspecialchars($row['rol']) ?>"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editarDocenteModal"
+                                >
+                                    Editar
+                                </button>
                             </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Modal Editar Docente -->
+    <div class="modal fade" id="editarDocenteModal" tabindex="-1" aria-labelledby="editarDocenteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form class="modal-content" action="../../app/Operaciones/editarDocenteManual.php" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarDocenteModalLabel">Editar Docente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label for="editar_codigo" class="form-label">Código</label>
+                                <input type="text" class="form-control" name="codigo" id="editar_codigo" required>
+                                <small id="error_editar_codigo" class="form-text text-danger d-none">Solo se permiten letras</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar_carrera" class="form-label">Carrera</label>
+                                <input type="text" class="form-control" name="carrera" id="editar_carrera" required>
+                                <small id="error_editar_carrera" class="form-text text-danger d-none">Solo se permiten letras</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar_nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" name="nombre" id="editar_nombre" required>
+                                <small id="error_editar_nombre" class="form-text text-danger d-none">Solo se permiten letras</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar_titulo" class="form-label">Título</label>
+                                <input type="text" class="form-control" name="titulo" id="editar_titulo" required>
+                                <small id="error_editar_titulo" class="form-text text-danger d-none">Solo se permiten letras</small>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label for="editar_rol" class="form-label">Rol</label>
+                                <select class="form-control" name="rol" id="editar_rol" required>
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="DOCENTE">DOCENTE</option>
+                                    <option value="COORDINADOR">COORDINADOR</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar_correo" class="form-label">Correo</label>
+                                <input type="email" class="form-control" name="correo" id="editar_correo" required>
+                                <small id="error_editar_correo" class="form-text text-danger d-none">Ingrese un correo electrónico válido</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editar_password" class="form-label">Contraseña (dejar en blanco para no cambiar)</label>
+                                <input type="password" class="form-control" name="password" id="editar_password" placeholder="Nueva contraseña">
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="codigo_original" id="editar_codigo_original">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-cafe">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -306,6 +384,83 @@ $hayErrores = isset($_GET['errores']);
                     $('#correo').removeClass('is-invalid');
                     $('#error_correo').addClass('d-none');
                 }
+            });
+
+            // Validación en tiempo real para solo letras en código (Editar Docente)
+            $('#editar_codigo').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ]*$/.test(valor)) {
+                    $('#editar_codigo').addClass('is-invalid');
+                    $('#error_editar_codigo').removeClass('d-none');
+                } else {
+                    $('#editar_codigo').removeClass('is-invalid');
+                    $('#error_editar_codigo').addClass('d-none');
+                }
+                $(this).val(valor.toUpperCase());
+            });
+
+            // Validación en tiempo real para solo letras en carrera (Editar Docente)
+            $('#editar_carrera').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#editar_carrera').addClass('is-invalid');
+                    $('#error_editar_carrera').removeClass('d-none');
+                } else {
+                    $('#editar_carrera').removeClass('is-invalid');
+                    $('#error_editar_carrera').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para solo letras en nombre (Editar Docente)
+            $('#editar_nombre').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#editar_nombre').addClass('is-invalid');
+                    $('#error_editar_nombre').removeClass('d-none');
+                } else {
+                    $('#editar_nombre').removeClass('is-invalid');
+                    $('#error_editar_nombre').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para solo letras en título (Editar Docente)
+            $('#editar_titulo').on('input', function() {
+                let valor = $(this).val();
+                if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]*$/.test(valor)) {
+                    $('#editar_titulo').addClass('is-invalid');
+                    $('#error_editar_titulo').removeClass('d-none');
+                } else {
+                    $('#editar_titulo').removeClass('is-invalid');
+                    $('#error_editar_titulo').addClass('d-none');
+                }
+            });
+
+            // Validación en tiempo real para correo electrónico válido (Editar Docente)
+            $('#editar_correo').on('input', function() {
+                let valor = $(this).val();
+                let correoValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!correoValido.test(valor)) {
+                    $('#editar_correo').addClass('is-invalid');
+                    $('#error_editar_correo').removeClass('d-none');
+                } else {
+                    $('#editar_correo').removeClass('is-invalid');
+                    $('#error_editar_correo').addClass('d-none');
+                }
+            });
+
+            // Botón Editar Docente: cargar datos en el modal
+            $('.btn-editar-docente').on('click', function() {
+                $('#editar_codigo').val($(this).data('codigo'));
+                $('#editar_codigo_original').val($(this).data('codigo'));
+                $('#editar_carrera').val($(this).data('carrera'));
+                $('#editar_nombre').val($(this).data('nombre'));
+                $('#editar_titulo').val($(this).data('titulo'));
+                $('#editar_correo').val($(this).data('correo'));
+                $('#editar_rol').val($(this).data('rol'));
+                $('#editar_password').val('');
+                // Limpiar validaciones previas
+                $('#editar_codigo, #editar_carrera, #editar_nombre, #editar_titulo, #editar_correo').removeClass('is-invalid');
+                $('#error_editar_codigo, #error_editar_carrera, #error_editar_nombre, #error_editar_titulo, #error_editar_correo').addClass('d-none');
             });
         });
     </script>

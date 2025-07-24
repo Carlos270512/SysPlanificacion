@@ -45,3 +45,12 @@ body {
             border: 1px solid #ced4da;
             margin-bottom: 10px;
         }
+.btn-cafe {
+    background-color: #6f4e37;
+    color: #fff;
+    border: none;
+}
+.btn-cafe:hover, .btn-cafe:focus {
+    background-color: #a67c52;
+    color: #fff;
+}

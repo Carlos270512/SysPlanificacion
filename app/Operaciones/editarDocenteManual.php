@@ -4,11 +4,10 @@ require_once __DIR__ . '/../../config/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = trim($_POST['codigo'] ?? '');
+    $codigo_original = trim($_POST['codigo_original'] ?? $codigo);
     $carrera = trim($_POST['carrera'] ?? '');
     $nombre = trim($_POST['nombre'] ?? '');
     $titulo = trim($_POST['titulo'] ?? '');
-    // Si el campo está vacío, se asigna null
-    $fecha_ingreso = (isset($_POST['fecha_ingreso']) && $_POST['fecha_ingreso'] !== '') ? $_POST['fecha_ingreso'] : null;
     $rol = trim($_POST['rol'] ?? '');
     $correo = trim($_POST['correo'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -20,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$titulo) $errores[] = "Título vacío";
     if (!$rol) $errores[] = "Rol vacío";
     if (!$correo) $errores[] = "Correo vacío";
-    if (!$password) $errores[] = "Contraseña vacía";
 
     if (!empty($errores)) {
         $_SESSION['errores_excel'][] = [
@@ -36,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Verificar duplicados
-    $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM docente WHERE codigo = ? OR correo = ?");
-    $stmtCheck->execute([$codigo, $correo]);
+    // Verificar duplicados de correo (excepto el propio)
+    $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM docente WHERE correo = ? AND codigo != ?");
+    $stmtCheck->execute([$correo, $codigo_original]);
     if ($stmtCheck->fetchColumn() > 0) {
         $_SESSION['errores_excel'][] = [
             'codigo' => $codigo,
@@ -47,15 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'nombre' => $nombre,
             'correo' => $correo,
             'rol' => $rol,
-            'errores' => 'Código o correo duplicado'
+            'errores' => 'Correo duplicado'
         ];
         header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?errores=1");
         exit();
     }
 
-    // Guardar en texto plano (sin hash)
-    $stmt = $pdo->prepare("INSERT INTO docente (codigo, carrera, nombre, titulo, fecha_ingreso, rol, correo, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$codigo, $carrera, $nombre, $titulo, $fecha_ingreso, $rol, $correo, $password]);
+    // Construir consulta de actualización
+    if ($password !== '') {
+        $stmt = $pdo->prepare("UPDATE docente SET codigo = ?, carrera = ?, nombre = ?, titulo = ?, rol = ?, correo = ?, password = ? WHERE codigo = ?");
+        $result = $stmt->execute([$codigo, $carrera, $nombre, $titulo, $rol, $correo, $password, $codigo_original]);
+    } else {
+        $stmt = $pdo->prepare("UPDATE docente SET codigo = ?, carrera = ?, nombre = ?, titulo = ?, rol = ?, correo = ? WHERE codigo = ?");
+        $result = $stmt->execute([$codigo, $carrera, $nombre, $titulo, $rol, $correo, $codigo_original]);
+    }
 
     header("Location: /SysPlanificacion/public/Administrador/gestionUsuarios.php?exito=1");
     exit();
