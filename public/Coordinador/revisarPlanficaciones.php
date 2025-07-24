@@ -46,11 +46,12 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
     <meta charset="UTF-8">
     <title>Revisar Planificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/planificaciontyle.css?v=2">
 </head>
 <body class="bg-light">
 <div class="container py-5">
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header text-white">
             <h4 class="mb-0"><i class="fas fa-search me-2"></i>Revisar Planificaciones</h4>
         </div>
         <div class="card-body">
