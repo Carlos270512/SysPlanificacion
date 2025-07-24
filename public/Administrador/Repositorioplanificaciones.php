@@ -32,7 +32,7 @@ if ($asignaturaFiltro || $periodoFiltro) {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="../assets/css/planificaciontyle.css">
+    <link rel="stylesheet" href="../assets/css/planificaciontyle.css?v=2">
 </head>
 
 <body class="bg-light">

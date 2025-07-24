@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <input type="date" id="swal_fecha_sabado" class="swal2-input" style="width: 200px; padding: 6px; font-size: 15px; margin-top: 6px;">
                 </div>
             `,
-                preConfirm: () => {
+                preConfirm: async () => {
                     const fechaSabado = document.getElementById('swal_fecha_sabado').value;
 
                     // Validación de mes actual
@@ -121,6 +121,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         Swal.showValidationMessage('La fecha debe ser del mes actual.');
                         return false;
                     }
+
+                    // Validar que no se repita el sábado
+                    try {
+                        const resp = await fetch(`/SysPlanificacion/app/SemanaLinea/listarSemanasLinea.php?id_unidad=${idUnidad}`);
+                        const data = await resp.json();
+                        if (data.success && data.semanas.some(s => s.fecha_sabado === fechaSabado)) {
+                            Swal.showValidationMessage('Ese sábado ya está seleccionado, no se puede elegir.');
+                            return false;
+                        }
+                    } catch (e) {
+                        Swal.showValidationMessage('Error al validar la fecha. Intenta de nuevo.');
+                        return false;
+                    }
+
                     return { fechaSabado };
                 },
                 showCancelButton: true,
