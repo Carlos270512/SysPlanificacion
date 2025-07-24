@@ -90,70 +90,79 @@ $html .= "
 </table>
 ";
 
+$mpdf->WriteHTML($html);
+
 function fecha_es($fecha) {
     return $fecha ? date('d/m/Y', strtotime($fecha)) : '';
 }
 
-// Si solo quieres mostrar una semana en línea (la seleccionada):
-if ($semana_linea) {
-    $html .= "
-    <br>
-    <div style='font-size:13px; font-weight:bold; margin-bottom:4px;'>
-        <span style='color:#222'>Sábado: " . fecha_es($semana_linea['fecha_sabado']) . "</span>
-    </div>
-    <table border='1' cellpadding='6' cellspacing='0' width='100%' style='font-size:11px;'>
-        <tr style='background:#E0E0E0; text-align:center; font-weight:bold;'>
-            <td width='18%'>Contenido</td>
-            <td width='82%'>
-                Objetivo (s):<br>
-                <span style='font-weight:normal;'>" . $semana_linea['objetivo'] . "</span>
-                <br><br>
-                <span style='font-weight:bold;'>Actividades:</span>
-            </td>
-        </tr>
-        <tr>
-            <td valign='top' rowspan='5'>" . $semana_linea['contenido'] . "</td>
-            <td>
-                <span style='font-weight:bold;'>Apertura:</span>
-                <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea['tiempo_actividades']) . "</span>
-                <br>" . $semana_linea['actividades'] . "
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span style='font-weight:bold;'>Desarrollo:</span>
-                <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea['tiempo_desarrollo']) . "</span>
-                <br>" . $semana_linea['desarrollo'] . "
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span style='font-weight:bold;'>Cierre:</span>
-                <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea['tiempo_cierre']) . "</span>
-                <br>" . $semana_linea['cierre'] . "
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span style='font-weight:bold;'>Evaluación durante la clase:</span>
-                <br>" . $semana_linea['evaluacion_clase'] . "
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span style='font-weight:bold;'>Equipo/Herramienta/ Recursos didácticos / Recursos interactivos/ empleados en la clase:</span>
-                <br>" . $semana_linea['equipo_herramientas_recursos'] . "
-            </td>
-        </tr>
-        <tr>
-            <td colspan='2'>
-                <span style='font-weight:bold;'>Actividades de refuerzo (trabajo autónomo):</span>
-                <br>" . $semana_linea['actividades_refuerzo'] . "
-            </td>
-        </tr>
-    </table>
-    ";
+// AQUÍ CAMBIA: En lugar de mostrar solo una semana, mostrar todas las semanas de la unidad
+if ($unidad && isset($unidad['id_unidad'])) {
+    $semanas_linea = $repo->getSemanasLineaPorUnidad($unidad['id_unidad']);
+    
+    foreach ($semanas_linea as $semana_linea_item) {
+        $mpdf->AddPage();
+        
+        $htmlSemanaLinea = "
+        <br>
+        <div style='font-size:13px; font-weight:bold; margin-bottom:4px;'>
+            <span style='color:#222'>Sábado: " . fecha_es($semana_linea_item['fecha_sabado']) . "</span>
+        </div>
+        <table border='1' cellpadding='6' cellspacing='0' width='100%' style='font-size:11px;'>
+            <tr style='background:#E0E0E0; text-align:center; font-weight:bold;'>
+                <td width='18%'>Contenido</td>
+                <td width='82%'>
+                    Objetivo (s):<br>
+                    <span style='font-weight:normal;'>" . $semana_linea_item['objetivo'] . "</span>
+                    <br><br>
+                    <span style='font-weight:bold;'>Actividades:</span>
+                </td>
+            </tr>
+            <tr>
+                <td valign='top' rowspan='5'>" . $semana_linea_item['contenido'] . "</td>
+                <td>
+                    <span style='font-weight:bold;'>Apertura:</span>
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_actividades']) . "</span>
+                    <br>" . $semana_linea_item['actividades'] . "
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style='font-weight:bold;'>Desarrollo:</span>
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_desarrollo']) . "</span>
+                    <br>" . $semana_linea_item['desarrollo'] . "
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style='font-weight:bold;'>Cierre:</span>
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_cierre']) . "</span>
+                    <br>" . $semana_linea_item['cierre'] . "
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style='font-weight:bold;'>Evaluación durante la clase:</span>
+                    <br>" . $semana_linea_item['evaluacion_clase'] . "
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style='font-weight:bold;'>Equipo/Herramienta/ Recursos didácticos / Recursos interactivos/ empleados en la clase:</span>
+                    <br>" . $semana_linea_item['equipo_herramientas_recursos'] . "
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                    <span style='font-weight:bold;'>Actividades de refuerzo (trabajo autónomo):</span>
+                    <br>" . $semana_linea_item['actividades_refuerzo'] . "
+                </td>
+            </tr>
+        </table>
+        ";
+        
+        $mpdf->WriteHTML($htmlSemanaLinea);
+    }
 }
 
-$mpdf->WriteHTML($html);
 $mpdf->Output('planificacion_linea.pdf', 'I');
