@@ -35,6 +35,7 @@ $hayErrores = isset($_GET['errores']);
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/gestionUsuariosSytles.css">
     <script src="../assets/js/Administrador/toast.js"></script>
 </head>
@@ -159,14 +160,18 @@ $hayErrores = isset($_GET['errores']);
                                 <form action="../../app/Operaciones/cambiarEstadoUsuario.php" method="POST" style="display:inline;">
                                     <input type="hidden" name="codigo" value="<?= htmlspecialchars($row['codigo']) ?>">
                                     <input type="hidden" name="estado" value="<?= $row['estado'] === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO' ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <?= $row['estado'] === 'ACTIVO' ? 'Inactivar' : 'Activar' ?>
+                                    <button type="submit" class="btn btn-sm <?= $row['estado'] === 'ACTIVO' ? 'btn-outline-danger' : 'btn-outline-success' ?>" title="<?= $row['estado'] === 'ACTIVO' ? 'Inactivar' : 'Activar' ?>">
+                                        <?php if ($row['estado'] === 'ACTIVO'): ?>
+                                            <i class="fas fa-user-slash"></i>
+                                        <?php else: ?>
+                                            <i class="fas fa-user-check"></i>
+                                        <?php endif; ?>
                                     </button>
                                 </form>
                                 <!-- Botón Editar -->
                                 <button 
                                     type="button" 
-                                    class="btn btn-sm btn-primary btn-editar-docente"
+                                    class="btn btn-sm btn-outline-primary btn-editar-docente ms-1"
                                     data-codigo="<?= htmlspecialchars($row['codigo']) ?>"
                                     data-carrera="<?= htmlspecialchars($row['carrera']) ?>"
                                     data-titulo="<?= htmlspecialchars($row['titulo']) ?>"
@@ -175,8 +180,9 @@ $hayErrores = isset($_GET['errores']);
                                     data-rol="<?= htmlspecialchars($row['rol']) ?>"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editarDocenteModal"
+                                    title="Editar"
                                 >
-                                    Editar
+                                    <i class="fas fa-edit"></i>
                                 </button>
                             </td>
                         </tr>
