@@ -39,7 +39,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'DOCENTE') {
                     <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Generar Reportes</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="../acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
+                    <a class="nav-link custom-nav-link" href="../Acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
 
 
