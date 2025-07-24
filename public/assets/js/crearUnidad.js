@@ -3,7 +3,7 @@ class CrearUnidadForm {
         this.form = document.getElementById(formId);
         this.msgDivId = msgDivId;
         this.btnNuevaSemana = document.getElementById('btnNuevaSemana');
-        this.unidadId = document.getElementById('id_unidad')?.value || null;        this.updateUrl = '/SysPlanificacion/app/Unidad/updateUnidad.php';
+        this.unidadId = document.getElementById('id_unidad')?.value || null; this.updateUrl = '/SysPlanificacion/app/Unidad/updateUnidad.php';
         if (this.form) {
             this.form.addEventListener('submit', this.handleSubmit.bind(this));
             this.initAutoSave();
@@ -23,7 +23,10 @@ class CrearUnidadForm {
             msgDiv.id = this.msgDivId;
             this.form.parentNode.insertBefore(msgDiv, this.form);
         }
-        msgDiv.innerHTML = '';
+        // Solo limpiar el div si no existe SweetAlert2
+        if (typeof Swal === 'undefined') {
+            msgDiv.innerHTML = '';
+        }
 
         try {
             const resp = await fetch(this.form.action, {
@@ -32,7 +35,21 @@ class CrearUnidadForm {
             });
             const data = await resp.json();
             if (data.success) {
-                msgDiv.innerHTML = '<div class="alert alert-success">Unidad guardada correctamente.</div>';
+                // SweetAlert de éxito
+                if (typeof Swal !== 'undefined') {
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: 'Unidad guardada correctamente.',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    }, 100); // Pequeño delay para asegurar render
+                } else {
+                    msgDiv.innerHTML = '<div class="alert alert-success">Unidad guardada correctamente.</div>';
+                }
                 // Guarda el id_unidad en el campo oculto
                 if (data.unidad_id) {
                     this.unidadId = data.unidad_id;
@@ -51,12 +68,12 @@ class CrearUnidadForm {
     }
 
     handleNuevaSemana() {
-    if (this.unidadId) {
-        // Obtén el código de la asignatura del input oculto
-        const codigo = document.querySelector('input[name="asignatura_codigo"]').value;
-        window.location.href = `crearSemanaPlanificacion.php?id_unidad=${encodeURIComponent(this.unidadId)}&codigo=${encodeURIComponent(codigo)}`;
+        if (this.unidadId) {
+            // Obtén el código de la asignatura del input oculto
+            const codigo = document.querySelector('input[name="asignatura_codigo"]').value;
+            window.location.href = `crearSemanaPlanificacion.php?id_unidad=${encodeURIComponent(this.unidadId)}&codigo=${encodeURIComponent(codigo)}`;
+        }
     }
-}
 
     initAutoSave() {
         // Selecciona todos los campos editables
@@ -115,6 +132,6 @@ class CrearUnidadForm {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     new CrearUnidadForm('formUnidad');
 });

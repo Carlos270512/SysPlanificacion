@@ -158,9 +158,11 @@ $hayErrores = isset($_GET['errores']);
                                     <label for="jornada" class="form-label">Jornada</label>
                                     <select class="form-control" id="jornada" name="jornada">
                                         <option value="">Seleccionar...</option>
-                                        <option value="MATUTINA">MATUTINA</option>
-                                        <option value="VESPERTINA">VESPERTINA</option>
-                                        <option value="NOCTURNA">NOCTURNA</option>
+                                        <option value="PM">MATUTINA</option>
+                                        <option value="PN">NOCTURNA</option>
+                                        <option value="V">VESPERTINA</option>
+                                        <option value="S">SEMIPRESENCIAL</option>
+                                        <option value="EL">EN LINEA</option>
                                     </select>
                                 </div>
                             </div>
@@ -271,9 +273,11 @@ $hayErrores = isset($_GET['errores']);
                                     <label for="edit_jornada" class="form-label">Jornada</label>
                                     <select class="form-control" id="edit_jornada" name="jornada">
                                         <option value="">Seleccionar...</option>
-                                        <option value="MATUTINA">MATUTINA</option>
-                                        <option value="VESPERTINA">VESPERTINA</option>
-                                        <option value="NOCTURNA">NOCTURNA</option>
+                                        <option value="PM">MATUTINA</option>
+                                        <option value="PN">NOCTURNA</option>
+                                        <option value="V">VESPERTINA</option>
+                                        <option value="S">SEMIPRESENCIAL</option>
+                                        <option value="EL">EN LINEA</option>
                                     </select>
                                 </div>
                             </div>
