@@ -196,7 +196,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'COORDINADOR
         // Ver observación específica
         function verObservacion(planificacionId) {
             // Redirigir a la página de planificaciones con filtro
-            document.getElementById('mainFrame').src = `revisarPlanficaciones.php?planificacion=${planificacionId}`;
+            document.getElementById('mainFrame').src = `../planificaciones.php?highlight_planificacion=${planificacionId}`;
         }
 
         // Marcar todas como leídas
