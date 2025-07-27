@@ -35,26 +35,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         // ORDEN CORRECTO DE ELIMINACIÓN (respetando dependencias):
 
-        // 1. Eliminar semana_linea (depende de unidad)
+       // 1. Eliminar observaciones_planificacion (depende de planificaciones)
+        $pdo->exec("DELETE FROM observaciones_planificacion");
+
+        // 2. Eliminar semana_linea (depende de unidad)
         $pdo->exec("DELETE FROM semana_linea");
-        //$pdo->exec("ALTER TABLE semana_linea AUTO_INCREMENT = 1");
 
-        // 2. Eliminar planificaciones (depende de unidad) - NO planificaciones_repository
+        // 3. Eliminar planificaciones (depende de unidad) - NO planificaciones_repository
         $pdo->exec("DELETE FROM planificaciones");
-        //$pdo->exec("ALTER TABLE planificaciones AUTO_INCREMENT = 1");
 
-        // 3. Eliminar semana (depende de unidad)
+        // 4. Eliminar semana (depende de unidad)
         $pdo->exec("DELETE FROM semana");
-        //$pdo->exec("ALTER TABLE semana AUTO_INCREMENT = 1");
 
-        // 4. Eliminar unidad (depende de asignatura)
+        // 5. Eliminar unidad (depende de asignatura)
         $pdo->exec("DELETE FROM unidad");
-        //$pdo->exec("ALTER TABLE unidad AUTO_INCREMENT = 1");
 
-        // 5. Eliminar asignatura (depende de docente)
+        // 6. Eliminar asignatura (depende de docente)
         $pdo->exec("DELETE FROM asignatura");
 
-        // 6. Eliminar docentes EXCEPTO el administrador actual
+        // 7. Eliminar docentes EXCEPTO el administrador actual
         if ($admin_actual) {
             $stmt = $pdo->prepare("DELETE FROM docente WHERE codigo != ?");
             $stmt->execute([$admin_actual]);
