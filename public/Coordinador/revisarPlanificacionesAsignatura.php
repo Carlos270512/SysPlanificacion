@@ -192,6 +192,20 @@ if (!$docente || !$asignatura) {
                             <!-- CORREGIDO: Ahora debe tener el codigo -->
                             <input type="hidden" name="docente_codigo" value="<?= htmlspecialchars($docente['codigo'] ?? '') ?>">
                             <input type="hidden" name="asignatura_codigo" value="<?= htmlspecialchars($asignatura['codigo'] ?? '') ?>">
+                            <!-- NUEVO: Campo para capturar la unidad actual -->
+                            <input type="hidden" name="unidad_id" id="unidad_id_hidden" value="">
+                            
+                            <!-- Mostrar información de la unidad seleccionada -->
+                            <div class="alert alert-info" id="unidad_info" style="display: none;">
+                                <strong>Observación para:</strong> <span id="unidad_nombre_display"></span>
+                            </div>
+                            
+                            <!-- Alerta cuando no hay planificación -->
+                            <div class="alert alert-warning" id="sin_planificacion_alert" style="display: none;">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                <strong>Sin planificación:</strong> Esta unidad aún no tiene planificaciones subidas por el docente.
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="campo_corregir" class="form-label">¿Qué debe corregir?</label>
                                 <select class="form-select" id="campo_corregir" name="campo_corregir" required>
@@ -226,15 +240,107 @@ if (!$docente || !$asignatura) {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
+        let unidadActual = null; // Variable global para la unidad actual
+        let tienePlanificacion = false; // Variable para saber si la unidad tiene planificación
+        
         // Cargar planificación al hacer clic en unidad
         document.querySelectorAll('.unidad-link').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 var unidadId = this.getAttribute('data-unidad-id');
+                var unidadTexto = this.textContent.trim();
                 var iframe = document.querySelector('.iframe-container');
+                
                 if (unidadId && iframe) {
+                    // Limpiar alertas previas
+                    document.getElementById('unidad_info').style.display = 'none';
+                    document.getElementById('sin_planificacion_alert').style.display = 'none';
+                    
+                    // Mostrar loading mientras se carga
+                    iframe.src = "about:blank";
+                    iframe.style.background = '#f8f9fa url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMSAxKSIgZmlsbD0iIzAwN2JmZiI+CiAgICAgICAgICAgIDxjaXJjbGUgY3g9IjUiIGN5PSI1MCIgcj0iNSI+CiAgICAgICAgICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJjeS1iZWdpbiIgdmFsdWVzPSI1MDs1OzUwOzUwIiBkdXI9IjJzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgogICAgICAgICAgICA8L2NpcmNsZT4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=") center no-repeat';
+                    
+                    // Intentar cargar la planificación
                     iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
+                    
+                    // Verificar si la planificación se carga correctamente
+                    iframe.onload = function() {
+                        // Verificar si hay contenido o es una página de error
+                        try {
+                            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            var hasError = iframeDoc.body.textContent.includes('Archivo no encontrado') || 
+                                         iframeDoc.body.textContent.includes('No se encontró') ||
+                                         iframeDoc.body.innerHTML.trim() === '';
+                            
+                            if (hasError) {
+                                tienePlanificacion = false;
+                                iframe.style.background = '#f8f9fa';
+                                iframe.src = "data:text/html;charset=utf-8,<html><body style='font-family: Arial; text-align: center; padding: 50px; color: #6c757d;'><i class='bi bi-file-earmark-x' style='font-size: 48px;'></i><h4>Sin planificación</h4><p>Esta unidad aún no tiene planificaciones subidas por el docente.</p></body></html>";
+                            } else {
+                                tienePlanificacion = true;
+                                iframe.style.background = 'white';
+                            }
+                        } catch (e) {
+                            // Si no podemos acceder al contenido del iframe por CORS, asumimos que se cargó
+                            tienePlanificacion = true;
+                            iframe.style.background = 'white';
+                        }
+                    };
+                    
+                    // Error al cargar
+                    iframe.onerror = function() {
+                        tienePlanificacion = false;
+                        iframe.style.background = '#f8f9fa';
+                    };
+                    
+                    // Guardar la unidad actual
+                    unidadActual = {
+                        id: unidadId,
+                        nombre: unidadTexto
+                    };
+                    
+                    // Actualizar campos ocultos del modal
+                    document.getElementById('unidad_id_hidden').value = unidadId;
+                    document.getElementById('unidad_nombre_display').textContent = unidadTexto;
+                    
+                    // Marcar como activo
+                    document.querySelectorAll('.unidad-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
                 }
             });
+        });
+
+        // Validar que hay una unidad seleccionada y con planificación antes de abrir el modal
+        document.querySelector('[data-bs-target="#modalObservaciones"]').addEventListener('click', function(e) {
+            if (!unidadActual || !unidadActual.id) {
+                e.preventDefault();
+                e.stopPropagation();
+                Swal.fire({
+                    title: '¡Seleccione una unidad!',
+                    text: 'Debe seleccionar una unidad de la lista antes de enviar una observación.',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#ffc107'
+                });
+                return false;
+            }
+            
+            // Verificar si la unidad tiene planificación antes de abrir el modal
+            if (tienePlanificacion === false) {
+                e.preventDefault();
+                e.stopPropagation();
+                Swal.fire({
+                    title: '¡Sin planificación!',
+                    text: 'Esta unidad aún no tiene planificaciones subidas por el docente. No se pueden enviar observaciones.',
+                    icon: 'info',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#0dcaf0'
+                });
+                return false;
+            }
+            
+            // Si llegamos aquí, mostrar la información de la unidad
+            document.getElementById('unidad_info').style.display = 'block';
+            document.getElementById('sin_planificacion_alert').style.display = 'none';
         });
 
         // Validación del formulario de observaciones con AJAX
@@ -243,6 +349,29 @@ if (!$docente || !$asignatura) {
             
             var campo = document.getElementById('campo_corregir').value;
             var descripcion = document.getElementById('descripcion_observacion').value.trim();
+            var unidadId = document.getElementById('unidad_id_hidden').value;
+            
+            if (!unidadId) {
+                Swal.fire({
+                    title: '¡Seleccione una unidad!',
+                    text: 'Debe seleccionar una unidad antes de enviar la observación.',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#ffc107'
+                });
+                return false;
+            }
+            
+            if (!tienePlanificacion) {
+                Swal.fire({
+                    title: '¡Sin planificación!',
+                    text: 'Esta unidad no tiene planificaciones. No se puede enviar la observación.',
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#ffc107'
+                });
+                return false;
+            }
             
             if (!campo || !descripcion) {
                 Swal.fire({
@@ -266,10 +395,10 @@ if (!$docente || !$asignatura) {
                 return false;
             }
             
-            // Confirmación con SweetAlert
+            // Confirmación con SweetAlert - mostrar la unidad específica
             Swal.fire({
                 title: '¿Enviar observación?',
-                text: '¿Está seguro de enviar esta observación al docente?',
+                text: '¿Está seguro de enviar esta observación para: ' + (unidadActual ? unidadActual.nombre : 'la unidad seleccionada') + '?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#ffc107',
@@ -310,6 +439,7 @@ if (!$docente || !$asignatura) {
                                 // Cerrar modal y limpiar formulario
                                 document.getElementById('modalObservaciones').querySelector('[data-bs-dismiss="modal"]').click();
                                 this.reset();
+                                document.getElementById('unidad_info').style.display = 'none';
                             });
                         } else {
                             Swal.fire({

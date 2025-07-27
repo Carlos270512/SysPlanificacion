@@ -16,14 +16,16 @@ $transactionStarted = false;
 try {
     $pdo = require_once __DIR__ . '/../../config/conexion.php';
     
-    // Validar datos requeridos
+    // Validar datos requeridos - AHORA INCLUYE unidad_id
     if (empty($_POST['docente_codigo']) || empty($_POST['asignatura_codigo']) || 
-        empty($_POST['campo_corregir']) || empty($_POST['descripcion_observacion'])) {
+        empty($_POST['campo_corregir']) || empty($_POST['descripcion_observacion']) ||
+        empty($_POST['unidad_id'])) {
         throw new Exception("Faltan datos obligatorios para guardar la observación.");
     }
     
     $docente_codigo = $_POST['docente_codigo'];
     $asignatura_codigo = $_POST['asignatura_codigo'];
+    $unidad_id = $_POST['unidad_id']; // NUEVO: unidad específica
     $campo_corregir = $_POST['campo_corregir'];
     $descripcion_observacion = $_POST['descripcion_observacion'];
     $usuario_revisa = $_SESSION['usuario']['nombre'] ?? $_SESSION['usuario']['codigo'];
@@ -32,31 +34,49 @@ try {
     $observacion_completa = "Campo a corregir: " . ucfirst($campo_corregir) . "\n\n" . 
                            "Descripción: " . $descripcion_observacion;
     
-    // Obtener todas las planificaciones de la asignatura y docente
+    // MODIFICADO: Obtener planificaciones SOLO de la unidad específica que estén ACTIVAS
     $sql_planificaciones = "
         SELECT DISTINCT 
             p.id_planificacion,
             p.unidad_id,
             p.nombre_archivo,
-            u.asignatura_codigo
+            u.asignatura_codigo,
+            u.nombre as nombre_unidad,
+            u.numero_unidad
         FROM planificaciones p
         INNER JOIN unidad u ON p.unidad_id = u.id_unidad
         INNER JOIN asignatura a ON u.asignatura_codigo = a.codigo
         WHERE a.codigo = :asignatura_codigo 
         AND a.docente_codigo = :docente_codigo
+        AND u.id_unidad = :unidad_id
         AND p.estado = 'A'
     ";
     
     $stmt_planificaciones = $pdo->prepare($sql_planificaciones);
     $stmt_planificaciones->execute([
         'asignatura_codigo' => $asignatura_codigo,
-        'docente_codigo' => $docente_codigo
+        'docente_codigo' => $docente_codigo,
+        'unidad_id' => $unidad_id // NUEVO: filtrar por unidad específica
     ]);
     
     $planificaciones = $stmt_planificaciones->fetchAll(PDO::FETCH_ASSOC);
     
     if (empty($planificaciones)) {
-        throw new Exception("No se encontraron planificaciones para esta asignatura y docente.");
+        // Obtener información de la unidad para el mensaje de error
+        $sql_unidad = "
+            SELECT u.nombre, u.numero_unidad 
+            FROM unidad u 
+            WHERE u.id_unidad = :unidad_id
+        ";
+        $stmt_unidad = $pdo->prepare($sql_unidad);
+        $stmt_unidad->execute(['unidad_id' => $unidad_id]);
+        $unidad_info = $stmt_unidad->fetch(PDO::FETCH_ASSOC);
+        
+        $unidad_nombre = $unidad_info ? 
+            "Unidad {$unidad_info['numero_unidad']}: {$unidad_info['nombre']}" : 
+            "la unidad seleccionada";
+            
+        throw new Exception("No se encontraron planificaciones activas para {$unidad_nombre}. El docente aún no ha subido planificaciones para esta unidad.");
     }
     
     // Iniciar transacción DESPUÉS de verificar que hay planificaciones
@@ -89,9 +109,14 @@ try {
     $stmt_insert = $pdo->prepare($sql_insert);
     
     $observaciones_guardadas = 0;
+    $unidad_info = null;
     
-    // Insertar observación para cada planificación encontrada
+    // Insertar observación para cada planificación encontrada de la unidad específica
     foreach ($planificaciones as $planificacion) {
+        if (!$unidad_info) {
+            $unidad_info = "Unidad " . $planificacion['numero_unidad'] . ": " . $planificacion['nombre_unidad'];
+        }
+        
         // Verificar si ya existe una observación pendiente para esta planificación
         $sql_check = "
             SELECT COUNT(*) as total 
@@ -124,17 +149,20 @@ try {
     
     // Verificar si se guardó al menos una observación
     if ($observaciones_guardadas === 0) {
-        throw new Exception("No se pudo guardar ninguna observación. Es posible que ya existan observaciones pendientes para todas las planificaciones.");
+        throw new Exception("No se pudo guardar ninguna observación. Es posible que ya existan observaciones pendientes para todas las planificaciones de esta unidad.");
     }
     
     $pdo->commit();
     $transactionStarted = false;
     
-    // En lugar de redireccionar, enviar respuesta JSON para el iframe
+    // Mensaje específico para la unidad
+    $mensaje_success = "Observación enviada exitosamente para la {$unidad_info}. Se crearon {$observaciones_guardadas} observaciones.";
+    
+    // Enviar respuesta JSON
     header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
-        'message' => "Observación enviada exitosamente. Se crearon {$observaciones_guardadas} observaciones para las planificaciones de esta asignatura."
+        'message' => $mensaje_success
     ]);
     exit();
     
@@ -144,7 +172,6 @@ try {
         try {
             $pdo->rollBack();
         } catch (PDOException $rollbackError) {
-            // Log del error de rollback si es necesario
             error_log("Error en rollback: " . $rollbackError->getMessage());
         }
     }
