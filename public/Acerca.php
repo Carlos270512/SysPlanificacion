@@ -85,19 +85,19 @@
         Acerca del Sistema de Planificación Académica
     </div>
     <p style="color:#222; font-size:1.08em;">
-        Este sistema web permite a docentes, coordinadores y administradores gestionar y revisar planificaciones académicas, generar reportes, recibir notificaciones y mantener un control eficiente del proceso educativo en la institución.
+        Este sistema web está trabajando para la creación, revisión y almacenamiento de planificaciones académicas, permitiendo a los usuarios gestionar de manera eficiente el proceso educativo en la institución mediante herramientas de seguimiento y control.
     </p>
     <ul class="about-list">
-        <li>Gestión de usuarios y roles (docentes, coordinadores, administradores)</li>
-        <li>Creación, revisión y observación de planificaciones</li>
-        <li>Notificaciones automáticas de observaciones pendientes</li>
+        <li>Creación y gestión de planificaciones académicas</li>
+        <li>Revisión y seguimiento de planificaciones</li>
+        <li>Almacenamiento seguro de datos académicos</li>
         <li>Generación de reportes y exportación a PDF</li>
         <li>Importación y validación de datos desde archivos Excel</li>
     </ul>
     <div class="about-info">
         <strong>Versión:</strong> 1.0<br>
         <strong>Desarrollado por:</strong> Carlos Garces y Joseph Sanchez<br>
-        <strong>Soporte:</strong> <a href="mailto:soporte@tusistema.com" style="color:#2c4073;">soporte@tusistema.com</a>
+        <strong>Soporte:</strong> <a href="mailto:sistemas@istvidanueva.edu.ec" style="color:#2c4073;">sistemas@istvidanueva.edu.ec</a>
     </div>
     <div class="about-logo">
         <img src="assets/img/logotvn.png" alt="Logo TVN">

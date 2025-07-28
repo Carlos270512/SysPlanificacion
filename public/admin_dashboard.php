@@ -208,7 +208,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
     </nav>
 
     <div id="content" style="height:calc(100vh - 72px);">
-        <iframe id="mainFrame" name="mainFrame" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="mainFrame" name="mainFrame" src="planificaciones.php" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

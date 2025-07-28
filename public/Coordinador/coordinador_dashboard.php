@@ -143,13 +143,11 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                         <i class="fas fa-user-cog me-2"></i>Planificación
                     </a>
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionDropdown">
-                        <li><a class="dropdown-item" href="revisarPlanficaciones.php" target="mainFrame">Revisar Planificación</a></li>
+                        <li><a class="dropdown-item" href="revisarPlanficaciones.php" target="mainFrame">Revisar Planificaciones</a></li>
                         <li><a class="dropdown-item" href="../planificaciones.php" target="mainFrame">Generar Planificaciones </a></li>
                     </ul>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Generar Reportes</a>
-                </li>
+                
                 <li class="nav-item mx-2">
                     <a class="nav-link custom-nav-link" href="../Acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
@@ -205,7 +203,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
     </nav>
 
     <div id="content" style="height:calc(100vh - 72px);">
-        <iframe id="mainFrame" name="mainFrame" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="mainFrame" name="mainFrame" src="../planificaciones.php" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

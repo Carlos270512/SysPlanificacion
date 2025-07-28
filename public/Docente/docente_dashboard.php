@@ -147,9 +147,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                         
                     </ul>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="../reportes.php" target="mainFrame"><i class="fas fa-file-download me-2"></i>Cambiar Contraseña</a>
-                </li>
+                
                 <li class="nav-item mx-2">
                     <a class="nav-link custom-nav-link" href="../Acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
                 </li>
@@ -204,7 +202,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
     </nav>
 
     <div id="content" style="height:calc(100vh - 72px);">
-        <iframe id="mainFrame" name="mainFrame" src="../generarPlanificacion.php" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="mainFrame" name="mainFrame" src="../planificaciones.php" frameborder="0" style="width:100%;height:100%;"></iframe>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
