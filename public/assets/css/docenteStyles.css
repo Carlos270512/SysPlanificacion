@@ -314,3 +314,41 @@ html, body {
     background-color: #8B5C2A !important;
     border-color: #8B5C2A !important;
 }
+.btn-sigaa {
+    background: #fff !important;
+    color: #8B5C2A !important;
+    border: 2px solid #8B5C2A !important;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-sigaa:hover, .btn-sigaa:focus {
+    background: #8B5C2A !important;
+    color: #fff !important;
+    border-color: #8B5C2A !important;
+}
+
+.btn-aula {
+    background: #fff !important;
+    color: rgb(44, 64, 115) !important;
+    border: 2px solid rgb(44, 64, 115) !important;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-aula:hover, .btn-aula:focus {
+    background: rgb(44, 64, 115) !important;
+    color: #fff !important;
+    border-color: rgb(44, 64, 115) !important;
+}
+
+.btn-biblioteca {
+    background: #fff !important;
+    color: rgb(248, 220, 130) !important;
+    border: 2px solid rgb(248, 220, 130) !important;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-biblioteca:hover, .btn-biblioteca:focus {
+    background: rgb(248, 220, 130) !important;
+    color: #222 !important;
+    border-color: rgb(248, 220, 130) !important;
+}

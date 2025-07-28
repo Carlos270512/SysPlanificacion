@@ -97,27 +97,15 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
 
             <!-- Enlaces de redirección -->
             <div class="d-grid gap-2">
-                <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-start">
+                <a href="https://www.istvidanueva.edu.ec/sigaa/" class="btn btn-aula d-flex align-items-center justify-content-start">
                     <i class="fas fa-graduation-cap me-3"></i>
                     <span>SIGA TVN</span>
                 </a>
-
-                <a href="#" class="btn btn-outline-success d-flex align-items-center justify-content-start">
-                    <i class="fas fa-globe me-3"></i>
-                    <span>Portal Web</span>
-                </a>
-
-                <a href="#" class="btn btn-outline-info d-flex align-items-center justify-content-start">
+                <a href="https://aulavirtual.istvidanueva.edu.ec/" class="btn btn-sigaa d-flex align-items-center justify-content-start">
                     <i class="fas fa-envelope me-3"></i>
-                    <span>Correo Institucional</span>
+                    <span>Aula Virtual</span>
                 </a>
-
-                <a href="#" class="btn btn-outline-warning d-flex align-items-center justify-content-start">
-                    <i class="fas fa-calendar-alt me-3"></i>
-                    <span>Calendario Académico</span>
-                </a>
-
-                <a href="#" class="btn btn-outline-secondary d-flex align-items-center justify-content-start">
+                <a href="https://www.istvidanueva.edu.ec/library-istvn/recursos.php" class="btn btn-biblioteca d-flex align-items-center justify-content-start">
                     <i class="fas fa-book-open me-3"></i>
                     <span>Biblioteca Virtual</span>
                 </a>
