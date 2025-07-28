@@ -199,13 +199,25 @@ if (!$docente || !$asignatura) {
                             <div class="alert alert-info" id="unidad_info" style="display: none;">
                                 <strong>Observación para:</strong> <span id="unidad_nombre_display"></span>
                             </div>
-                            
+
+                            <!-- Campo solo lectura para la fecha y hora de observación -->
+                            <div class="mb-3 row align-items-end">
+                                <div class="col-7">
+                                    <label for="fecha_observacion" class="form-label">Fecha de la observación</label>
+                                    <input type="text" class="form-control" id="fecha_observacion" name="fecha_observacion" value="" readonly tabindex="-1" style="background:#f8f9fa; color:#6c757d;">
+                                </div>
+                                <div class="col-5">
+                                    <label for="hora_observacion" class="form-label">Hora</label>
+                                    <input type="text" class="form-control" id="hora_observacion" name="hora_observacion" value="" readonly tabindex="-1" style="background:#f8f9fa; color:#6c757d;">
+                                </div>
+                            </div>
+
                             <!-- Alerta cuando no hay planificación -->
                             <div class="alert alert-warning" id="sin_planificacion_alert" style="display: none;">
                                 <i class="bi bi-exclamation-triangle"></i> 
                                 <strong>Sin planificación:</strong> Esta unidad aún no tiene planificaciones subidas por el docente.
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="campo_corregir" class="form-label">¿Qué debe corregir?</label>
                                 <select class="form-select" id="campo_corregir" name="campo_corregir" required>
@@ -323,7 +335,7 @@ if (!$docente || !$asignatura) {
                 });
                 return false;
             }
-            
+
             // Verificar si la unidad tiene planificación antes de abrir el modal
             if (tienePlanificacion === false) {
                 e.preventDefault();
@@ -337,10 +349,19 @@ if (!$docente || !$asignatura) {
                 });
                 return false;
             }
-            
+
             // Si llegamos aquí, mostrar la información de la unidad
             document.getElementById('unidad_info').style.display = 'block';
             document.getElementById('sin_planificacion_alert').style.display = 'none';
+
+            // Establecer la fecha y hora de observación (solo visual)
+            const fechaInput = document.getElementById('fecha_observacion');
+            const horaInput = document.getElementById('hora_observacion');
+            const hoy = new Date();
+            const fechaStr = hoy.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const horaStr = hoy.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            fechaInput.value = fechaStr;
+            horaInput.value = horaStr;
         });
 
         // Validación del formulario de observaciones con AJAX
