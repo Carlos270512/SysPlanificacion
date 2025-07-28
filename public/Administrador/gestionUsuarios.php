@@ -54,6 +54,9 @@ $hayErrores = isset($_GET['errores']);
             <button type="button" class="btn btn-success mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#registrarDocenteModal">
                 <i class="fas fa-user-plus me-1"></i> Registrar
             </button>
+            <a href="descargarUsuariosExcel.php" class="btn btn-cafe mb-4 ms-2" target="_blank">
+                <i class="fas fa-file-excel me-1"></i>Descargar Excel de ejemplo
+            </a>
         </form>
 
         <!-- Modal Registrar Docente -->

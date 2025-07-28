@@ -46,7 +46,6 @@ $hayErrores = isset($_GET['errores']);
 
 <body>
     <h2 class="mb-4">Subir Asignaturas</h2>
-
     <!-- Botones de acción -->
     <div class="mb-4">
         <form action="../../app/Operaciones/procesarExcel.php" method="POST" enctype="multipart/form-data">
@@ -60,6 +59,9 @@ $hayErrores = isset($_GET['errores']);
             <button class="btn btn-success mb-2 ms-2" data-bs-toggle="modal" data-bs-target="#nuevaAsignaturaModal" type="button">
                 <i class="fas fa-plus me-1"></i>Nueva Asignatura
             </button>
+            <a href="descargarAsignaturasExcel.php" class="btn btn-cafe mb-2 ms-2" target="_blank">
+                <i class="fas fa-file-excel me-1"></i>Descargar Excel de ejemplo
+            </a>
         </form>
     </div>
 
