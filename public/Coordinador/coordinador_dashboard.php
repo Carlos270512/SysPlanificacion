@@ -119,6 +119,45 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
         </div>
     </div>
 
+    <!-- NUEVO OFFCANVAS PARA CHAT IA -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="chatAIOffcanvas" aria-labelledby="chatAIOffcanvasLabel">
+        <div class="offcanvas-header bg-dark text-white">
+            <h5 class="offcanvas-title" id="chatAIOffcanvasLabel">
+                <i class="fas fa-robot me-2"></i>Asistente IA
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column p-0">
+            <!-- Área de chat -->
+            <div id="chat-messages" class="flex-grow-1 p-3" style="overflow-y: auto; max-height: calc(100vh - 200px);">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    ¡Hola! Soy tu asistente de IA. Puedo ayudarte con coordinación académica, revisión de planificaciones, gestión educativa, o cualquier tema que necesites.
+                    <br><small class="text-muted mt-2 d-block">Consultas disponibles este mes: <span id="consultas-restantes">100</span></small>
+                </div>
+            </div>
+            
+            <!-- Input para mensajes -->
+            <div class="border-top p-3">
+                <div class="input-group">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Escribe tu pregunta aquí..." disabled>
+                    <button class="btn btn-primary" type="button" id="send-button" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Presiona Enter para enviar</small>
+            </div>
+            
+            <!-- Indicador de carga -->
+            <div id="loading-indicator" class="d-none p-3 text-center">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Pensando...</span>
+                </div>
+                <small class="ms-2 text-muted">La IA está pensando...</small>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-dark bg-dark w-100 navbar-expand-lg">
         <div class="container-fluid d-flex justify-content-between">
             <a href="coordinador_dashboard.php" class="navbar-brand d-flex align-items-center">
@@ -138,6 +177,13 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                 
                 <li class="nav-item mx-2">
                     <a class="nav-link custom-nav-link" href="../Acerca.php" target="mainFrame"><i class="fas fa-info-circle me-2"></i></a>
+                </li>
+
+                <!-- NUEVO BOTÓN DE IA -->
+                <li class="nav-item mx-2">
+                    <a class="nav-link custom-nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#chatAIOffcanvas" title="Asistente IA">
+                        <i class="fas fa-robot me-2"></i>
+                    </a>
                 </li>
 
                 <!-- NUEVA CAMPANITA DE NOTIFICACIONES -->
@@ -411,6 +457,132 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                 }
             } catch (error) {
                 console.error('Error al marcar como leídas:', error);
+            }
+        }
+
+        // NUEVO CÓDIGO PARA CHAT IA
+        let chatInitialized = false;
+        
+        // Inicializar chat cuando se abra el offcanvas
+        document.getElementById('chatAIOffcanvas').addEventListener('shown.bs.offcanvas', function () {
+            if (!chatInitialized) {
+                initializeChat();
+                chatInitialized = true;
+            }
+        });
+        
+        function initializeChat() {
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            
+            // Habilitar input y botón
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            
+            // Event listeners
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    enviarMensaje();
+                }
+            });
+            
+            sendButton.addEventListener('click', enviarMensaje);
+        }
+        
+        async function enviarMensaje() {
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            
+            const pregunta = chatInput.value.trim();
+            if (!pregunta) return;
+            
+            // Deshabilitar input mientras se procesa
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Agregar mensaje del usuario
+            agregarMensaje('usuario', pregunta);
+            chatInput.value = '';
+            
+            // Mostrar indicador de carga
+            loadingIndicator.classList.remove('d-none');
+            
+            try {
+                const response = await fetch('../../app/IntegracionIA/chat_endpoint.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pregunta: pregunta })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    agregarMensaje('ia', data.respuesta);
+                    actualizarContadorConsultas();
+                } else {
+                    agregarMensaje('error', data.message || 'Error al procesar la consulta');
+                }
+                
+            } catch (error) {
+                agregarMensaje('error', 'Error de conexión. Intenta nuevamente.');
+                console.error('Error:', error);
+            } finally {
+                // Ocultar indicador de carga y habilitar input
+                loadingIndicator.classList.add('d-none');
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+            }
+        }
+        
+        function agregarMensaje(tipo, mensaje) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-3 ${tipo === 'usuario' ? 'text-end' : ''}`;
+            
+            let contenido = '';
+            if (tipo === 'usuario') {
+                contenido = `
+                    <div class="d-inline-block bg-primary text-white p-2 rounded" style="max-width: 80%;">
+                        <strong>Tú:</strong><br>
+                        ${mensaje}
+                    </div>
+                `;
+            } else if (tipo === 'ia') {
+                contenido = `
+                    <div class="d-inline-block bg-light border p-2 rounded" style="max-width: 80%;">
+                        <strong><i class="fas fa-robot text-primary me-1"></i>IA:</strong><br>
+                        ${mensaje.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            } else if (tipo === 'error') {
+                contenido = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${mensaje}
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = contenido;
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll hacia abajo
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function actualizarContadorConsultas() {
+            const contador = document.getElementById('consultas-restantes');
+            let consultasRestantes = parseInt(contador.textContent) - 1;
+            contador.textContent = consultasRestantes;
+            
+            if (consultasRestantes <= 0) {
+                contador.parentElement.innerHTML = '<span class="text-danger">Sin consultas disponibles este mes</span>';
             }
         }
     </script>
