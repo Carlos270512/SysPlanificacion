@@ -107,7 +107,8 @@ $html .= "
 $mpdf->WriteHTML($html);
 // --- NUEVA HOJA: PLANIFICACIÓN SEMANAL ---
 
-function fecha_es($fecha) {
+function fecha_es($fecha)
+{
     return $fecha ? date('d-m-Y', strtotime($fecha)) : '';
 }
 
@@ -117,7 +118,7 @@ if ($unidad_id) {
         $mpdf->AddPage();
 
         $htmlSemana = "
-        <div style='font-size:14px; font-weight:bold; margin-bottom:4px;'>Semana: Del " . fecha_es($semana['fecha_semana']) . "</div>
+        <div style='font-size:14px; font-weight:bold; margin-bottom:4px;'>Semana: Del " . fecha_es($semana['fecha_semana']) . " al " . fecha_es($semana['semana_fin']) . "</div>
         <div style='font-size:12px'>
         <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:9px;'>
             <tr style='background:#FFF9C4; font-weight:bold;'>
