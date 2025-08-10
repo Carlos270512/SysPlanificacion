@@ -172,6 +172,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                     <ul class="dropdown-menu custom-dropdown" aria-labelledby="planificacionDropdown">
                         <li><a class="dropdown-item" href="revisarPlanficaciones.php" target="mainFrame">Revisar Planificaciones</a></li>
                         <li><a class="dropdown-item" href="../planificaciones.php" target="mainFrame">Generar Planificaciones </a></li>
+                        <li><a class="dropdown-item" href="coevaluacion_inicio.php" target="mainFrame">Planificacion de Coevaluación</a></li>
                     </ul>
                 </li>
                 
