@@ -1,0 +1,70 @@
+.form-container {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.section-title {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group-custom {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.btn-generate {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 25px;
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    color: white;
+}
+
+.table-bordered {
+    font-size: 12px;
+}
+
+.btn-delete {
+    background: #dc3545;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+/* Estilos adicionales para mejorar la UX */
+.form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 0.65;
+}
+
+.form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 0.65;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.alert-info {
+    border-left: 4px solid #0dcaf0;
+}

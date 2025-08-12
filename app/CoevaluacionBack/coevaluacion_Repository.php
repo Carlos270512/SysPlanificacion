@@ -54,6 +54,44 @@ class CoevaluacionRepository {
     }
     
     /**
+     * Obtener todos los docentes para coevaluar (excluyendo al coordinador logueado)
+     */
+    public function getDocentesParaCoevaluar($codigoCoordinador) {
+        try {
+            $stmt = $this->conexion->prepare("
+                SELECT codigo, nombre, carrera 
+                FROM docente 
+                WHERE estado = 'ACTIVO' AND codigo != ?
+                ORDER BY nombre ASC
+            ");
+            $stmt->execute([$codigoCoordinador]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error en getDocentesParaCoevaluar: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Obtener asignaturas de un docente específico
+     */
+    public function getAsignaturasPorDocente($codigoDocente) {
+        try {
+            $stmt = $this->conexion->prepare("
+                SELECT codigo, nombre_asignatura, horario, jornada, aula, nivel
+                FROM asignatura 
+                WHERE docente_codigo = ?
+                ORDER BY nombre_asignatura ASC
+            ");
+            $stmt->execute([$codigoDocente]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error en getAsignaturasPorDocente: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
      * Obtener todos los docentes de una carrera específica
      */
     public function getDocentesPorCarrera($carrera) {
