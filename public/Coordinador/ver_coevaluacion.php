@@ -137,11 +137,6 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                     <h1><i class="fas fa-folder-open"></i> Repositorio de Coevaluaciones</h1>
                     <p class="mb-0">Gestiona y descarga los documentos PDF de planificación de coevaluaciones</p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="coevaluacion_inicio.php" class="btn btn-light btn-lg">
-                        <i class="fas fa-plus"></i> Nueva Coevaluación
-                    </a>
-                </div>
             </div>
         </div>
     </div>
