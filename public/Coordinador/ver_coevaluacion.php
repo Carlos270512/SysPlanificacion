@@ -93,7 +93,8 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
+    <link rel="stylesheet" href="../assets/css/coevaluacionStyle.css?v=2">
+   <style>
         .pdf-icon {
             color: #dc3545;
             font-size: 1.5rem;
@@ -108,7 +109,7 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .header-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, rgb(44, 64, 115), #0056b3);
             color: white;
             padding: 30px 0;
             margin-bottom: 30px;
@@ -123,7 +124,7 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: #6B3F13;
         }
     </style>
 </head>
@@ -205,7 +206,7 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                     <i class="fas fa-folder-open fa-5x text-muted mb-3"></i>
                     <h4 class="text-muted">No hay documentos disponibles</h4>
                     <p class="text-muted">Aún no se han generado documentos de coevaluación.</p>
-                    <a href="coevaluacion_inicio.php" class="btn btn-primary">
+                    <a href="coevaluacion_inicio.php" class="btn btn-cafe btn-lg">
                         <i class="fas fa-plus"></i> Crear Primera Coevaluación
                     </a>
                 </div>
@@ -286,7 +287,7 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
         <!-- Botones de acción general -->
         <div class="row mt-4">
             <div class="col-md-6">
-                <a href="coevaluacion_inicio.php" class="btn btn-primary">
+                <a href="coevaluacion_inicio.php" class="btn btn-cafe">
                     <i class="fas fa-plus"></i> Nueva Coevaluación
                 </a>
                 <a href="../coordinador.php" class="btn btn-secondary">

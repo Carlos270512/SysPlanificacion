@@ -30,7 +30,7 @@ if (!$coordinadorLogueado) {
     <title>Generación de Planificación de Coevaluaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/coevaluacionStyle.css">
+    <link rel="stylesheet" href="../assets/css/coevaluacionStyle.css?v=2">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -48,7 +48,7 @@ if (!$coordinadorLogueado) {
                     <form id="formCoevaluacion" method="POST" action="">
                         <!-- Fecha del documento -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-calendar me-2 text-primary"></i>Fecha del Documento</h5>
+                            <h5 class="mb-3"><i class="fas fa-calendar me-2 text-cafe-oscuro"></i>Fecha del Documento</h5>
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="fecha_documento" class="form-label fw-bold">Fecha del documento:</label>
@@ -61,7 +61,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- Datos del coordinador (automáticos) -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-user me-2 text-primary"></i>Datos del Coordinador (DE:)</h5>
+                            <h5 class="mb-3"><i class="fas fa-user me-2 text-cafe-oscuro"></i>Datos del Coordinador (DE:)</h5>
                             <div class="alert alert-info">
                                 <strong><?php echo $coordinadorLogueado['titulo_abreviado']; ?></strong><br>
                                 <?php echo htmlspecialchars($coordinadorLogueado['nombre']); ?><br>
@@ -71,7 +71,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- Modalidad -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-graduation-cap me-2 text-primary"></i>Modalidad de Estudio</h5>
+                            <h5 class="mb-3"><i class="fas fa-graduation-cap me-2 text-cafe-oscuro"></i>Modalidad de Estudio</h5>
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="modalidad" class="form-label fw-bold">Seleccione la modalidad:</label>
@@ -88,7 +88,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- Período de coevaluaciones -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-calendar-alt me-2 text-primary"></i>Período de Coevaluaciones</h5>
+                            <h5 class="mb-3"><i class="fas fa-calendar-alt me-2 text-cafe-oscuro"></i>Período de Coevaluaciones</h5>
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="fecha_inicio" class="form-label fw-bold">Fecha de inicio:</label>
@@ -106,7 +106,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- NUEVA SECCIÓN: Docentes para coevaluar -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-users me-2 text-primary"></i>Docentes para Coevaluar</h5>
+                            <h5 class="mb-3"><i class="fas fa-users me-2 text-cafe-oscuro"></i>Docentes para Coevaluar</h5>
 
                             <!-- Selector de docente -->
                             <div class="row mb-3">
@@ -172,7 +172,7 @@ if (!$coordinadorLogueado) {
 
                             <!-- Botón para agregar a la tabla -->
                             <div class="text-center">
-                                <button type="button" class="btn btn-success" onclick="agregarCoevaluacion()" disabled id="btnAgregar">
+                                <button type="button" class="btn btn-cafe" onclick="agregarCoevaluacion()" disabled id="btnAgregar">
                                     <i class="fas fa-plus me-2"></i>Agregar Coevaluación
                                 </button>
                             </div>
@@ -180,7 +180,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- Tabla de coevaluaciones agregadas -->
                         <div class="form-group-custom">
-                            <h5 class="mb-3"><i class="fas fa-table me-2 text-primary"></i>Coevaluaciones Programadas</h5>
+                            <h5 class="mb-3"><i class="fas fa-table me-2 text-cafe-oscuro"></i>Coevaluaciones Programadas</h5>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped" id="tablaCoevaluaciones">
                                     <thead class="table-dark">
@@ -204,7 +204,7 @@ if (!$coordinadorLogueado) {
 
                         <!-- Botón para generar -->
                         <div class="text-center mt-4">
-                            <button type="button" class="btn btn-generate btn-lg" onclick="generarPDF()">
+                            <button type="button" class="btn btn btn-cafe btn-lg" onclick="generarPDF()">
                                 <i class="fas fa-file-pdf me-2"></i>Ver PDF de Coevaluación
                             </button>
                         </div>
@@ -229,7 +229,7 @@ if (!$coordinadorLogueado) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success me-2" onclick="guardarPDF()">
+                    <button type="button" class="btn btn-cafe me-2" onclick="guardarPDF()">
                         <i class="fas fa-save me-2"></i>Guardar PDF
                     </button>
                     <button type="button" class="btn btn-primary" onclick="descargarPDF()">
