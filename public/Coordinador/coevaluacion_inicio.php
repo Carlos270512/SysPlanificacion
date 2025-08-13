@@ -23,6 +23,7 @@ if (!$coordinadorLogueado) {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,10 @@ if (!$coordinadorLogueado) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/coevaluacionStyle.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-light">
     <div class="container py-5">
         <div class="row justify-content-center">
@@ -48,8 +52,8 @@ if (!$coordinadorLogueado) {
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="fecha_documento" class="form-label fw-bold">Fecha del documento:</label>
-                                    <input type="date" class="form-control" id="fecha_documento" name="fecha_documento" 
-                                           value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" class="form-control" id="fecha_documento" name="fecha_documento"
+                                        value="<?php echo date('Y-m-d'); ?>" required>
                                     <small class="text-muted">Esta fecha aparecerá como: "Quito, 17 de junio de 2025"</small>
                                 </div>
                             </div>
@@ -103,7 +107,7 @@ if (!$coordinadorLogueado) {
                         <!-- NUEVA SECCIÓN: Docentes para coevaluar -->
                         <div class="form-group-custom">
                             <h5 class="mb-3"><i class="fas fa-users me-2 text-primary"></i>Docentes para Coevaluar</h5>
-                            
+
                             <!-- Selector de docente -->
                             <div class="row mb-3">
                                 <div class="col-md-8">
@@ -119,7 +123,7 @@ if (!$coordinadorLogueado) {
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <!-- Selector de asignatura (se activa cuando se selecciona docente) -->
                             <div class="row mb-3">
                                 <div class="col-md-8">
@@ -129,7 +133,7 @@ if (!$coordinadorLogueado) {
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <!-- Fecha y hora de coevaluación (se activa cuando se selecciona asignatura) -->
                             <div class="row mb-3">
                                 <div class="col-md-4">
@@ -147,7 +151,7 @@ if (!$coordinadorLogueado) {
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <!-- Observaciones -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -161,11 +165,11 @@ if (!$coordinadorLogueado) {
                                 </div>
                                 <div class="col-md-6">
                                     <label for="observaciones_texto" class="form-label fw-bold">Observaciones:</label>
-                                    <input type="text" class="form-control" id="observaciones_texto" name="observaciones_texto" 
-                                           placeholder="Las observaciones aparecerán automáticamente" readonly>
+                                    <input type="text" class="form-control" id="observaciones_texto" name="observaciones_texto"
+                                        placeholder="Las observaciones aparecerán automáticamente" readonly>
                                 </div>
                             </div>
-                            
+
                             <!-- Botón para agregar a la tabla -->
                             <div class="text-center">
                                 <button type="button" class="btn btn-success" onclick="agregarCoevaluacion()" disabled id="btnAgregar">
@@ -225,6 +229,9 @@ if (!$coordinadorLogueado) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success me-2" onclick="guardarPDF()">
+                        <i class="fas fa-save me-2"></i>Guardar PDF
+                    </button>
                     <button type="button" class="btn btn-primary" onclick="descargarPDF()">
                         <i class="fas fa-download me-2"></i>Descargar PDF
                     </button>
@@ -242,9 +249,14 @@ if (!$coordinadorLogueado) {
         document.getElementById('fecha_fin').addEventListener('change', function() {
             const fechaInicio = document.getElementById('fecha_inicio').value;
             const fechaFin = this.value;
-            
+
             if (fechaInicio && fechaFin && fechaFin <= fechaInicio) {
-                alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fecha incorrecta',
+                    text: 'La fecha de fin debe ser posterior a la fecha de inicio',
+                    confirmButtonColor: '#3085d6'
+                });
                 this.value = '';
             }
         });
@@ -253,12 +265,12 @@ if (!$coordinadorLogueado) {
         function cargarAsignaturas() {
             const docenteCodigo = document.getElementById('docente_coevaluar').value;
             const selectAsignatura = document.getElementById('asignatura_coevaluar');
-            
+
             // Reset campos
             selectAsignatura.innerHTML = '<option value="">-- Cargando asignaturas... --</option>';
             selectAsignatura.disabled = true;
             desactivarCampos();
-            
+
             if (docenteCodigo) {
                 // RUTA CORREGIDA para el AJAX
                 fetch('../../app/CoevaluacionBack/getAsignaturas.php?docente_codigo=' + docenteCodigo)
@@ -273,6 +285,12 @@ if (!$coordinadorLogueado) {
                     .catch(error => {
                         console.error('Error:', error);
                         selectAsignatura.innerHTML = '<option value="">-- Error al cargar asignaturas --</option>';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al cargar las asignaturas del docente',
+                            confirmButtonColor: '#3085d6'
+                        });
                     });
             } else {
                 selectAsignatura.innerHTML = '<option value="">-- Primero seleccione un docente --</option>';
@@ -284,7 +302,7 @@ if (!$coordinadorLogueado) {
             const asignatura = document.getElementById('asignatura_coevaluar').value;
             const fechaCoevaluacion = document.getElementById('fecha_coevaluacion');
             const horaCoevaluacion = document.getElementById('hora_coevaluacion');
-            
+
             if (asignatura) {
                 fechaCoevaluacion.disabled = false;
                 horaCoevaluacion.disabled = false;
@@ -300,7 +318,7 @@ if (!$coordinadorLogueado) {
         function manejarObservacion() {
             const tipoObservacion = document.getElementById('tipo_observacion').value;
             const observacionesTexto = document.getElementById('observaciones_texto');
-            
+
             if (tipoObservacion === 'Con carga horaria') {
                 observacionesTexto.value = 'Con carga horaria';
                 observacionesTexto.readOnly = false; // PERMITIR EDITAR
@@ -316,7 +334,7 @@ if (!$coordinadorLogueado) {
                 observacionesTexto.readOnly = true;
                 observacionesTexto.placeholder = 'Las observaciones aparecerán automáticamente';
             }
-            
+
             validarBotonAgregar();
         }
 
@@ -328,9 +346,9 @@ if (!$coordinadorLogueado) {
             const hora = document.getElementById('hora_coevaluacion').value;
             const tipoObservacion = document.getElementById('tipo_observacion').value;
             const observaciones = document.getElementById('observaciones_texto').value;
-            
+
             const btnAgregar = document.getElementById('btnAgregar');
-            
+
             if (docente && asignatura && fecha && hora && tipoObservacion && observaciones.trim()) {
                 btnAgregar.disabled = false;
             } else {
@@ -361,12 +379,17 @@ if (!$coordinadorLogueado) {
             const fecha = document.getElementById('fecha_coevaluacion').value;
             const hora = document.getElementById('hora_coevaluacion').value;
             const observaciones = document.getElementById('observaciones_texto').value;
-            
+
             if (!modalidad) {
-                alert('Por favor seleccione la modalidad antes de agregar coevaluaciones');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Modalidad requerida',
+                    text: 'Por favor seleccione la modalidad antes de agregar coevaluaciones',
+                    confirmButtonColor: '#3085d6'
+                });
                 return;
             }
-            
+
             const coevaluacion = {
                 carrera: '<?php echo $coordinadorLogueado['carrera']; ?>',
                 modalidad: modalidad.charAt(0).toUpperCase() + modalidad.slice(1).replace('_', ' '),
@@ -378,29 +401,38 @@ if (!$coordinadorLogueado) {
                 asignatura_nombre: asignaturaSelect.options[asignaturaSelect.selectedIndex].text,
                 observaciones: observaciones
             };
-            
+
             // Agregar al array
             coevaluaciones.push(coevaluacion);
-            
+
             // Actualizar tabla
             actualizarTabla();
-            
+
             // Limpiar formulario
             limpiarFormularioCoevaluacion();
+
+            // Mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Coevaluación agregada!',
+                text: 'La coevaluación se ha agregado correctamente a la tabla',
+                timer: 1500,
+                showConfirmButton: false
+            });
         }
 
         // Actualizar la tabla de coevaluaciones
         function actualizarTabla() {
             const tbody = document.querySelector('#tablaCoevaluaciones tbody');
             tbody.innerHTML = '';
-            
+
             coevaluaciones.forEach((coevaluacion, index) => {
                 const fechaFormateada = new Date(coevaluacion.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 });
-                
+
                 const fila = `
                     <tr>
                         <td>${coevaluacion.carrera}</td>
@@ -423,10 +455,28 @@ if (!$coordinadorLogueado) {
 
         // Eliminar coevaluación
         function eliminarCoevaluacion(index) {
-            if (confirm('¿Está seguro de que desea eliminar esta coevaluación?')) {
-                coevaluaciones.splice(index, 1);
-                actualizarTabla();
-            }
+            Swal.fire({
+                title: '¿Eliminar coevaluación?',
+                text: '¿Está seguro de que desea eliminar esta coevaluación?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    coevaluaciones.splice(index, 1);
+                    actualizarTabla();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminado',
+                        text: 'La coevaluación ha sido eliminada',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
         }
 
         // Limpiar formulario de coevaluación
@@ -454,6 +504,16 @@ if (!$coordinadorLogueado) {
                 return;
             }
 
+            if (coevaluaciones.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin coevaluaciones',
+                    text: 'Debe agregar al menos una coevaluación para generar el PDF',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             // Obtener datos del formulario
             const formData = new FormData(form);
             formData.append('generar_pdf', '1');
@@ -462,10 +522,121 @@ if (!$coordinadorLogueado) {
             // Crear URL para el PDF - RUTA CORREGIDA
             const params = new URLSearchParams(formData);
             const pdfUrl = '../../app/CoevaluacionBack/coevaluacionPDF.php?' + params.toString();
-            
+
             // Mostrar en modal
             document.getElementById('pdfViewer').src = pdfUrl;
             new bootstrap.Modal(document.getElementById('pdfModal')).show();
+        }
+
+        function guardarPDF() {
+            if (coevaluaciones.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin coevaluaciones',
+                    text: 'No hay coevaluaciones para guardar',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            // Validar formulario básico
+            const form = document.getElementById('formCoevaluacion');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Obtener datos para mostrar en la confirmación
+            const fechaDocumento = document.getElementById('fecha_documento').value;
+            const modalidad = document.getElementById('modalidad').options[document.getElementById('modalidad').selectedIndex].text;
+            const coordi = '<?php echo $coordinadorLogueado['carrera']; ?>';
+            const fechaFormateada = new Date(fechaDocumento).toLocaleDateString('es-ES');
+            const nombreArchivo = `coevaluacion_${coordi}_${fechaDocumento}.pdf`;
+
+            // Confirmación con información del archivo
+            Swal.fire({
+                title: 'Confirmar guardado',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>¿Desea guardar el PDF en el repositorio?</strong></p>
+                        <hr>
+                        <p><i class="fas fa-file-pdf text-danger"></i> <strong>Archivo:</strong> ${nombreArchivo}</p>
+                        <p><i class="fas fa-user text-primary"></i> <strong>Carrera:</strong> ${coordi}</p>
+                        <p><i class="fas fa-graduation-cap text-success"></i> <strong>Modalidad:</strong> ${modalidad}</p>
+                        <p><i class="fas fa-calendar text-info"></i> <strong>Fecha:</strong> ${fechaFormateada}</p>
+                        <p><i class="fas fa-list text-warning"></i> <strong>Coevaluaciones:</strong> ${coevaluaciones.length}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-save"></i> Sí, guardar',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                focusConfirm: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    ejecutarGuardado();
+                }
+            });
+        }
+
+        function ejecutarGuardado() {
+            // Preparar datos para enviar
+            const form = document.getElementById('formCoevaluacion');
+            const formData = new FormData(form);
+            formData.append('coevaluaciones', JSON.stringify(coevaluaciones));
+            formData.append('guardar_pdf', '1');
+
+            // Mostrar loading
+            Swal.fire({
+                title: 'Guardando PDF...',
+                html: '<i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Por favor espere mientras se guarda el documento',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false
+            });
+
+            // CAMBIAR LA RUTA AQUÍ
+            fetch('../../app/CoevaluacionBack/guardar_coevaluacion.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡PDF guardado exitosamente!',
+                            html: `
+                    <div style="text-align: left;">
+                        <p><i class="fas fa-check-circle text-success"></i> El documento ha sido guardado en el repositorio</p>
+                        <hr>
+                        <p><i class="fas fa-file-pdf text-danger"></i> <strong>Archivo:</strong> ${data.archivo}</p>
+                        <p><i class="fas fa-database text-info"></i> <strong>ID:</strong> ${data.id}</p>
+                    </div>
+                `,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: '<i class="fas fa-thumbs-up"></i> ¡Perfecto!'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al guardar',
+                            text: data.error || 'Error desconocido al guardar el PDF',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor para guardar el PDF',
+                        confirmButtonColor: '#dc3545'
+                    });
+                });
         }
 
         function descargarPDF() {
@@ -479,4 +650,5 @@ if (!$coordinadorLogueado) {
         }
     </script>
 </body>
+
 </html>

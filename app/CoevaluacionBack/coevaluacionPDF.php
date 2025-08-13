@@ -1,8 +1,15 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'COORDINADOR') {
-    header("Location: ../index.php");
-    exit();
+// **CAMBIO 1: Solo iniciar sesión si no existe**
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// **CAMBIO 2: Solo verificar sesión si no es incluido como librería**
+if (!defined('SOLO_FUNCIONES')) {
+    if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'COORDINADOR') {
+        header("Location: ../index.php");
+        exit();
+    }
 }
 
 // Conexión a la base de datos
@@ -12,45 +19,13 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
-// Validar que se recibieron los parámetros
-if (
-    !isset($_GET['fecha_documento']) || !isset($_GET['modalidad']) ||
-    !isset($_GET['fecha_inicio']) || !isset($_GET['fecha_fin'])
-) {
-    die('Error: Faltan parámetros necesarios para generar el PDF');
-}
-
-// Obtener parámetros
-$fecha_documento = $_GET['fecha_documento'];
-$modalidad = $_GET['modalidad'];
-$fecha_inicio = $_GET['fecha_inicio'];
-$fecha_fin = $_GET['fecha_fin'];
-$coevaluaciones = isset($_GET['coevaluaciones']) ? json_decode($_GET['coevaluaciones'], true) : [];
-
-// Inicializar repository y obtener datos del coordinador
-$repo = new CoevaluacionRepository($pdo);
-$coordinadorLogueado = $repo->getDocentePorCodigo($_SESSION['usuario']['codigo']);
-
-if (!$coordinadorLogueado) {
-    die('Error: No se encontraron datos del coordinador');
-}
-
 // Función para convertir fecha a español
 function fechaEspanol($fecha)
 {
     $meses = [
-        1 => 'enero',
-        2 => 'febrero',
-        3 => 'marzo',
-        4 => 'abril',
-        5 => 'mayo',
-        6 => 'junio',
-        7 => 'julio',
-        8 => 'agosto',
-        9 => 'septiembre',
-        10 => 'octubre',
-        11 => 'noviembre',
-        12 => 'diciembre'
+        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+        5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+        9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
     ];
 
     $timestamp = strtotime($fecha);
@@ -65,57 +40,15 @@ function fechaEspanol($fecha)
 function modalidadTexto($modalidad)
 {
     switch ($modalidad) {
-        case 'presencial':
-            return 'presencial';
-        case 'en_linea':
-            return 'en línea';
-        case 'hibrida':
-            return 'híbrida';
-        case 'semi_presencial':
-            return 'semi-presencial';
-        default:
-            return 'presencial';
+        case 'presencial': return 'presencial';
+        case 'en_linea': return 'en línea';
+        case 'hibrida': return 'híbrida';
+        case 'semi_presencial': return 'semi-presencial';
+        default: return 'presencial';
     }
 }
 
-// Formatear fechas
-$fecha_documento_formateada = fechaEspanol($fecha_documento);
-$fecha_inicio_formateada = fechaEspanol($fecha_inicio);
-$fecha_fin_formateada = fechaEspanol($fecha_fin);
-$modalidad_texto = modalidadTexto($modalidad);
-
-// Crear el PDF
-try {
-    $mpdf = new Mpdf([
-        'format' => 'A4',
-        'margin_top' => 15,
-        'margin_bottom' => 15,
-        'margin_left' => 20,
-        'margin_right' => 20,
-        'default_font' => 'Arial'
-    ]);
-
-    // HTML del PDF
-    $html = generarHTMLPDF(
-        $coordinadorLogueado,
-        $fecha_documento_formateada,
-        $modalidad_texto,
-        $fecha_inicio_formateada,
-        $fecha_fin_formateada,
-        $coevaluaciones
-    );
-
-    $mpdf->WriteHTML($html);
-
-    // Determinar si es descarga o visualización
-    $output = isset($_GET['download']) && $_GET['download'] == '1' ? 'D' : 'I';
-    $filename = 'coevaluacion_' . date('Y-m-d', strtotime($fecha_documento)) . '.pdf';
-
-    $mpdf->Output($filename, $output);
-} catch (Exception $e) {
-    die('Error al generar PDF: ' . $e->getMessage());
-}
-
+// Función para generar HTML del PDF
 function generarHTMLPDF($coordinador, $fecha_documento, $modalidad, $fecha_inicio, $fecha_fin, $coevaluaciones)
 {
     // Ruta corregida para el logo
@@ -254,11 +187,6 @@ function generarHTMLPDF($coordinador, $fecha_documento, $modalidad, $fecha_inici
                 line-height: 1.2;
                 text-align: left;
             }
-            .firma-nombre {
-                font-size: 10px;
-                line-height: 1.2;
-                text-align: left;
-            }
         </style>
     </head>
     <body>
@@ -332,3 +260,104 @@ function generarHTMLPDF($coordinador, $fecha_documento, $modalidad, $fecha_inici
     </html>
     ";
 }
+
+// Función para generar PDF como string (para guardar en BD)
+function generarPDFCoevaluacion($coordinador, $fecha_documento, $modalidad, $fecha_inicio, $fecha_fin, $coevaluaciones)
+{
+    // Formatear fechas
+    $fecha_documento_formateada = fechaEspanol($fecha_documento);
+    $fecha_inicio_formateada = fechaEspanol($fecha_inicio);
+    $fecha_fin_formateada = fechaEspanol($fecha_fin);
+    $modalidad_texto = modalidadTexto($modalidad);
+    
+    // Crear el PDF
+    $mpdf = new Mpdf([
+        'format' => 'A4',
+        'margin_top' => 15,
+        'margin_bottom' => 15,
+        'margin_left' => 20,
+        'margin_right' => 20,
+        'default_font' => 'Arial'
+    ]);
+
+    // HTML del PDF
+    $html = generarHTMLPDF(
+        $coordinador,
+        $fecha_documento_formateada,
+        $modalidad_texto,
+        $fecha_inicio_formateada,
+        $fecha_fin_formateada,
+        $coevaluaciones
+    );
+
+    $mpdf->WriteHTML($html);
+    
+    // Retornar PDF como string
+    return $mpdf->Output('', 'S');
+}
+
+// **CAMBIO 3: Solo ejecutar si no es incluido como librería**
+// EJECUCIÓN: Solo si se llama directamente (no cuando se incluye como librería)
+if (!defined('SOLO_FUNCIONES') && (isset($_GET['fecha_documento']) || isset($_GET['generar_pdf']))) {
+    // Validar que se recibieron los parámetros
+    if (
+        !isset($_GET['fecha_documento']) || !isset($_GET['modalidad']) ||
+        !isset($_GET['fecha_inicio']) || !isset($_GET['fecha_fin'])
+    ) {
+        die('Error: Faltan parámetros necesarios para generar el PDF');
+    }
+
+    // Obtener parámetros
+    $fecha_documento = $_GET['fecha_documento'];
+    $modalidad = $_GET['modalidad'];
+    $fecha_inicio = $_GET['fecha_inicio'];
+    $fecha_fin = $_GET['fecha_fin'];
+    $coevaluaciones = isset($_GET['coevaluaciones']) ? json_decode($_GET['coevaluaciones'], true) : [];
+
+    // Inicializar repository y obtener datos del coordinador
+    $repo = new CoevaluacionRepository($pdo);
+    $coordinadorLogueado = $repo->getDocentePorCodigo($_SESSION['usuario']['codigo']);
+
+    if (!$coordinadorLogueado) {
+        die('Error: No se encontraron datos del coordinador');
+    }
+
+    // Formatear fechas
+    $fecha_documento_formateada = fechaEspanol($fecha_documento);
+    $fecha_inicio_formateada = fechaEspanol($fecha_inicio);
+    $fecha_fin_formateada = fechaEspanol($fecha_fin);
+    $modalidad_texto = modalidadTexto($modalidad);
+
+    // Crear el PDF
+    try {
+        $mpdf = new Mpdf([
+            'format' => 'A4',
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'margin_left' => 20,
+            'margin_right' => 20,
+            'default_font' => 'Arial'
+        ]);
+
+        // HTML del PDF
+        $html = generarHTMLPDF(
+            $coordinadorLogueado,
+            $fecha_documento_formateada,
+            $modalidad_texto,
+            $fecha_inicio_formateada,
+            $fecha_fin_formateada,
+            $coevaluaciones
+        );
+
+        $mpdf->WriteHTML($html);
+
+        // Determinar si es descarga o visualización
+        $output = isset($_GET['download']) && $_GET['download'] == '1' ? 'D' : 'I';
+        $filename = 'coevaluacion_' . date('Y-m-d', strtotime($fecha_documento)) . '.pdf';
+
+        $mpdf->Output($filename, $output);
+    } catch (Exception $e) {
+        die('Error al generar PDF: ' . $e->getMessage());
+    }
+}
+?>
