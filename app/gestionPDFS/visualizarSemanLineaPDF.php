@@ -112,8 +112,11 @@ if ($unidad && isset($unidad['id_unidad'])) {
             <tr style='background:#E0E0E0; text-align:center; font-weight:bold;'>
                 <td width='18%'>Contenido</td>
                 <td width='82%'>
-                    Objetivo (s):<br>
+                    <span style='font-weight:bold;'>Objetivo (s):</span><br>
                     <span style='font-weight:normal;'>" . $semana_linea_item['objetivo'] . "</span>
+                    <br><br>
+                    <span style='font-weight:bold;'>Innovación / Tendencia tecnológica aplicada:</span><br>
+                    <span style='font-weight:normal;'>" . ($semana_linea_item['innovacion'] ?? '') . "</span>
                     <br><br>
                     <span style='font-weight:bold;'>Actividades:</span>
                 </td>

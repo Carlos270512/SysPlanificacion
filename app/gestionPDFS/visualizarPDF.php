@@ -153,6 +153,14 @@ if ($unidad_id) {
                 <td>" . $semana['objetivo_viernes'] . "</td>
             </tr>
             <tr>
+                <td style='font-weight:bold;'>Innovación / Tendencia tecnológica aplicada</td>
+                <td>" . ($semana['innovacion_lunes'] ?? '') . "</td>
+                <td>" . ($semana['innovacion_martes'] ?? '') . "</td>
+                <td>" . ($semana['innovacion_miercoles'] ?? '') . "</td>
+                <td>" . ($semana['innovacion_jueves'] ?? '') . "</td>
+                <td>" . ($semana['innovacion_viernes'] ?? '') . "</td>
+            </tr>
+            <tr>
                 <td style='font-weight:bold;'>Apertura</td>
                 <td>" . $semana['apertura_lunes'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_lunes'] . "</small></td>
                 <td>" . $semana['apertura_martes'] . "<br><small>Tiempo: " . $semana['tiempo_apertura_martes'] . "</small></td>
