@@ -103,24 +103,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Campos de la tabla (por día y tipo)
-    const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
-    dias.forEach(dia => {
-        campos.forEach(campo => {
-            const id = `#editor_${campo}_${dia}`;
-            const el = document.querySelector(id);
-            if (el) {
-                window.quill_editors[`${campo}_${dia}`] = new Quill(id, {
-                    theme: 'snow',
-                    modules: { toolbar: quillToolbar }
-                });
-                // Sincroniza con input hidden
-                window.quill_editors[`${campo}_${dia}`].on('text-change', function () {
-                    const input = document.querySelector(`input[name="${campo}_${dia}"]`);
-                    if (input) input.value = window.quill_editors[`${campo}_${dia}`].root.innerHTML;
-                });
+    const campos = ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+    
+    // IMPORTANTE: Primero mostramos todos los tabs para que Quill pueda inicializarse
+    const diasTabsContent = document.getElementById('diasTabsContent');
+    if (diasTabsContent) {
+        // Temporalmente hacemos visibles todos los tabs para inicializar Quill
+        const allTabs = diasTabsContent.querySelectorAll('.tab-pane');
+        allTabs.forEach(tab => {
+            tab.classList.add('show', 'active');
+        });
+        
+        // Inicializamos los editores Quill
+        dias.forEach(dia => {
+            campos.forEach(campo => {
+                const id = `#editor_${campo}_${dia}`;
+                const el = document.querySelector(id);
+                if (el) {
+                    window.quill_editors[`${campo}_${dia}`] = new Quill(id, {
+                        theme: 'snow',
+                        modules: { toolbar: quillToolbar }
+                    });
+                    // Sincroniza con input hidden
+                    window.quill_editors[`${campo}_${dia}`].on('text-change', function () {
+                        const input = document.querySelector(`input[name="${campo}_${dia}"]`);
+                        if (input) input.value = window.quill_editors[`${campo}_${dia}`].root.innerHTML;
+                    });
+                }
+            });
+        });
+        
+        // Restauramos el estado original de los tabs (solo el primero visible)
+        allTabs.forEach((tab, index) => {
+            if (index !== 0) {
+                tab.classList.remove('show', 'active');
             }
         });
-    });
+    }
 
     // --- Manejo del formulario por AJAX (original) ---
     const form = document.getElementById('formSemana');

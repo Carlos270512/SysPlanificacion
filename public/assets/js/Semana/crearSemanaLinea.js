@@ -2,10 +2,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formSemanaPL');
     if (!form) return;
 
+    // --- Inicialización de Quill.js ---
+    const quillToolbar = [
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }]
+    ];
+
+    window.quill_editors_pl = {};
+
     // Define los campos y su relación con los IDs de los editores
     const quillFields = [
         { name: 'contenido', id: 'editor_contenido_pl' },
         { name: 'objetivo', id: 'editor_objetivo_pl' },
+        { name: 'innovacion', id: 'editor_innovacion_pl' },
         { name: 'actividades', id: 'editor_actividades_pl' },
         { name: 'desarrollo', id: 'editor_desarrollo_pl' },
         { name: 'cierre', id: 'editor_cierre_pl' },
@@ -14,14 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { name: 'actividades_refuerzo', id: 'editor_actividades_refuerzo_pl' }
     ];
 
-    const quillToolbar = [
-        ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }]
-    ];
-
-    window.quill_editors_pl = {};
-
-    // Inicializa Quill y sincroniza con los inputs hidden
+    // Inicializar todos los editores Quill
     quillFields.forEach(field => {
         const el = document.getElementById(field.id);
         if (el) {
@@ -33,97 +35,23 @@ document.addEventListener('DOMContentLoaded', function () {
             window.quill_editors_pl[field.name].on('text-change', function () {
                 const input = form.querySelector(`input[name="${field.name}"]`);
                 if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
-                // No llamar autoGuardarSemanaPL aquí
-            });
-            // Auto-guardado y pintado en verde al perder el foco (igual que semana normal)
-            window.quill_editors_pl[field.name].on('selection-change', function (range, oldRange, source) {
-                if (oldRange && !range) { // blur
-                    const input = form.querySelector(`input[name="${field.name}"]`);
-                    if (input) autoGuardarSemanaPL(input);
-                }
             });
         }
     });
 
-    // Auto-guardado para inputs normales
-let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
-
-[
-    'tiempo_actividades',
-    'tiempo_desarrollo',
-    'tiempo_cierre',
-    'fecha_sabado'
-].forEach(name => {
-    const input = form.querySelector(`input[name="${name}"]`);
-    if (input) {
-        // Guardar el valor anterior al hacer focus (solo para fecha_sabado)
-        if (name === 'fecha_sabado') {
-            input.addEventListener('focus', () => {
-                fechaSabadoAnterior = input.value;
-            });
-            // Validación para solo sábado
-            input.addEventListener('change', async () => {
-                if (input.value) {
-                    const fechaSeleccionada = new Date(input.value);
-                    if (fechaSeleccionada.getDay() !== 6) { // 6 = Sábado
-                        await Swal.fire({
-                            icon: 'warning',
-                            title: 'Fecha inválida',
-                            text: 'Solo puede seleccionar días sábado.',
-                            confirmButtonText: 'OK'
-                        });
-                        input.value = fechaSabadoAnterior; // Restaura el valor anterior
-                        input.focus();
-                        return;
-                    }
-                }
-            });
-        }
-        input.addEventListener('blur', async () => {
-            if (name === 'fecha_sabado' && input.value) {
-                const fechaSeleccionada = new Date(input.value);
-                // Compara año y mes
-                if (
-                    fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
-                    (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
-                ) {
-                    await Swal.fire({
-                        icon: 'warning',
-                        title: 'Fecha inválida',
-                        text: 'Solo puede seleccionar fechas del mes actual.',
-                        confirmButtonText: 'OK'
-                    });
-                    input.value = fechaSabadoAnterior; // Restaura el valor anterior
-                    input.focus();
-                    return;
-                }
-                // Validación para solo sábado también en blur
-                if (fechaSeleccionada.getDay() !== 6) {
-                    await Swal.fire({
-                        icon: 'warning',
-                        title: 'Fecha inválida',
-                        text: 'Solo puede seleccionar días sábado.',
-                        confirmButtonText: 'OK'
-                    });
-                    input.value = fechaSabadoAnterior;
-                    input.focus();
-                    return;
-                }
-            }
-            autoGuardarSemanaPL(input);
-        });
-    }
-});
+    // Función para pintar verde
     function pintarVerde(element) {
         const original = element.style.backgroundColor;
         element.style.backgroundColor = '#b6fcb6';
         setTimeout(() => { element.style.backgroundColor = original; }, 1200);
     }
+
     // Función de auto-guardado
     async function autoGuardarSemanaPL(inputEditado) {
         const idSemanaLinea = form.querySelector('input[name="id_semana_linea"]');
         if (!idSemanaLinea || !idSemanaLinea.value) return;
 
+        // Sincronizar todos los editores antes de guardar
         quillFields.forEach(field => {
             const input = form.querySelector(`input[name="${field.name}"]`);
             if (input && window.quill_editors_pl[field.name]) {
@@ -138,13 +66,11 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
                 body: formData
             });
             const data = await resp.json();
-            // Mensaje verde
             const msgDiv = document.getElementById('msgSemana');
             if (data.success) {
                 msgDiv.innerHTML = '<div class="alert alert-success py-2 mb-2" style="font-size:15px;">¡Guardado automáticamente!</div>';
                 setTimeout(() => { msgDiv.innerHTML = ''; }, 1500);
 
-                // Pinta de verde el campo editado (input o editor Quill)
                 if (inputEditado) {
                     pintarVerde(inputEditado);
                     // Si es un input hidden de un Quill, pinta también el área del editor
@@ -160,9 +86,84 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
         }
     }
 
+    // Auto-guardado al perder el foco en los editores Quill
+    quillFields.forEach(field => {
+        if (window.quill_editors_pl[field.name]) {
+            window.quill_editors_pl[field.name].on('selection-change', function (range, oldRange, source) {
+                if (oldRange && !range) { // blur
+                    const input = form.querySelector(`input[name="${field.name}"]`);
+                    if (input) autoGuardarSemanaPL(input);
+                }
+            });
+        }
+    });
+
+    // Auto-guardado para inputs normales
+    const hoy = new Date();
+    let fechaSabadoAnterior = '';
+
+    ['tiempo_actividades', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_sabado'].forEach(name => {
+        const input = form.querySelector(`input[name="${name}"]`);
+        if (input) {
+            if (name === 'fecha_sabado') {
+                input.addEventListener('focus', () => {
+                    fechaSabadoAnterior = input.value;
+                });
+                input.addEventListener('change', async () => {
+                    if (input.value) {
+                        const fechaSeleccionada = new Date(input.value);
+                        if (fechaSeleccionada.getDay() !== 6) {
+                            await Swal.fire({
+                                icon: 'warning',
+                                title: 'Fecha inválida',
+                                text: 'Solo puede seleccionar días sábado.',
+                                confirmButtonText: 'OK'
+                            });
+                            input.value = fechaSabadoAnterior;
+                            input.focus();
+                            return;
+                        }
+                    }
+                });
+            }
+            input.addEventListener('blur', async () => {
+                if (name === 'fecha_sabado' && input.value) {
+                    const fechaSeleccionada = new Date(input.value);
+                    if (
+                        fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
+                        (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
+                    ) {
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: 'Fecha inválida',
+                            text: 'Solo puede seleccionar fechas del mes actual.',
+                            confirmButtonText: 'OK'
+                        });
+                        input.value = fechaSabadoAnterior;
+                        input.focus();
+                        return;
+                    }
+                    if (fechaSeleccionada.getDay() !== 6) {
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: 'Fecha inválida',
+                            text: 'Solo puede seleccionar días sábado.',
+                            confirmButtonText: 'OK'
+                        });
+                        input.value = fechaSabadoAnterior;
+                        input.focus();
+                        return;
+                    }
+                }
+                autoGuardarSemanaPL(input);
+            });
+        }
+    });
+
     // Al enviar el formulario manualmente
     const msgDiv = document.getElementById('msgSemana');
     form.addEventListener('submit', async function (e) {
+        // Sincronizar todos los editores Quill antes de enviar
         quillFields.forEach(field => {
             const input = form.querySelector(`input[name="${field.name}"]`);
             if (input && window.quill_editors_pl[field.name]) {
@@ -179,7 +180,6 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
             });
             const data = await resp.json();
             if (data.success) {
-                // SweetAlert de éxito
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
@@ -187,7 +187,6 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
                     confirmButtonText: 'OK'
                 });
             } else {
-                // SweetAlert de error (aquí se mostrarán las validaciones de fecha)
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -196,7 +195,6 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
                 });
             }
         } catch (err) {
-            // SweetAlert de error de conexión
             Swal.fire({
                 icon: 'error',
                 title: 'Error de conexión',
@@ -205,6 +203,7 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
             });
         }
     });
+
     // Cargar datos si ya existe una semana S/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
     if (idSemanaLineaInput && idSemanaLineaInput.value) {
@@ -213,12 +212,7 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
             .then(data => {
                 if (data.success && data.semana) {
                     // Llena los campos normales
-                    [
-                        'fecha_sabado',
-                        'tiempo_actividades',
-                        'tiempo_desarrollo',
-                        'tiempo_cierre'
-                    ].forEach(name => {
+                    ['fecha_sabado', 'tiempo_actividades', 'tiempo_desarrollo', 'tiempo_cierre'].forEach(name => {
                         const input = form.querySelector(`input[name="${name}"]`);
                         if (input && data.semana[name]) input.value = data.semana[name];
                     });
@@ -226,29 +220,23 @@ let fechaSabadoAnterior = ''; // Variable para guardar el valor anterior
                     quillFields.forEach(field => {
                         if (window.quill_editors_pl[field.name] && data.semana[field.name]) {
                             window.quill_editors_pl[field.name].root.innerHTML = data.semana[field.name];
-                            // También actualiza el input hidden
                             const input = form.querySelector(`input[name="${field.name}"]`);
                             if (input) input.value = data.semana[field.name];
                         }
                     });
 
-                    // --- ABRIR EL ACCORDION DE SEMANA EN LÍNEA ---
-                    const collapseEl = document.getElementById('collapsePlanificacion'); // Cambia el id si es otro
+                    const collapseEl = document.getElementById('collapsePlanificacion');
                     if (collapseEl) {
-                        // Bootstrap 5
                         const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
                         bsCollapse.show();
                     }
                 }
             });
     }
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    // --- Botón Visualizar PDF Línea (mantiene funcionalidad original) ---
+    // --- Botón Visualizar PDF Línea ---
     const btnVisualizarPDFLinea = document.getElementById('btnVisualizarPDFLinea');
-    const formSemanaPL = document.getElementById('formSemanaPL');
-    if (btnVisualizarPDFLinea && formSemanaPL) {
+    if (btnVisualizarPDFLinea) {
         btnVisualizarPDFLinea.addEventListener('click', function () {
             const idSemanaLinea = document.getElementById('id_semana_linea').value;
             if (!idSemanaLinea) {
@@ -264,16 +252,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Botón Guardar PDF con SweetAlert y guardado en guardarPlanificacion.php ---
+    // --- Botón Guardar PDF ---
     const btnGuardarPDF = document.getElementById('btnGuardarPDF');
     if (btnGuardarPDF) {
         btnGuardarPDF.addEventListener('click', async function () {
-            // Obtén los datos necesarios
             const nombreUnidad = window.nombreUnidad || '';
             const idUnidad = document.querySelector('input[name="unidad_id"]')?.value || '';
             const fechaCreacion = new Date().toLocaleString('es-EC');
 
-            // SweetAlert de confirmación
             const result = await Swal.fire({
                 title: '¿Deseas guardar el PDF?',
                 html: `
@@ -290,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (result.isConfirmed) {
-                // Obtén el PDF del iframe
                 const iframe = document.getElementById('iframePDF');
                 if (!iframe || !iframe.src) {
                     Swal.fire('Error', 'No se encontró el PDF para guardar.', 'error');
@@ -298,18 +283,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 try {
-                    // Descarga el PDF como blob
                     const pdfResp = await fetch(iframe.src);
                     if (!pdfResp.ok) throw new Error('No se pudo obtener el PDF');
                     const pdfBlob = await pdfResp.blob();
 
-                    // Prepara FormData
                     const formData = new FormData();
                     formData.append('unidad_id', idUnidad);
                     formData.append('nombre_archivo', nombreUnidad + '.pdf');
                     formData.append('archivo_pdf', pdfBlob, nombreUnidad + '.pdf');
 
-                    // Envía a guardarPlanificacion.php
                     const resp = await fetch('/SysPlanificacion/app/gestionPDFS/guardarPlanificacion.php', {
                         method: 'POST',
                         body: formData

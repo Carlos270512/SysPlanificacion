@@ -84,6 +84,13 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                                 <div id="editor_objetivo_pl" class="quill-editor border rounded bg-white"></div>
                                                 <input type="hidden" name="objetivo" required>
                                             </div>
+
+                                            <div class="mb-2">
+                                                <label class="fw-bold">Innovación / Tendencia tecnológica aplicada:</label>
+                                                <div id="editor_innovacion_pl" class="quill-editor border rounded bg-white"></div>
+                                                <input type="hidden" name="innovacion">
+                                            </div>
+
                                             <div class="mb-2">
                                                 <label class="fw-bold">Actividades:</label>
                                                 <div id="editor_actividades_pl" class="quill-editor border rounded bg-white"></div>
@@ -211,6 +218,11 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                                                     <label>Tiempo:</label>
                                                                     <input type="text" name="tiempo_objetivo_<?php echo $dia_key; ?>" style="width:60px;" placeholder="min">
                                                                 </div>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <strong>Innovación / Tendencia tecnológica aplicada:</strong>
+                                                                <div id="editor_innovacion_<?php echo $dia_key; ?>" class="quill-editor"></div>
+                                                                <input type="hidden" name="innovacion_<?php echo $dia_key; ?>">
                                                             </div>
                                                             <div class="mb-2">
                                                                 <strong>Apertura:</strong>

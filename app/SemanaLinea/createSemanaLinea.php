@@ -5,6 +5,7 @@ $id_unidad = intval($_POST['unidad_id'] ?? 0);
 $fecha_sabado = $_POST['fecha_sabado'] ?? null;
 $contenido = $_POST['contenido'] ?? '';
 $objetivo = $_POST['objetivo'] ?? '';
+$innovacion = $_POST['innovacion'] ?? '';
 $actividades = $_POST['actividades'] ?? '';
 $tiempo_actividades = $_POST['tiempo_actividades'] ?? '';
 $desarrollo = $_POST['desarrollo'] ?? '';
@@ -36,13 +37,14 @@ if ($fecha_obj->format('w') != 6) {
 
 try {
     $stmt = $pdo->prepare("INSERT INTO semana_linea 
-        (id_unidad, fecha_sabado, contenido, objetivo, actividades, tiempo_actividades, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, evaluacion_clase, equipo_herramientas_recursos, actividades_refuerzo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (id_unidad, fecha_sabado, contenido, objetivo, innovacion, actividades, tiempo_actividades, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, evaluacion_clase, equipo_herramientas_recursos, actividades_refuerzo)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $id_unidad,
         $fecha_sabado,
         $contenido,
         $objetivo,
+        $innovacion,
         $actividades,
         $tiempo_actividades,
         $desarrollo,

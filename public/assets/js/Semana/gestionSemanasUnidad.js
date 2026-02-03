@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Campos de cada día
                     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-                    const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+                    const campos = ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
                     dias.forEach(dia => {
                         campos.forEach(campo => {
                             const key = `${campo}_${dia}`;
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Llena los editores Quill
                         if (window.quill_editors_pl) {
                             [
-                                'contenido', 'objetivo', 'actividades', 'desarrollo', 'cierre',
+                                'contenido', 'objetivo', 'innovacion', 'actividades', 'desarrollo', 'cierre',
                                 'evaluacion_clase', 'equipo_herramientas_recursos', 'actividades_refuerzo'
                             ].forEach(name => {
                                 if (window.quill_editors_pl[name] && semana[name] !== undefined) {

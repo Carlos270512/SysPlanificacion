@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Función para actualizar el color de los tabs según el estado de los campos
         function actualizarColoresTabsDias() {
             const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-            const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+            const campos = ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
 
             dias.forEach(dia => {
                 let llenos = 0;
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Llama a la función después de cargar los datos y cada vez que se edite un campo
         function agregarListenersDias() {
             const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-            const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+            const campos = ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
             dias.forEach(dia => {
                 campos.forEach(campo => {
                     // Si usas Quill, escucha el evento 'text-change'
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (input) input.value = semana.contenido;
             }
             const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-            const campos = ['objetivo', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
+            const campos = ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'];
             dias.forEach(dia => {
                 campos.forEach(campo => {
                     const key = `${campo}_${dia}`;

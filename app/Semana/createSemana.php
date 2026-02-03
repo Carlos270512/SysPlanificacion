@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $campos[$dia] = [
                 'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
                 'objetivo' => $_POST['objetivo_' . $dia] ?? null,
+                'innovacion' => $_POST['innovacion_' . $dia] ?? null,
                 'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? null,
                 'apertura' => $_POST['apertura_' . $dia] ?? null,
                 'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? null,
@@ -40,18 +41,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             INSERT INTO semana (
                 id_unidad, fecha_semana, semana_fin, actividades_previas, tiempo_actividades_previas, contenido,
-                fecha_lunes, objetivo_lunes, tiempo_objetivo_lunes, apertura_lunes, tiempo_apertura_lunes, desarrollo_lunes, tiempo_desarrollo_lunes, cierre_lunes, tiempo_cierre_lunes, trabajo_autonomo_lunes, fecha_entrega_lunes,
-                fecha_martes, objetivo_martes, tiempo_objetivo_martes, apertura_martes, tiempo_apertura_martes, desarrollo_martes, tiempo_desarrollo_martes, cierre_martes, tiempo_cierre_martes, trabajo_autonomo_martes, fecha_entrega_martes,
-                fecha_miercoles, objetivo_miercoles, tiempo_objetivo_miercoles, apertura_miercoles, tiempo_apertura_miercoles, desarrollo_miercoles, tiempo_desarrollo_miercoles, cierre_miercoles, tiempo_cierre_miercoles, trabajo_autonomo_miercoles, fecha_entrega_miercoles,
-                fecha_jueves, objetivo_jueves, tiempo_objetivo_jueves, apertura_jueves, tiempo_apertura_jueves, desarrollo_jueves, tiempo_desarrollo_jueves, cierre_jueves, tiempo_cierre_jueves, trabajo_autonomo_jueves, fecha_entrega_jueves,
-                fecha_viernes, objetivo_viernes, tiempo_objetivo_viernes, apertura_viernes, tiempo_apertura_viernes, desarrollo_viernes, tiempo_desarrollo_viernes, cierre_viernes, tiempo_cierre_viernes, trabajo_autonomo_viernes, fecha_entrega_viernes
+                fecha_lunes, objetivo_lunes, innovacion_lunes, tiempo_objetivo_lunes, apertura_lunes, tiempo_apertura_lunes, desarrollo_lunes, tiempo_desarrollo_lunes, cierre_lunes, tiempo_cierre_lunes, trabajo_autonomo_lunes, fecha_entrega_lunes,
+                fecha_martes, objetivo_martes, innovacion_martes, tiempo_objetivo_martes, apertura_martes, tiempo_apertura_martes, desarrollo_martes, tiempo_desarrollo_martes, cierre_martes, tiempo_cierre_martes, trabajo_autonomo_martes, fecha_entrega_martes,
+                fecha_miercoles, objetivo_miercoles, innovacion_miercoles, tiempo_objetivo_miercoles, apertura_miercoles, tiempo_apertura_miercoles, desarrollo_miercoles, tiempo_desarrollo_miercoles, cierre_miercoles, tiempo_cierre_miercoles, trabajo_autonomo_miercoles, fecha_entrega_miercoles,
+                fecha_jueves, objetivo_jueves, innovacion_jueves, tiempo_objetivo_jueves, apertura_jueves, tiempo_apertura_jueves, desarrollo_jueves, tiempo_desarrollo_jueves, cierre_jueves, tiempo_cierre_jueves, trabajo_autonomo_jueves, fecha_entrega_jueves,
+                fecha_viernes, objetivo_viernes, innovacion_viernes, tiempo_objetivo_viernes, apertura_viernes, tiempo_apertura_viernes, desarrollo_viernes, tiempo_desarrollo_viernes, cierre_viernes, tiempo_cierre_viernes, trabajo_autonomo_viernes, fecha_entrega_viernes
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
         ");
 
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Lunes
             $campos['lunes']['fecha'],
             $campos['lunes']['objetivo'],
+            $campos['lunes']['innovacion'],
             $campos['lunes']['tiempo_objetivo'],
             $campos['lunes']['apertura'],
             $campos['lunes']['tiempo_apertura'],
@@ -79,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Martes
             $campos['martes']['fecha'],
             $campos['martes']['objetivo'],
+            $campos['martes']['innovacion'],
             $campos['martes']['tiempo_objetivo'],
             $campos['martes']['apertura'],
             $campos['martes']['tiempo_apertura'],
@@ -92,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Miércoles
             $campos['miercoles']['fecha'],
             $campos['miercoles']['objetivo'],
+            $campos['miercoles']['innovacion'],
             $campos['miercoles']['tiempo_objetivo'],
             $campos['miercoles']['apertura'],
             $campos['miercoles']['tiempo_apertura'],
@@ -105,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Jueves
             $campos['jueves']['fecha'],
             $campos['jueves']['objetivo'],
+            $campos['jueves']['innovacion'],
             $campos['jueves']['tiempo_objetivo'],
             $campos['jueves']['apertura'],
             $campos['jueves']['tiempo_apertura'],
@@ -118,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Viernes
             $campos['viernes']['fecha'],
             $campos['viernes']['objetivo'],
+            $campos['viernes']['innovacion'],
             $campos['viernes']['tiempo_objetivo'],
             $campos['viernes']['apertura'],
             $campos['viernes']['tiempo_apertura'],
