@@ -125,29 +125,31 @@ if ($id_unidad) {
                     </td>
                 </tr>
                 <?php if ($soloCamposPL): ?>
+                    <!-- Campos para jornadas S y EL (mismos que presencial) -->
                     <tr>
-                        <!-- Columna izquierda: Objetivo de la unidad y Bibliografía debajo -->
-                        <td rowspan="2" colspan="3" style="vertical-align:top; min-width:350px;">
+                        <td colspan="2" style="vertical-align:top;">
                             <div class="resaltado">Objetivo de la unidad:</div>
                             <div id="editor_objetivo_unidad" class="quill-editor"></div>
                             <textarea name="objetivo_unidad" id="objetivo_unidad" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['objetivo_unidad']) : ''; ?></textarea>
-                            <div class="resaltado mt-3">Bibliografía:</div>
+                            <div class="resaltado mt-2">Bibliografía:</div>
                             <div id="editor_bibliografia" class="quill-editor"></div>
                             <textarea name="bibliografia" id="bibliografia" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['bibliografia']) : ''; ?></textarea>
+
                         </td>
-                        <!-- Columna derecha arriba: Equipo/Herramienta/Recursos didácticos -->
+                        <td style="vertical-align:top;">
+                            <div class="resaltado mt-2">Metodología:</div>
+                            <div id="editor_metodologia" class="quill-editor"></div>
+                            <textarea name="metodologia" id="metodologia" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['metodologia']) : ''; ?></textarea>
+                        </td>
+                        <td style="vertical-align:top;">
+                            <div class="resaltado mt-2">Actividades de recuperación:</div>
+                            <div id="editor_actividades_recuperacion" class="quill-editor"></div>
+                            <textarea name="actividades_recuperacion" id="actividades_recuperacion" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['actividades_recuperacion']) : ''; ?></textarea>
                         <td colspan="3" style="vertical-align:top;">
                             <div class="resaltado">Equipo/Herramienta/<br>Recursos didácticos de la unidad:</div>
                             <div id="editor_recursos_didacticos" class="quill-editor"></div>
                             <textarea name="recursos_didacticos" id="recursos_didacticos" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['recursos_didacticos']) : ''; ?></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <!-- Columna derecha abajo: Estrategia de enseñanza y aprendizaje -->
-                        <td colspan="3" style="vertical-align:top;">
-                            <div class="resaltado">Estrategia de enseñanza y aprendizaje:</div>
-                            <div id="editor_estrategia" class="quill-editor"></div>
-                            <textarea name="estrategia" id="estrategia" class="d-none"><?php echo $unidad ? htmlspecialchars($unidad['estrategia_ensenanza_aprendizaje'] ?? '') : ''; ?></textarea>
+
                         </td>
                     </tr>
                 <?php else: ?>
