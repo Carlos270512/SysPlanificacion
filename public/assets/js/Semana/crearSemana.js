@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
     // --- Manejo del formulario por AJAX (original) ---
     const form = document.getElementById('formSemana');
     const msgDiv = document.getElementById('msgSemana');

@@ -3,18 +3,16 @@ require_once __DIR__ . '/../../config/conexion.php';
 
 $id_unidad = intval($_POST['unidad_id'] ?? 0);
 $fecha_sabado = $_POST['fecha_sabado'] ?? null;
-$contenido = $_POST['contenido'] ?? '';
 $objetivo = $_POST['objetivo'] ?? '';
 $innovacion = $_POST['innovacion'] ?? '';
-$actividades = $_POST['actividades'] ?? '';
-$tiempo_actividades = $_POST['tiempo_actividades'] ?? '';
+$apertura = $_POST['apertura'] ?? '';
+$tiempo_apertura = $_POST['tiempo_apertura'] ?? '';
 $desarrollo = $_POST['desarrollo'] ?? '';
 $tiempo_desarrollo = $_POST['tiempo_desarrollo'] ?? '';
 $cierre = $_POST['cierre'] ?? '';
 $tiempo_cierre = $_POST['tiempo_cierre'] ?? '';
-$evaluacion_clase = $_POST['evaluacion_clase'] ?? '';
-$equipo_herramientas_recursos = $_POST['equipo_herramientas_recursos'] ?? '';
-$actividades_refuerzo = $_POST['actividades_refuerzo'] ?? '';
+$trabajo_autonomo = $_POST['trabajo_autonomo'] ?? '';
+$fecha_entrega = $_POST['fecha_entrega'] ?? null;
 
 // Validación: verificar que la fecha sea un sábado
 if (empty($fecha_sabado)) {
@@ -35,28 +33,32 @@ if ($fecha_obj->format('w') != 6) {
     exit;
 }
 
+// Log para debug
+error_log("Creando semana_linea - fecha_sabado: $fecha_sabado, fecha_entrega: $fecha_entrega, tiempo_apertura: $tiempo_apertura, trabajo_autonomo: $trabajo_autonomo, apertura: $apertura");
+
 try {
     $stmt = $pdo->prepare("INSERT INTO semana_linea 
-        (id_unidad, fecha_sabado, contenido, objetivo, innovacion, actividades, tiempo_actividades, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, evaluacion_clase, equipo_herramientas_recursos, actividades_refuerzo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (id_unidad, fecha_sabado, objetivo, innovacion, apertura, tiempo_apertura, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, trabajo_autonomo, fecha_entrega)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $id_unidad,
         $fecha_sabado,
-        $contenido,
         $objetivo,
         $innovacion,
-        $actividades,
-        $tiempo_actividades,
+        $apertura,
+        $tiempo_apertura,
         $desarrollo,
         $tiempo_desarrollo,
         $cierre,
         $tiempo_cierre,
-        $evaluacion_clase,
-        $equipo_herramientas_recursos,
-        $actividades_refuerzo
+        $trabajo_autonomo,
+        $fecha_entrega
     ]);
     $id_semana_linea = $pdo->lastInsertId();
+    error_log("Semana_linea creada con ID: $id_semana_linea");
     echo json_encode(['success' => true, 'id_semana_linea' => $id_semana_linea]);
 } catch (Exception $e) {
+    error_log("Error al crear semana_linea: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
+

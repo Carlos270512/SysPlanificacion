@@ -374,48 +374,67 @@ document.addEventListener('DOMContentLoaded', function () {
         // ...existing code...
         if (e.target.classList.contains('btn-editar-semana-linea')) {
             const idSemanaLinea = e.target.getAttribute('data-id');
+            console.log(`Editando semana linea: ${idSemanaLinea}`);
+            
             const acordeon = document.getElementById('acordeonPlanificacion');
             if (acordeon) acordeon.style.display = 'block';
 
             // Coloca el id en el input hidden
             const inputId = document.querySelector('input[name="id_semana_linea"]');
-            if (inputId) inputId.value = idSemanaLinea;
+            if (inputId) {
+                inputId.value = idSemanaLinea;
+                console.log(`ID asignado: ${idSemanaLinea}`);
+            }
 
             // Habilita el botón PDF si existe
-            const btnPDF = document.getElementById('btnVisualizarPDF');
+            const btnPDF = document.getElementById('btnVisualizarPDFLinea');
             if (btnPDF) btnPDF.disabled = false;
 
             // Carga los datos de la semana seleccionada
             fetch(`/SysPlanificacion/app/SemanaLinea/getSemanaLineaById.php?id_semana_linea=${idSemanaLinea}`)
                 .then(resp => resp.json())
                 .then(data => {
+                    console.log('Datos recibidos al editar:', data);
                     if (data.success && data.semana) {
                         const semana = data.semana;
-                        // Llena los campos normales
-                        [
-                            'fecha_sabado',
-                            'tiempo_actividades',
-                            'tiempo_desarrollo',
-                            'tiempo_cierre'
-                        ].forEach(name => {
-                            const input = document.querySelector(`#formSemanaPL input[name="${name}"]`);
-                            if (input) input.value = semana[name] || '';
+                        
+                        // Llena los campos normales con los nombres CORRECTOS de la base de datos
+                        ['fecha_sabado', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
+                            const input = document.querySelector(`input[name="${name}"]`);
+                            if (input) {
+                                input.value = semana[name] || '';
+                                console.log(`Campo ${name} cargado: ${input.value}`);
+                            }
                         });
-                        // Llena los editores Quill
+                        
+                        // Llena los editores Quill con los nombres CORRECTOS
                         if (window.quill_editors_pl) {
-                            [
-                                'contenido', 'objetivo', 'innovacion', 'actividades', 'desarrollo', 'cierre',
-                                'evaluacion_clase', 'equipo_herramientas_recursos', 'actividades_refuerzo'
-                            ].forEach(name => {
-                                if (window.quill_editors_pl[name] && semana[name] !== undefined) {
-                                    window.quill_editors_pl[name].root.innerHTML = semana[name] || '';
+                            ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(name => {
+                                if (window.quill_editors_pl[name]) {
+                                    const contenido = semana[name] || '';
+                                    window.quill_editors_pl[name].root.innerHTML = contenido;
                                     // Actualiza el input hidden
-                                    const input = document.querySelector(`#formSemanaPL input[name="${name}"]`);
-                                    if (input) input.value = semana[name] || '';
+                                    const input = document.querySelector(`input[name="${name}"]`);
+                                    if (input) {
+                                        input.value = contenido;
+                                    }
+                                    console.log(`Editor ${name} cargado con: ${contenido.substring(0, 50)}...`);
                                 }
                             });
                         }
+                        
+                        // Expandir el acordeón para mostrar el formulario
+                        const collapseEl = document.getElementById('collapsePlanificacion');
+                        if (collapseEl) {
+                            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+                            bsCollapse.show();
+                        }
+                        
+                        console.log('Datos de edición cargados correctamente');
                     }
+                })
+                .catch(err => {
+                    console.error('Error al cargar datos de edición:', err);
                 });
         }
         // 4. Botón "Eliminar" (opcional)

@@ -12,15 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define los campos y su relación con los IDs de los editores
     const quillFields = [
-        { name: 'contenido', id: 'editor_contenido_pl' },
         { name: 'objetivo', id: 'editor_objetivo_pl' },
         { name: 'innovacion', id: 'editor_innovacion_pl' },
-        { name: 'actividades', id: 'editor_actividades_pl' },
+        { name: 'apertura', id: 'editor_apertura_pl' },
         { name: 'desarrollo', id: 'editor_desarrollo_pl' },
         { name: 'cierre', id: 'editor_cierre_pl' },
-        { name: 'evaluacion_clase', id: 'editor_evaluacion_clase_pl' },
-        { name: 'equipo_herramientas_recursos', id: 'editor_equipo_herramientas_recursos_pl' },
-        { name: 'actividades_refuerzo', id: 'editor_actividades_refuerzo_pl' }
+        { name: 'trabajo_autonomo', id: 'editor_trabajo_autonomo_pl' }
     ];
 
     // Inicializar todos los editores Quill
@@ -31,11 +28,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 theme: 'snow',
                 modules: { toolbar: quillToolbar }
             });
+            console.log(`Editor Quill inicializado: ${field.name}`);
             // Sincroniza el contenido con el input hidden en cada cambio
             window.quill_editors_pl[field.name].on('text-change', function () {
                 const input = form.querySelector(`input[name="${field.name}"]`);
-                if (input) input.value = window.quill_editors_pl[field.name].root.innerHTML;
+                if (input) {
+                    input.value = window.quill_editors_pl[field.name].root.innerHTML;
+                    console.log(`Contenido sincronizado en ${field.name}`);
+                }
             });
+        } else {
+            console.warn(`No se encontró el elemento para: ${field.id}`);
         }
     });
 
@@ -46,20 +49,38 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => { element.style.backgroundColor = original; }, 1200);
     }
 
-    // Función de auto-guardado
-    async function autoGuardarSemanaPL(inputEditado) {
-        const idSemanaLinea = form.querySelector('input[name="id_semana_linea"]');
-        if (!idSemanaLinea || !idSemanaLinea.value) return;
+    // Función de auto-guardado mejorada (campo por campo como en semana normal)
+    async function autoGuardarSemanaPL(inputEditado, campoNombre = null) {
+        const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
+        if (!idSemanaLineaInput || !idSemanaLineaInput.value) {
+            console.log('No se puede auto-guardar: no hay id_semana_linea');
+            return;
+        }
 
-        // Sincronizar todos los editores antes de guardar
-        quillFields.forEach(field => {
-            const input = form.querySelector(`input[name="${field.name}"]`);
-            if (input && window.quill_editors_pl[field.name]) {
-                input.value = window.quill_editors_pl[field.name].root.innerHTML;
+        const idSemanaLinea = idSemanaLineaInput.value;
+        
+        // Determinar el campo y valor a guardar
+        let campo = campoNombre || inputEditado?.name;
+        let valor = '';
+        
+        if (inputEditado) {
+            // Si es un editor Quill, obtener el contenido HTML
+            if (window.quill_editors_pl[campo]) {
+                valor = window.quill_editors_pl[campo].root.innerHTML;
+                // Sincronizar con el input hidden
+                inputEditado.value = valor;
+            } else {
+                valor = inputEditado.value;
             }
-        });
+        }
 
-        const formData = new FormData(form);
+        console.log(`Auto-guardando campo: ${campo}, valor: ${valor}, id_semana_linea: ${idSemanaLinea}`);
+
+        // Preparar los datos para enviar solo el campo modificado
+        const formData = new FormData();
+        formData.append('id_semana_linea', idSemanaLinea);
+        formData.append(campo, valor);
+
         try {
             const resp = await fetch('/SysPlanificacion/app/SemanaLinea/updateSemanaLinea.php', {
                 method: 'POST',
@@ -67,82 +88,126 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const data = await resp.json();
             const msgDiv = document.getElementById('msgSemana');
+            
+            console.log('Respuesta del servidor:', data);
+            
             if (data.success) {
+                // Mostrar mensaje de éxito temporal
                 msgDiv.innerHTML = '<div class="alert alert-success py-2 mb-2" style="font-size:15px;">¡Guardado automáticamente!</div>';
                 setTimeout(() => { msgDiv.innerHTML = ''; }, 1500);
 
+                // Pintar de verde el elemento editado
                 if (inputEditado) {
-                    pintarVerde(inputEditado);
-                    // Si es un input hidden de un Quill, pinta también el área del editor
-                    quillFields.forEach(field => {
-                        if (inputEditado.name === field.name && window.quill_editors_pl[field.name]) {
-                            pintarVerde(window.quill_editors_pl[field.name].root);
-                        }
-                    });
+                    // Si es un input hidden de Quill, pintar el editor
+                    if (window.quill_editors_pl[campo]) {
+                        pintarVerde(window.quill_editors_pl[campo].root);
+                    } else {
+                        pintarVerde(inputEditado);
+                    }
                 }
+            } else {
+                console.error('Error al guardar:', data.message);
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 mb-2" style="font-size:15px;">Error: ${data.message}</div>`;
+                setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
             }
         } catch (e) {
-            // Manejo de error opcional
+            console.error('Error en auto-guardado:', e);
+            const msgDiv = document.getElementById('msgSemana');
+            msgDiv.innerHTML = '<div class="alert alert-danger py-2 mb-2" style="font-size:15px;">Error de conexión</div>';
+            setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
         }
     }
 
     // Auto-guardado al perder el foco en los editores Quill
     quillFields.forEach(field => {
         if (window.quill_editors_pl[field.name]) {
+            console.log(`Configurando auto-guardado Quill para: ${field.name}`);
+            
+            // Usar el evento selection-change para detectar blur
             window.quill_editors_pl[field.name].on('selection-change', function (range, oldRange, source) {
-                if (oldRange && !range) { // blur
+                if (oldRange && !range) { // blur (perdió el foco)
+                    console.log(`Blur detectado en editor Quill: ${field.name}`);
+                    
+                    const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
+                    if (!idSemanaLineaInput || !idSemanaLineaInput.value) {
+                        console.log('No hay id_semana_linea, no se puede auto-guardar Quill');
+                        return;
+                    }
+                    
                     const input = form.querySelector(`input[name="${field.name}"]`);
-                    if (input) autoGuardarSemanaPL(input);
+                    if (input) {
+                        // Sincronizar contenido antes de guardar
+                        const contenido = window.quill_editors_pl[field.name].root.innerHTML;
+                        input.value = contenido;
+                        console.log(`Auto-guardando Quill ${field.name}, contenido: ${contenido.substring(0, 100)}...`);
+                        autoGuardarSemanaPL(input, field.name);
+                    } else {
+                        console.warn(`No se encontró input hidden para: ${field.name}`);
+                    }
+                }
+            });
+            
+            // ADICIONAL: También escuchar el evento text-change con un debounce
+            let timeoutId = null;
+            window.quill_editors_pl[field.name].on('text-change', function (delta, oldDelta, source) {
+                if (source === 'user') {
+                    console.log(`Cambio de texto detectado en: ${field.name}`);
+                    
+                    // Limpiar timeout anterior
+                    if (timeoutId) clearTimeout(timeoutId);
+                    
+                    // Esperar 2 segundos después del último cambio para auto-guardar
+                    timeoutId = setTimeout(() => {
+                        const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
+                        if (idSemanaLineaInput && idSemanaLineaInput.value) {
+                            const input = form.querySelector(`input[name="${field.name}"]`);
+                            if (input) {
+                                const contenido = window.quill_editors_pl[field.name].root.innerHTML;
+                                input.value = contenido;
+                                console.log(`Auto-guardado automático después de 2s en ${field.name}`);
+                                autoGuardarSemanaPL(input, field.name);
+                            }
+                        }
+                    }, 2000);
                 }
             });
         }
     });
 
-    // Auto-guardado para inputs normales
+    // Auto-guardado para inputs normales (tiempo y fechas)
     const hoy = new Date();
     let fechaSabadoAnterior = '';
+    let fechaEntregaAnterior = '';
 
-    ['tiempo_actividades', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_sabado'].forEach(name => {
+    // Campos que necesitan auto-guardado
+    const camposAutoguardado = ['tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_sabado', 'fecha_entrega'];
+    
+    camposAutoguardado.forEach(name => {
         const input = form.querySelector(`input[name="${name}"]`);
-        if (input) {
-            if (name === 'fecha_sabado') {
-                input.addEventListener('focus', () => {
-                    fechaSabadoAnterior = input.value;
-                });
-                input.addEventListener('change', async () => {
-                    if (input.value) {
-                        const fechaSeleccionada = new Date(input.value);
-                        if (fechaSeleccionada.getDay() !== 6) {
-                            await Swal.fire({
-                                icon: 'warning',
-                                title: 'Fecha inválida',
-                                text: 'Solo puede seleccionar días sábado.',
-                                confirmButtonText: 'OK'
-                            });
-                            input.value = fechaSabadoAnterior;
-                            input.focus();
-                            return;
-                        }
-                    }
-                });
-            }
-            input.addEventListener('blur', async () => {
-                if (name === 'fecha_sabado' && input.value) {
+        if (!input) {
+            console.warn(`Campo no encontrado: ${name}`);
+            return;
+        }
+
+        console.log(`Configurando auto-guardado para: ${name}`);
+
+        // Guardar valor anterior al hacer foco
+        if (name === 'fecha_sabado') {
+            input.addEventListener('focus', () => {
+                fechaSabadoAnterior = input.value;
+            });
+        }
+        if (name === 'fecha_entrega') {
+            input.addEventListener('focus', () => {
+                fechaEntregaAnterior = input.value;
+            });
+        }
+
+        // Validación en tiempo real para fecha_sabado
+        if (name === 'fecha_sabado') {
+            input.addEventListener('change', async () => {
+                if (input.value) {
                     const fechaSeleccionada = new Date(input.value);
-                    if (
-                        fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
-                        (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
-                    ) {
-                        await Swal.fire({
-                            icon: 'warning',
-                            title: 'Fecha inválida',
-                            text: 'Solo puede seleccionar fechas del mes actual.',
-                            confirmButtonText: 'OK'
-                        });
-                        input.value = fechaSabadoAnterior;
-                        input.focus();
-                        return;
-                    }
                     if (fechaSeleccionada.getDay() !== 6) {
                         await Swal.fire({
                             icon: 'warning',
@@ -155,9 +220,76 @@ document.addEventListener('DOMContentLoaded', function () {
                         return;
                     }
                 }
-                autoGuardarSemanaPL(input);
             });
         }
+
+        // Auto-guardado al perder el foco
+        input.addEventListener('blur', async () => {
+            console.log(`Blur en campo: ${name}, valor: ${input.value}`);
+            
+            const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
+            if (!idSemanaLineaInput || !idSemanaLineaInput.value) {
+                console.log('No hay id_semana_linea, no se puede auto-guardar');
+                return;
+            }
+
+            // Validaciones especiales para fecha_sabado antes de guardar
+            if (name === 'fecha_sabado' && input.value) {
+                const fechaSeleccionada = new Date(input.value);
+                
+                // Validar mes actual o futuro
+                if (
+                    fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
+                    (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
+                ) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'Solo puede seleccionar fechas del mes actual o futuro.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaSabadoAnterior;
+                    input.focus();
+                    return;
+                }
+                
+                // Validar que sea sábado
+                if (fechaSeleccionada.getDay() !== 6) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'Solo puede seleccionar días sábado.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaSabadoAnterior;
+                    input.focus();
+                    return;
+                }
+            }
+
+            // Validación para fecha_entrega (mes actual o futuro)
+            if (name === 'fecha_entrega' && input.value) {
+                const fechaSeleccionada = new Date(input.value);
+                if (
+                    fechaSeleccionada.getFullYear() < hoy.getFullYear() ||
+                    (fechaSeleccionada.getFullYear() === hoy.getFullYear() && fechaSeleccionada.getMonth() < hoy.getMonth())
+                ) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'No puede seleccionar una fecha de un mes anterior al actual.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaEntregaAnterior;
+                    input.focus();
+                    return;
+                }
+            }
+
+            // Ejecutar auto-guardado
+            console.log(`Ejecutando auto-guardado para ${name}`);
+            await autoGuardarSemanaPL(input, name);
+        });
     });
 
     // Al enviar el formulario manualmente
@@ -207,21 +339,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cargar datos si ya existe una semana S/EL
     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
     if (idSemanaLineaInput && idSemanaLineaInput.value) {
+        console.log(`Cargando datos de semana_linea: ${idSemanaLineaInput.value}`);
         fetch(`/SysPlanificacion/app/SemanaLinea/getSemanaLineaById.php?id_semana_linea=${idSemanaLineaInput.value}`)
             .then(resp => resp.json())
             .then(data => {
+                console.log('Datos recibidos:', data);
                 if (data.success && data.semana) {
-                    // Llena los campos normales
-                    ['fecha_sabado', 'tiempo_actividades', 'tiempo_desarrollo', 'tiempo_cierre'].forEach(name => {
+                    // Llena los campos normales (incluso si están vacíos)
+                    ['fecha_sabado', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
                         const input = form.querySelector(`input[name="${name}"]`);
-                        if (input && data.semana[name]) input.value = data.semana[name];
+                        if (input) {
+                            input.value = data.semana[name] || '';
+                            console.log(`Campo ${name} cargado: ${input.value}`);
+                        }
                     });
-                    // Llena los editores Quill
+                    
+                    // Llena los editores Quill (incluso si están vacíos)
                     quillFields.forEach(field => {
-                        if (window.quill_editors_pl[field.name] && data.semana[field.name]) {
-                            window.quill_editors_pl[field.name].root.innerHTML = data.semana[field.name];
+                        if (window.quill_editors_pl[field.name]) {
+                            const contenido = data.semana[field.name] || '';
+                            window.quill_editors_pl[field.name].root.innerHTML = contenido;
                             const input = form.querySelector(`input[name="${field.name}"]`);
-                            if (input) input.value = data.semana[field.name];
+                            if (input) {
+                                input.value = contenido;
+                            }
+                            console.log(`Editor Quill ${field.name} cargado con: ${contenido.substring(0, 50)}...`);
                         }
                     });
 
@@ -230,7 +372,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
                         bsCollapse.show();
                     }
+                    
+                    console.log('Todos los datos cargados correctamente');
+                } else {
+                    console.error('Error al cargar datos:', data.message);
                 }
+            })
+            .catch(err => {
+                console.error('Error en fetch:', err);
             });
     }
 

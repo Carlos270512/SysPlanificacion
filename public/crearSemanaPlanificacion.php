@@ -65,75 +65,62 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                 <input type="hidden" name="unidad_id" value="<?php echo htmlspecialchars($id_unidad); ?>">
                                 <input type="hidden" name="id_semana_linea" id="id_semana_linea" value="">
                                 <div class="card-body">
-                                    <div class="mb-2">
+                                    <div class="mb-3">
                                         <label class="fw-bold">Fecha (sábado):</label>
                                         <input type="date" name="fecha_sabado" class="form-control form-control-sm w-auto" required>
                                     </div>
-                                    <div class="row">
-                                        <!-- Columna izquierda: Contenido -->
-                                        <div class="col-md-4 mb-3">
-                                            <label class="fw-bold">Contenido:</label>
-                                            <div id="editor_contenido_pl" class="quill-editor border rounded bg-white" style="height:1080px;"></div>
 
-                                            <input type="hidden" name="contenido" required>
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Objetivo:</label>
+                                        <div id="editor_objetivo_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="objetivo" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Innovación / Tendencia tecnológica aplicada (enlistar):</label>
+                                        <div id="editor_innovacion_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="innovacion">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Apertura:</label>
+                                        <div id="editor_apertura_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="apertura">
+                                        <div class="mt-2">
+                                            <label class="fw-bold">Tiempo:</label>
+                                            <input type="text" name="tiempo_apertura" class="form-control form-control-sm" style="width:80px;" placeholder="min">
                                         </div>
-                                        <!-- Columna derecha: resto de campos, apilados -->
-                                        <div class="col-md-8">
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Objetivo:</label>
-                                                <div id="editor_objetivo_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="objetivo" required>
-                                            </div>
+                                    </div>
 
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Innovación / Tendencia tecnológica aplicada:</label>
-                                                <div id="editor_innovacion_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="innovacion">
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Actividades:</label>
-                                                <div id="editor_actividades_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="actividades" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Tiempo actividades:</label>
-                                                <input type="text" name="tiempo_actividades" class="form-control form-control-sm w-auto" placeholder="min">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Desarrollo:</label>
-                                                <div id="editor_desarrollo_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="desarrollo" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Tiempo desarrollo:</label>
-                                                <input type="text" name="tiempo_desarrollo" class="form-control form-control-sm w-auto" placeholder="min">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Cierre:</label>
-                                                <div id="editor_cierre_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="cierre" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Tiempo cierre:</label>
-                                                <input type="text" name="tiempo_cierre" class="form-control form-control-sm w-auto" placeholder="min">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Evaluación durante la clase:</label>
-                                                <div id="editor_evaluacion_clase_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="evaluacion_clase">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Equipo/Herramienta/Recursos didácticos/Recursos interactivos empleados en la clase:</label>
-                                                <div id="editor_equipo_herramientas_recursos_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="equipo_herramientas_recursos">
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="fw-bold">Actividades de refuerzo (trabajo autónomo):</label>
-                                                <div id="editor_actividades_refuerzo_pl" class="quill-editor border rounded bg-white"></div>
-                                                <input type="hidden" name="actividades_refuerzo">
-                                            </div>
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Desarrollo:</label>
+                                        <div id="editor_desarrollo_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="desarrollo" required>
+                                        <div class="mt-2">
+                                            <label class="fw-bold">Tiempo:</label>
+                                            <input type="text" name="tiempo_desarrollo" class="form-control form-control-sm" style="width:80px;" placeholder="min">
                                         </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Cierre:</label>
+                                        <div id="editor_cierre_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="cierre" required>
+                                        <div class="mt-2">
+                                            <label class="fw-bold">Tiempo:</label>
+                                            <input type="text" name="tiempo_cierre" class="form-control form-control-sm" style="width:80px;" placeholder="min">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Trabajo autónomo:</label>
+                                        <div id="editor_trabajo_autonomo_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="trabajo_autonomo">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Fecha de entrega:</label>
+                                        <input type="date" name="fecha_entrega" class="form-control form-control-sm w-auto">
                                     </div>
                                 </div>
                                 <!-- Botones de acción para semana en línea -->
