@@ -75,17 +75,22 @@ $html .= "
 
 <table border='1' cellpadding='6' cellspacing='0' width='100%' style='font-size:10px;'>
     <tr style='background:#FFF9C4; text-align:center; font-weight:bold;'>
-        <td width='35%'><strong>Objetivo de la unidad:</strong></td>
-        <td width='25%'><strong>Equipo/Herramienta/ Recursos didácticos de la unidad:</strong></td>
-        <td width='20%'><strong>Estrategia de enseñanza y aprendizaje</strong></td>
+        <td width='25%'><strong>Objetivo de la unidad:</strong></td>
+        <td width='25%'><strong>Metodologías de evaluación de la unidad:</strong></td>
+        <td width='25%'><strong>Actividades de recuperación de la unidad:</strong></td>
+        <td width='25%'><strong>Equipo/Herramienta/Recursos didácticos de la unidad:</strong></td>
     </tr>
     <tr>
-        <td valign='top'>" . ($unidad['objetivo_unidad'] ?? '') . "<br><br>
+        <td valign='top'>" . ($unidad['objetivo_unidad'] ?? '') . "</td>
+        <td valign='top'>" . ($unidad['metodologia'] ?? '') . "</td>
+        <td valign='top'>" . ($unidad['actividades_recuperacion'] ?? '') . "</td>
+        <td valign='top'>" . ($unidad['recursos_didacticos'] ?? '') . "</td>
+    </tr>
+    <tr>
+        <td colspan='4'>
             <span style='font-weight:bold;'>Bibliografía:</span><br>
             " . ($unidad['bibliografia'] ?? '') . "
         </td>
-        <td valign='top'>" . ($unidad['recursos_didacticos'] ?? '') . "</td>
-        <td valign='top'>" . ($unidad['estrategia_ensenanza_aprendizaje'] ?? '') . "</td>
     </tr>
 </table>
 ";
