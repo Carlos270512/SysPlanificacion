@@ -394,22 +394,33 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(`/SysPlanificacion/app/SemanaLinea/getSemanaLineaById.php?id_semana_linea=${idSemanaLinea}`)
                 .then(resp => resp.json())
                 .then(data => {
-                    console.log('Datos recibidos al editar:', data);
+                    console.log('===== DATOS RECIBIDOS AL EDITAR =====');
+                    console.log('Data completo:', data);
                     if (data.success && data.semana) {
+                        console.log('Semana object:', data.semana);
+                        console.log('tema_clase_SAnterior:', data.semana.tema_clase_SAnterior);
+                        console.log('Atividades_previas_clase:', data.semana.Atividades_previas_clase);
+                        console.log('tiempo_actividades_previas_clase:', data.semana.tiempo_actividades_previas_clase);
+                        console.log('====================================');
+                        
                         const semana = data.semana;
                         
                         // Llena los campos normales con los nombres CORRECTOS de la base de datos
-                        ['fecha_sabado', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
+                        ['fecha_sabado', 'tiempo_actividades_previas_clase', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
                             const input = document.querySelector(`input[name="${name}"]`);
                             if (input) {
                                 input.value = semana[name] || '';
-                                console.log(`Campo ${name} cargado: ${input.value}`);
+                                console.log(`✓ Campo ${name} cargado: "${input.value}"`);
+                            } else {
+                                console.error(`✗ NO se encontró input[name="${name}"]`);
                             }
                         });
                         
                         // Llena los editores Quill con los nombres CORRECTOS
+                        console.log('window.quill_editors_pl:', window.quill_editors_pl);
                         if (window.quill_editors_pl) {
-                            ['objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(name => {
+                            ['tema_clase_SAnterior', 'Atividades_previas_clase', 'objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(name => {
+                                console.log(`Verificando editor: ${name}, existe:`, !!window.quill_editors_pl[name]);
                                 if (window.quill_editors_pl[name]) {
                                     const contenido = semana[name] || '';
                                     window.quill_editors_pl[name].root.innerHTML = contenido;
@@ -418,9 +429,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                     if (input) {
                                         input.value = contenido;
                                     }
-                                    console.log(`Editor ${name} cargado con: ${contenido.substring(0, 50)}...`);
+                                    console.log(`✓ Editor ${name} cargado con: "${contenido.substring(0, 50)}..."`);
+                                } else {
+                                    console.error(`✗ NO existe window.quill_editors_pl[${name}]`);
                                 }
                             });
+                        } else {
+                            console.error('✗ window.quill_editors_pl NO EXISTE');
                         }
                         
                         // Expandir el acordeón para mostrar el formulario

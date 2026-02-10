@@ -71,6 +71,22 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                     </div>
 
                                     <div class="mb-3">
+                                        <label class="fw-bold">Tema de la clase síncrona de la semana anterior:</label>
+                                        <div id="editor_tema_clase_SAnterior_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="tema_clase_SAnterior">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Actividades previas a la clase:</label>
+                                        <div id="editor_atividades_previas_clase_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="Atividades_previas_clase">
+                                        <div class="mt-2">
+                                            <label class="fw-bold">Tiempo:</label>
+                                            <input type="text" name="tiempo_actividades_previas_clase" class="form-control form-control-sm" style="width:80px;" placeholder="min">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label class="fw-bold">Objetivo:</label>
                                         <div id="editor_objetivo_pl" class="quill-editor border rounded bg-white"></div>
                                         <input type="hidden" name="objetivo" required>

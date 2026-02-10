@@ -2,6 +2,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formSemanaPL');
     if (!form) return;
 
+    console.log('=== VERIFICANDO ELEMENTOS DEL DOM ===');
+    console.log('✓ Formulario encontrado:', form);
+    
+    // Verificar que existen los editores en el DOM
+    const editoresEsperados = [
+        'editor_tema_clase_SAnterior_pl',
+        'editor_atividades_previas_clase_pl',
+        'editor_objetivo_pl'
+    ];
+    
+    editoresEsperados.forEach(id => {
+        const el = document.getElementById(id);
+        console.log(`${el ? '✓' : '✗'} Editor ${id}:`, el ? 'EXISTE' : 'NO ENCONTRADO');
+    });
+    
+    // Verificar que existen los inputs hidden
+    const inputsEsperados = [
+        'tema_clase_SAnterior',
+        'Atividades_previas_clase',
+        'tiempo_actividades_previas_clase',
+        'objetivo'
+    ];
+    
+    inputsEsperados.forEach(name => {
+        const input = form.querySelector(`input[name="${name}"]`);
+        console.log(`${input ? '✓' : '✗'} Input[name="${name}"]:`, input ? 'EXISTE' : 'NO ENCONTRADO');
+    });
+    console.log('=====================================');
+
     // --- Inicialización de Quill.js ---
     const quillToolbar = [
         ['bold', 'italic', 'underline'],
@@ -12,6 +41,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define los campos y su relación con los IDs de los editores
     const quillFields = [
+        { name: 'tema_clase_SAnterior', id: 'editor_tema_clase_SAnterior_pl' },
+        { name: 'Atividades_previas_clase', id: 'editor_atividades_previas_clase_pl' },
         { name: 'objetivo', id: 'editor_objetivo_pl' },
         { name: 'innovacion', id: 'editor_innovacion_pl' },
         { name: 'apertura', id: 'editor_apertura_pl' },
@@ -28,17 +59,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 theme: 'snow',
                 modules: { toolbar: quillToolbar }
             });
-            console.log(`Editor Quill inicializado: ${field.name}`);
+            console.log(`✓ Editor Quill inicializado: ${field.name} -> ID: ${field.id}`);
+            
             // Sincroniza el contenido con el input hidden en cada cambio
             window.quill_editors_pl[field.name].on('text-change', function () {
                 const input = form.querySelector(`input[name="${field.name}"]`);
                 if (input) {
-                    input.value = window.quill_editors_pl[field.name].root.innerHTML;
-                    console.log(`Contenido sincronizado en ${field.name}`);
+                    const contenido = window.quill_editors_pl[field.name].root.innerHTML;
+                    input.value = contenido;
+                    console.log(`✓ Sincronizado ${field.name}: "${contenido.substring(0, 80)}..."`);
+                } else {
+                    console.error(`✗ NO SE ENCONTRÓ input[name="${field.name}"]`);
                 }
             });
         } else {
-            console.warn(`No se encontró el elemento para: ${field.id}`);
+            console.error(`✗ NO SE ENCONTRÓ el elemento con ID: ${field.id}`);
         }
     });
 
@@ -130,7 +165,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
                     if (!idSemanaLineaInput || !idSemanaLineaInput.value) {
-                        console.log('No hay id_semana_linea, no se puede auto-guardar Quill');
+                        console.log('No hay id_semana_linea, esperando que se llene la fecha primero');
+                        
+                        // Mostrar mensaje temporal indicando que se debe llenar la fecha primero
+                        const msgDiv = document.getElementById('msgSemana');
+                        msgDiv.innerHTML = '<div class="alert alert-info py-2 mb-2" style="font-size:14px;">Por favor, selecciona primero la fecha (sábado) para poder guardar los cambios.</div>';
+                        setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
                         return;
                     }
                     
@@ -180,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let fechaEntregaAnterior = '';
 
     // Campos que necesitan auto-guardado
-    const camposAutoguardado = ['tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_sabado', 'fecha_entrega'];
+    const camposAutoguardado = ['tiempo_actividades_previas_clase', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_sabado', 'fecha_entrega'];
     
     camposAutoguardado.forEach(name => {
         const input = form.querySelector(`input[name="${name}"]`);
@@ -228,6 +268,108 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(`Blur en campo: ${name}, valor: ${input.value}`);
             
             const idSemanaLineaInput = form.querySelector('input[name="id_semana_linea"]');
+            
+            // Si no existe id_semana_linea y es fecha_sabado, crear el registro primero
+            if ((!idSemanaLineaInput || !idSemanaLineaInput.value) && name === 'fecha_sabado' && input.value) {
+                console.log('Creando nuevo registro de semana_linea con fecha_sabado');
+                
+                // Validar que sea sábado primero
+                const fechaSeleccionada = new Date(input.value);
+                if (fechaSeleccionada.getDay() !== 6) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'Solo puede seleccionar días sábado.',
+                        confirmButtonText: 'OK'
+                    });
+                    input.value = fechaSabadoAnterior;
+                    input.focus();
+                    return;
+                }
+                
+                // Sincronizar todos los editores Quill antes de crear
+                quillFields.forEach(field => {
+                    const inputHidden = form.querySelector(`input[name="${field.name}"]`);
+                    if (inputHidden && window.quill_editors_pl[field.name]) {
+                        const contenidoQuill = window.quill_editors_pl[field.name].root.innerHTML;
+                        inputHidden.value = contenidoQuill;
+                        console.log(`✓ Sincronizando ${field.name}:`);
+                        console.log(`  - Contenido Quill: "${contenidoQuill.substring(0, 100)}..."`);
+                        console.log(`  - Input hidden value: "${inputHidden.value.substring(0, 100)}..."`);
+                    }
+                });
+                
+                // Crear el registro con TODOS los datos del formulario
+                const formData = new FormData(form);
+                
+                console.log('=== FormData que se enviará al servidor ===');
+                for (let pair of formData.entries()) {
+                    const valor = typeof pair[1] === 'string' ? pair[1].substring(0, 100) : pair[1];
+                    console.log(`  ${pair[0]}: "${valor}"`);
+                }
+                console.log('===========================================');
+                try {
+                    const resp = await fetch('/SysPlanificacion/app/SemanaLinea/createSemanaLinea.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    
+                    if (data.success && data.id_semana_linea) {
+                        console.log(`Registro creado con id_semana_linea: ${data.id_semana_linea}`);
+                        idSemanaLineaInput.value = data.id_semana_linea;
+                        
+                        // Mostrar mensaje de éxito
+                        const msgDiv = document.getElementById('msgSemana');
+                        msgDiv.innerHTML = '<div class="alert alert-success py-2 mb-2" style="font-size:15px;">¡Semana creada! Todos los cambios se guardarán automáticamente.</div>';
+                        setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
+                        
+                        // Pintar campo de verde
+                        pintarVerde(input);
+                        
+                        // Pintar de verde todos los editores Quill que tienen contenido
+                        quillFields.forEach(field => {
+                            if (window.quill_editors_pl[field.name]) {
+                                const contenido = window.quill_editors_pl[field.name].root.innerHTML;
+                                if (contenido && contenido.trim() !== '' && contenido.trim() !== '<p><br></p>') {
+                                    console.log(`Editor ${field.name} tiene contenido, pintando verde`);
+                                    pintarVerde(window.quill_editors_pl[field.name].root);
+                                }
+                            }
+                        });
+                        
+                        // Pintar de verde todos los campos normales que tienen contenido
+                        camposAutoguardado.forEach(campoName => {
+                            if (campoName !== 'fecha_sabado') {
+                                const campoInput = form.querySelector(`input[name="${campoName}"]`);
+                                if (campoInput && campoInput.value && campoInput.value.trim() !== '') {
+                                    console.log(`Campo ${campoName} tiene contenido, pintando verde`);
+                                    pintarVerde(campoInput);
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Error al crear registro:', data.message);
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'No se pudo crear el registro',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error al crear registro:', e);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor',
+                        confirmButtonText: 'OK'
+                    });
+                }
+                return;
+            }
+            
+            // Si no hay id_semana_linea después de intentar crear, no continuar
             if (!idSemanaLineaInput || !idSemanaLineaInput.value) {
                 console.log('No hay id_semana_linea, no se puede auto-guardar');
                 return;
@@ -346,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Datos recibidos:', data);
                 if (data.success && data.semana) {
                     // Llena los campos normales (incluso si están vacíos)
-                    ['fecha_sabado', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
+                    ['fecha_sabado', 'tiempo_actividades_previas_clase', 'tiempo_apertura', 'tiempo_desarrollo', 'tiempo_cierre', 'fecha_entrega'].forEach(name => {
                         const input = form.querySelector(`input[name="${name}"]`);
                         if (input) {
                             input.value = data.semana[name] || '';
