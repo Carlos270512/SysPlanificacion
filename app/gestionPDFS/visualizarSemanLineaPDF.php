@@ -113,57 +113,71 @@ if ($unidad && isset($unidad['id_unidad'])) {
         <div style='font-size:13px; font-weight:bold; margin-bottom:4px;'>
             <span style='color:#222'>Sábado: " . fecha_es($semana_linea_item['fecha_sabado']) . "</span>
         </div>
+        
+        <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:11px; margin-bottom:8px;'>
+            <tr>
+                <td><strong>Tema de la clase síncrona de la semana anterior:</strong></td>
+            </tr>
+            <tr>
+                <td>" . ($semana_linea_item['tema_clase_SAnterior'] ?? '') . "</td>
+            </tr>
+        </table>
+        
+        <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:11px; margin-bottom:8px;'>
+            <tr>
+                <td>
+                    <strong>Actividades previas a la clase:</strong>
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_actividades_previas_clase'] ?? '') . "</span>
+                </td>
+            </tr>
+            <tr>
+                <td>" . ($semana_linea_item['Atividades_previas_clase'] ?? '') . "</td>
+            </tr>
+        </table>
+        
         <table border='1' cellpadding='6' cellspacing='0' width='100%' style='font-size:11px;'>
             <tr style='background:#E0E0E0; text-align:center; font-weight:bold;'>
                 <td width='18%'>Contenido</td>
                 <td width='82%'>
-                    <span style='font-weight:bold;'>Objetivo (s):</span><br>
-                    <span style='font-weight:normal;'>" . $semana_linea_item['objetivo'] . "</span>
-                    <br><br>
-                    <span style='font-weight:bold;'>Innovación / Tendencia tecnológica aplicada:</span><br>
-                    <span style='font-weight:normal;'>" . ($semana_linea_item['innovacion'] ?? '') . "</span>
-                    <br><br>
-                    <span style='font-weight:bold;'>Actividades:</span>
+                    <span style='font-weight:bold;'>Actividades de la clase Sábado</span><br>
+                    
                 </td>
             </tr>
             <tr>
-                <td valign='top' rowspan='5'>" . $semana_linea_item['contenido'] . "</td>
+                <td valign='top' rowspan='5'>" . ($semana_linea_item['contenido'] ?? '') . "</td>
+                <td>
+                    <span style='font-weight:bold;'>Objetivo:</span><br>
+                    " . ($semana_linea_item['objetivo'] ?? '') . "
+                </td>
+            </tr>
+            <tr>
                 <td>
                     <span style='font-weight:bold;'>Apertura:</span>
-                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_actividades']) . "</span>
-                    <br>" . $semana_linea_item['actividades'] . "
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_apertura'] ?? '') . "</span>
+                    <br>" . ($semana_linea_item['apertura'] ?? '') . "
                 </td>
             </tr>
             <tr>
                 <td>
                     <span style='font-weight:bold;'>Desarrollo:</span>
-                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_desarrollo']) . "</span>
-                    <br>" . $semana_linea_item['desarrollo'] . "
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_desarrollo'] ?? '') . "</span>
+                    <br>" . ($semana_linea_item['desarrollo'] ?? '') . "
                 </td>
             </tr>
             <tr>
                 <td>
                     <span style='font-weight:bold;'>Cierre:</span>
-                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_cierre']) . "</span>
-                    <br>" . $semana_linea_item['cierre'] . "
+                    <span style='font-weight:normal;'>Tiempo: " . htmlspecialchars($semana_linea_item['tiempo_cierre'] ?? '') . "</span>
+                    <br>" . ($semana_linea_item['cierre'] ?? '') . "
                 </td>
             </tr>
             <tr>
                 <td>
-                    <span style='font-weight:bold;'>Evaluación durante la clase:</span>
-                    <br>" . $semana_linea_item['evaluacion_clase'] . "
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span style='font-weight:bold;'>Equipo/Herramienta/ Recursos didácticos / Recursos interactivos/ empleados en la clase:</span>
-                    <br>" . $semana_linea_item['equipo_herramientas_recursos'] . "
-                </td>
-            </tr>
-            <tr>
-                <td colspan='2'>
-                    <span style='font-weight:bold;'>Actividades de refuerzo (trabajo autónomo):</span>
-                    <br>" . $semana_linea_item['actividades_refuerzo'] . "
+                    <span style='font-weight:bold;'>Trabajo autónomo:</span>
+                    <br>" . ($semana_linea_item['trabajo_autonomo'] ?? '') . "
+                    <br><br>
+                    <span style='font-weight:bold;'>Fecha de entrega:</span>
+                    <span style='font-weight:normal;'>" . fecha_es($semana_linea_item['fecha_entrega'] ?? null) . "</span>
                 </td>
             </tr>
         </table>
