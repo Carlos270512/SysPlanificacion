@@ -71,6 +71,12 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                     </div>
 
                                     <div class="mb-3">
+                                        <label class="fw-bold">Contenido:</label>
+                                        <div id="editor_contenido_pl" class="quill-editor border rounded bg-white"></div>
+                                        <input type="hidden" name="contenido">
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label class="fw-bold">Tema de la clase síncrona de la semana anterior:</label>
                                         <div id="editor_tema_clase_SAnterior_pl" class="quill-editor border rounded bg-white"></div>
                                         <input type="hidden" name="tema_clase_SAnterior">

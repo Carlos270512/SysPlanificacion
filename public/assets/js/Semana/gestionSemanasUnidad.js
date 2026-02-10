@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Llena los editores Quill con los nombres CORRECTOS
                         console.log('window.quill_editors_pl:', window.quill_editors_pl);
                         if (window.quill_editors_pl) {
-                            ['tema_clase_SAnterior', 'Atividades_previas_clase', 'objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(name => {
+                            ['contenido', 'tema_clase_SAnterior', 'Atividades_previas_clase', 'objetivo', 'innovacion', 'apertura', 'desarrollo', 'cierre', 'trabajo_autonomo'].forEach(name => {
                                 console.log(`Verificando editor: ${name}, existe:`, !!window.quill_editors_pl[name]);
                                 if (window.quill_editors_pl[name]) {
                                     const contenido = semana[name] || '';

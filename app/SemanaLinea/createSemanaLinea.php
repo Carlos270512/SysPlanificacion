@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 
 $id_unidad = intval($_POST['unidad_id'] ?? 0);
 $fecha_sabado = $_POST['fecha_sabado'] ?? null;
+$contenido = $_POST['contenido'] ?? '';
 $tema_clase_SAnterior = $_POST['tema_clase_SAnterior'] ?? '';
 $Atividades_previas_clase = $_POST['Atividades_previas_clase'] ?? '';
 $tiempo_actividades_previas_clase = $_POST['tiempo_actividades_previas_clase'] ?? '';
@@ -41,6 +42,7 @@ error_log("=== CREANDO SEMANA_LINEA ===");
 error_log("POST completo: " . print_r($_POST, true));
 error_log("---");
 error_log("fecha_sabado: " . ($fecha_sabado ?? 'NULL'));
+error_log("contenido (len=" . strlen($contenido) . "): " . substr($contenido, 0, 150));
 error_log("tema_clase_SAnterior (len=" . strlen($tema_clase_SAnterior) . "): " . substr($tema_clase_SAnterior, 0, 150));
 error_log("Atividades_previas_clase (len=" . strlen($Atividades_previas_clase) . "): " . substr($Atividades_previas_clase, 0, 150));
 error_log("tiempo_actividades_previas_clase: " . ($tiempo_actividades_previas_clase ?? 'EMPTY'));
@@ -49,11 +51,12 @@ error_log("===========================");
 
 try {
     $stmt = $pdo->prepare("INSERT INTO semana_linea 
-        (id_unidad, fecha_sabado, tema_clase_SAnterior, Atividades_previas_clase, tiempo_actividades_previas_clase, objetivo, innovacion, apertura, tiempo_apertura, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, trabajo_autonomo, fecha_entrega)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (id_unidad, fecha_sabado, contenido, tema_clase_SAnterior, Atividades_previas_clase, tiempo_actividades_previas_clase, objetivo, innovacion, apertura, tiempo_apertura, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, trabajo_autonomo, fecha_entrega)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $id_unidad,
         $fecha_sabado,
+        $contenido,
         $tema_clase_SAnterior,
         $Atividades_previas_clase,
         $tiempo_actividades_previas_clase,

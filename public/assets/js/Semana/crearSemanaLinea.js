@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Verificar que existen los editores en el DOM
     const editoresEsperados = [
+        'editor_contenido_pl',
         'editor_tema_clase_SAnterior_pl',
         'editor_atividades_previas_clase_pl',
         'editor_objetivo_pl'
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Verificar que existen los inputs hidden
     const inputsEsperados = [
+        'contenido',
         'tema_clase_SAnterior',
         'Atividades_previas_clase',
         'tiempo_actividades_previas_clase',
@@ -41,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define los campos y su relación con los IDs de los editores
     const quillFields = [
+        { name: 'contenido', id: 'editor_contenido_pl' },
         { name: 'tema_clase_SAnterior', id: 'editor_tema_clase_SAnterior_pl' },
         { name: 'Atividades_previas_clase', id: 'editor_atividades_previas_clase_pl' },
         { name: 'objetivo', id: 'editor_objetivo_pl' },

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 
 $id_semana_linea = intval($_POST['id_semana_linea'] ?? 0);
 $campos = [
-    'fecha_sabado', 'tema_clase_SAnterior', 'Atividades_previas_clase', 'tiempo_actividades_previas_clase',
+    'fecha_sabado', 'contenido', 'tema_clase_SAnterior', 'Atividades_previas_clase', 'tiempo_actividades_previas_clase',
     'objetivo', 'innovacion', 'apertura', 'tiempo_apertura',
     'desarrollo', 'tiempo_desarrollo', 'cierre', 'tiempo_cierre',
     'trabajo_autonomo', 'fecha_entrega'
