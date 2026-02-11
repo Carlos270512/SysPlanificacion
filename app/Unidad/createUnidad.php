@@ -22,10 +22,13 @@ if (!$asignatura_codigo || !$nombre || !$numero_unidad) {
     exit;
 }
 
+// Determinar si es unidad base (automático si numero_unidad = 1)
+$unidad_base = ($numero_unidad == 1) ? 1 : 0;
+
 try {
     $stmt = $pdo->prepare("INSERT INTO unidad 
-        (asignatura_codigo, numero_unidad, nombre, objetivo_unidad, bibliografia, metodologia, actividades_recuperacion, recursos_didacticos, estrategia_ensenanza_aprendizaje, semana_inicio, semana_fin) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (asignatura_codigo, numero_unidad, nombre, objetivo_unidad, bibliografia, metodologia, actividades_recuperacion, recursos_didacticos, estrategia_ensenanza_aprendizaje, semana_inicio, semana_fin, unidad_base) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $asignatura_codigo,
         $numero_unidad,
@@ -37,7 +40,8 @@ try {
         $recursos_didacticos,
         $estrategia, // <--- Aquí se guarda en la columna correcta
         $semana_inicio,
-        $semana_fin
+        $semana_fin,
+        $unidad_base
     ]);
     $unidad_id = $pdo->lastInsertId();
     echo json_encode(['success' => true, 'unidad_id' => $unidad_id]);
