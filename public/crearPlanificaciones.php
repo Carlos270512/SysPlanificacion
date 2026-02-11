@@ -113,7 +113,7 @@ if ($id_unidad) {
                 <tr>
                     <td colspan="6" style="text-align:left;">
                         <span class="resaltado">Unidad N°</span>
-                        <input type="number" name="numero_unidad" min="1" required style="width:60px; text-align:center;" class="subrayado ms-2 me-4"
+                        <input type="number" name="numero_unidad" min="1" required readonly style="width:60px; text-align:center;" class="subrayado ms-2 me-4"
                             value="<?php echo $unidad ? htmlspecialchars($unidad['numero_unidad']) : $siguiente_numero_unidad; ?>">
                     </td>
                 </tr>
