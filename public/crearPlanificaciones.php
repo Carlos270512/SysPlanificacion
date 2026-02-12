@@ -66,6 +66,28 @@ if ($id_unidad) {
     $stmtUnidadData = $pdo->prepare("SELECT * FROM unidad WHERE id_unidad = ?");
     $stmtUnidadData->execute([$id_unidad]);
     $unidad = $stmtUnidadData->fetch(PDO::FETCH_ASSOC);
+} else {
+    // Si NO es edición y la siguiente unidad NO es la #1, cargar datos de la unidad base
+    if ($siguiente_numero_unidad > 1) {
+        $stmtUnidadBase = $pdo->prepare("SELECT * FROM unidad 
+                                          WHERE asignatura_codigo = ? 
+                                          AND numero_unidad = 1 
+                                          AND unidad_base = 1 
+                                          LIMIT 1");
+        $stmtUnidadBase->execute([$codigo]);
+        $unidadBase = $stmtUnidadBase->fetch(PDO::FETCH_ASSOC);
+        
+        // Si existe unidad base, usar sus datos como plantilla
+        if ($unidadBase) {
+            $unidad = $unidadBase;
+            // Limpiar campos que NO deben copiarse
+            $unidad['id_unidad'] = null;
+            $unidad['numero_unidad'] = $siguiente_numero_unidad;
+            $unidad['nombre'] = '';
+            $unidad['semana_inicio'] = null;
+            $unidad['semana_fin'] = null;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>

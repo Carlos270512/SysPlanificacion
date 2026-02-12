@@ -25,6 +25,46 @@ if (!$asignatura_codigo || !$nombre || !$numero_unidad) {
 // Determinar si es unidad base (automático si numero_unidad = 1)
 $unidad_base = ($numero_unidad == 1) ? 1 : 0;
 
+// Si NO es la unidad base, buscar la unidad base de esta asignatura y copiar sus campos
+if ($numero_unidad != 1) {
+    try {
+        $stmtBase = $pdo->prepare("SELECT objetivo_unidad, metodologia, actividades_recuperacion, 
+                                    recursos_didacticos, bibliografia, estrategia_ensenanza_aprendizaje 
+                                    FROM unidad 
+                                    WHERE asignatura_codigo = ? 
+                                    AND numero_unidad = 1 
+                                    AND unidad_base = 1 
+                                    LIMIT 1");
+        $stmtBase->execute([$asignatura_codigo]);
+        $unidadBase = $stmtBase->fetch(PDO::FETCH_ASSOC);
+        
+        // Si existe unidad base, copiar sus campos solo si no vienen del formulario
+        if ($unidadBase) {
+            if (empty($objetivo_unidad)) {
+                $objetivo_unidad = $unidadBase['objetivo_unidad'];
+            }
+            if (empty($metodologia)) {
+                $metodologia = $unidadBase['metodologia'];
+            }
+            if (empty($actividades_recuperacion)) {
+                $actividades_recuperacion = $unidadBase['actividades_recuperacion'];
+            }
+            if (empty($recursos_didacticos)) {
+                $recursos_didacticos = $unidadBase['recursos_didacticos'];
+            }
+            if (empty($bibliografia)) {
+                $bibliografia = $unidadBase['bibliografia'];
+            }
+            if (empty($estrategia)) {
+                $estrategia = $unidadBase['estrategia_ensenanza_aprendizaje'];
+            }
+        }
+    } catch (Exception $e) {
+        // Si hay error al buscar la unidad base, continuar sin copiar
+        error_log("Error al buscar unidad base: " . $e->getMessage());
+    }
+}
+
 try {
     $stmt = $pdo->prepare("INSERT INTO unidad 
         (asignatura_codigo, numero_unidad, nombre, objetivo_unidad, bibliografia, metodologia, actividades_recuperacion, recursos_didacticos, estrategia_ensenanza_aprendizaje, semana_inicio, semana_fin, unidad_base) 
