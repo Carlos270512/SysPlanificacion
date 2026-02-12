@@ -18,7 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const resp = await fetch(`/SysPlanificacion/app/Unidad/get_unidades.php?asignatura_codigo=${encodeURIComponent(codigoAsignatura)}`);
         if (!resp.ok) return;
-        const unidades = await resp.json();
+        let unidades = await resp.json();
+        
+        // Filtrar Unidad 1 si el usuario es DOCENTE
+        if (typeof userRole !== 'undefined' && userRole === 'DOCENTE') {
+            unidades = unidades.filter(u => u.numero_unidad != 1);
+        }
+        
         unidadesOriginales = unidades;
 
         mostrarUnidades(unidadesOriginales);
@@ -64,7 +70,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (buscador) {
         buscador.addEventListener('input', function () {
             const texto = this.value.trim().toLowerCase();
-            const filtradas = unidadesOriginales.filter(u => u.nombre.toLowerCase().includes(texto));
+            let filtradas = unidadesOriginales.filter(u => u.nombre.toLowerCase().includes(texto));
+            
+            // Filtrar Unidad 1 si el usuario es DOCENTE
+            if (typeof userRole !== 'undefined' && userRole === 'DOCENTE') {
+                filtradas = filtradas.filter(u => u.numero_unidad != 1);
+            }
+            
             mostrarUnidades(filtradas);
         });
     }

@@ -79,6 +79,10 @@ if ($docente) {
     <?php endif; ?>
 </div>
 <script>
+    // Variable global con el rol del usuario
+    const userRole = <?php echo json_encode($_SESSION['usuario']['rol']); ?>;
+</script>
+<script>
     // Variables y lógica de asignatura (igual que antes)
     document.addEventListener('DOMContentLoaded', function() {
         const asignaturas = <?php echo json_encode($asignaturas); ?>;
