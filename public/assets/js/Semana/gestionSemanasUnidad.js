@@ -36,6 +36,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += '</tbody></table>';
                 tablaSemanas.innerHTML = html;
             } else {
+                // No hay semanas: colapsar y ocultar el acordeón
+                const acordeon = document.getElementById('acordeonPlanificacion');
+                const collapseEl = document.getElementById('collapsePlanificacion');
+                
+                if (collapseEl) {
+                    // Remover la clase 'show' para colapsar el acordeón
+                    collapseEl.classList.remove('show');
+                    // Agregar clase 'collapsed' al botón del acordeón
+                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                    if (accordionButton) {
+                        accordionButton.classList.add('collapsed');
+                        accordionButton.setAttribute('aria-expanded', 'false');
+                    }
+                }
+                
+                // Ocultar el acordeón completamente
+                if (acordeon) {
+                    acordeon.style.display = 'none';
+                }
+                
+                // Limpiar formulario y resetear variables
+                if (formSemana) formSemana.reset();
+                if (window.quill_editors) {
+                    Object.values(window.quill_editors).forEach(editor => editor.setContents([]));
+                }
+                window.idSemanaGuardada = null;
+                const idSemanaInput = document.getElementById('id_semana');
+                if (idSemanaInput) idSemanaInput.value = '';
+                const btnPDF = document.getElementById('btnVisualizarPDF');
+                if (btnPDF) btnPDF.disabled = true;
+                
                 tablaSemanas.innerHTML = '<div class="alert alert-warning mb-0">No hay semanas registradas para esta unidad.</div>';
             }
         } catch (e) {
@@ -80,6 +111,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += '</tbody></table>';
                 tablaSemanas.innerHTML = html;
             } else {
+                // No hay semanas: colapsar y ocultar el acordeón
+                const acordeon = document.getElementById('acordeonPlanificacion');
+                const collapseEl = document.getElementById('collapsePlanificacion');
+                
+                if (collapseEl) {
+                    // Remover la clase 'show' para colapsar el acordeón
+                    collapseEl.classList.remove('show');
+                    // Agregar clase 'collapsed' al botón del acordeón
+                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                    if (accordionButton) {
+                        accordionButton.classList.add('collapsed');
+                        accordionButton.setAttribute('aria-expanded', 'false');
+                    }
+                }
+                
+                // Ocultar el acordeón completamente
+                if (acordeon) {
+                    acordeon.style.display = 'none';
+                }
+                
+                // Limpiar formulario y resetear variables
+                const formPL = document.getElementById('formSemanaPL');
+                if (formPL) formPL.reset();
+                if (window.quill_editors_pl) {
+                    Object.values(window.quill_editors_pl).forEach(editor => editor.setContents([]));
+                }
+                const inputId = document.querySelector('input[name="id_semana_linea"]');
+                if (inputId) inputId.value = '';
+                const btnPDF = document.getElementById('btnVisualizarPDFLinea');
+                if (btnPDF) btnPDF.disabled = true;
+                
                 tablaSemanas.innerHTML = '<div class="alert alert-warning mb-0">No hay semanas registradas para esta unidad.</div>';
             }
         } catch (e) {
@@ -164,7 +226,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         const data = await resp.json();
                         if (data.success && data.id_semana_linea) {
                             // Muestra el acordeón y coloca la fecha en el campo
-                            if (acordeon) acordeon.style.display = 'block';
+                            if (acordeon) {
+                                acordeon.style.display = 'block';
+                                
+                                // Expandir el acordeón automáticamente
+                                const collapseEl = document.getElementById('collapsePlanificacion');
+                                if (collapseEl) {
+                                    collapseEl.classList.add('show');
+                                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                                    if (accordionButton) {
+                                        accordionButton.classList.remove('collapsed');
+                                        accordionButton.setAttribute('aria-expanded', 'true');
+                                    }
+                                }
+                            }
+                            
                             const inputFecha = document.querySelector('input[name="fecha_sabado"]');
                             if (inputFecha) {
                                 inputFecha.value = result.value.fechaSabado;
@@ -282,7 +358,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             // Mostrar el acordeón SOLO después de crear la semana
                             const acordeon = document.getElementById('acordeonPlanificacion');
-                            if (acordeon) acordeon.style.display = 'block';
+                            if (acordeon) {
+                                acordeon.style.display = 'block';
+                                
+                                // Expandir el acordeón automáticamente
+                                const collapseEl = document.getElementById('collapsePlanificacion');
+                                if (collapseEl) {
+                                    collapseEl.classList.add('show');
+                                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                                    if (accordionButton) {
+                                        accordionButton.classList.remove('collapsed');
+                                        accordionButton.setAttribute('aria-expanded', 'true');
+                                    }
+                                }
+                            }
 
                             // Habilitar el botón PDF
                             document.getElementById('btnVisualizarPDF').disabled = false;
