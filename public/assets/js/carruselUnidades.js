@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         unidades.forEach((unidad) => {
             const card = document.createElement('div');
-            card.className = 'card unidad-card text-center shadow-sm';
+            // Agregar clase especial si es Unidad 1 (Unidad Base)
+            const esUnidadBase = unidad.numero_unidad == 1;
+            card.className = esUnidadBase ? 'card unidad-card unidad-base text-center shadow-sm' : 'card unidad-card text-center shadow-sm';
             card.innerHTML = `
             <div class="card-body d-flex flex-column justify-content-between">
                 <h6 class="card-title mb-2 nombre-unidad">Unidad ${unidad.numero_unidad}</h6>

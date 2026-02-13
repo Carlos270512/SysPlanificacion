@@ -105,7 +105,6 @@ if ($docente) {
             <td class="px-3"><strong>Código:</strong><br>${asig.codigo}</td>
             <td class="px-3"><strong>Nivel:</strong><br>${asig.nivel ?? ''}</td>
             <td class="px-3"><strong>Jornada:</strong><br>${asig.jornada ?? ''}</td>
-            <td class="px-3"><strong>Modalidad:</strong><br>${asig.modalidad ?? ''}</td>
         </tr>
         <tr>
             <td class="px-3"><strong>Aula:</strong><br>${asig.aula ?? ''}</td>

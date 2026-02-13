@@ -94,6 +94,31 @@
   font-weight: bold;
 }
 
+/* Estilos especiales para la Unidad 1 (Unidad Base) */
+.unidad-card.unidad-base {
+  background: rgb(44, 64, 115) !important;
+  border-color:rgb(44, 64, 115);
+}
+
+.unidad-card.unidad-base .nombre-unidad,
+.unidad-card.unidad-base .card-title,
+.unidad-card.unidad-base .card-body > div {
+  color: #fff !important;
+}
+
+.unidad-card.unidad-base .btn-ver-editar {
+  background: rgb(248, 220, 130);
+  color: #8B5C2A;
+  border-color: #8B5C2A;
+}
+
+.unidad-card.unidad-base .btn-ver-editar:hover,
+.unidad-card.unidad-base .btn-ver-editar:focus {
+  background: #6B3F13;
+  color: #fff;
+  border-color: #6B3F13;
+}
+
 /* Botón Generar Planificación: café, hover café oscuro */
 #btnGenerarPlanificacion {
   background: #8B5C2A;
