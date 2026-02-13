@@ -238,11 +238,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         const data = await resp.json();
                         if (data.success && data.id_semana_linea) {
-                            // Asignar el ID al input hidden (para futuras ediciones)
-                            const inputId = document.querySelector('input[name="id_semana_linea"]');
-                            if (inputId) inputId.value = data.id_semana_linea;
-                            const inputFecha = document.querySelector('input[name="fecha_sabado"]');
-                            if (inputFecha) inputFecha.value = result.value.fechaSabado;
+                            // NO llenar los campos todavía - solo al editar
+                            
+                            // ASEGURAR que el acordeón permanezca oculto
+                            const acordeon = document.getElementById('acordeonPlanificacion');
+                            if (acordeon) {
+                                acordeon.style.display = 'none';
+                                const collapseEl = document.getElementById('collapsePlanificacion');
+                                if (collapseEl) {
+                                    collapseEl.classList.remove('show');
+                                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                                    if (accordionButton) {
+                                        accordionButton.classList.add('collapsed');
+                                        accordionButton.setAttribute('aria-expanded', 'false');
+                                    }
+                                }
+                            }
 
                             // Mostrar mensaje de éxito
                             Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
@@ -364,10 +375,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         const data = await resp.json();
                         if (data.success && data.semana_id) {
-                            window.idSemanaGuardada = data.semana_id;
-                            document.getElementById('id_semana').value = data.semana_id;
-                            document.getElementById('semana_inicio').value = result.value.fechaInicio;
-                            document.getElementById('semana_fin').value = result.value.fechaFin;
+                            // NO llenar los campos todavía - solo al editar
+                            
+                            // ASEGURAR que el acordeón permanezca oculto
+                            const acordeon = document.getElementById('acordeonPlanificacion');
+                            if (acordeon) {
+                                acordeon.style.display = 'none';
+                                const collapseEl = document.getElementById('collapsePlanificacion');
+                                if (collapseEl) {
+                                    collapseEl.classList.remove('show');
+                                    const accordionButton = document.querySelector('#headingPlanificacion button');
+                                    if (accordionButton) {
+                                        accordionButton.classList.add('collapsed');
+                                        accordionButton.setAttribute('aria-expanded', 'false');
+                                    }
+                                }
+                            }
 
                             // Mostrar mensaje de éxito
                             Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');

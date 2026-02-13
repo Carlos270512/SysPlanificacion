@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const resp = await fetch(`/SysPlanificacion/app/Semana/getSemana.php?id_unidad=${idUnidad}`);
     const data = await resp.json();
     if (data.success && data.semana) {
-        // Muestra el acordeón si ya existe una semana
-        const acordeon = document.getElementById('acordeonPlanificacion');
-        if (acordeon) acordeon.style.display = 'block';
+        // NO mostramos el acordeón automáticamente, solo al hacer clic en "Editar"
+        // const acordeon = document.getElementById('acordeonPlanificacion');
+        // if (acordeon) acordeon.style.display = 'block';
         const semana = data.semana;
         if (semana.fecha_semana) document.getElementById('semana_inicio').value = semana.fecha_semana;
         if (semana.semana_fin) {
