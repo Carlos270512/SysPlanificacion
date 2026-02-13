@@ -99,10 +99,13 @@ if ($id_unidad) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/crearPlanificacionestyle.css">
+    <?php if ($_SESSION['usuario']['rol'] === 'DOCENTE'): ?>
+    <link rel="stylesheet" href="assets/css/docenteStyles.css">
+    <?php endif; ?>
 </head>
 
-<body>
-    <div class="container mt-4">
+<body<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
+    <div class="container mt-4"<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
         <!-- Cabecera de la planificación -->
         <table class="tabla-planificacion">
             <tr>

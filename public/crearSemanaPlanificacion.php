@@ -1,5 +1,11 @@
 <?php
-require_once __DIR__ . '/../config/conexion.php'; // <-- Agrega esta línea al principio
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header("Location: index.php");
+    exit();
+}
+
+require_once __DIR__ . '/../config/conexion.php';
 
 $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : null;
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
@@ -24,11 +30,14 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css">
+    <?php if ($_SESSION['usuario']['rol'] === 'DOCENTE'): ?>
+    <link rel="stylesheet" href="assets/css/docenteStyles.css">
+    <?php endif; ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </head>
 
-<body>
-    <div class="container mt-4">
+<body<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
+    <div class="container mt-4"<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
         <h2>Planificación semanal</h2>
         <?php if ($nombre_unidad): ?>
             <div class="alert alert-info mb-3">

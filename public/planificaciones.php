@@ -26,10 +26,13 @@ if ($docente) {
     <title>Planificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="assets/css/planificaciontyle.css">
+    <link rel="stylesheet" href="assets/css/planificaciontyle.css">
+    <?php if ($_SESSION['usuario']['rol'] === 'DOCENTE'): ?>
+    <link rel="stylesheet" href="assets/css/docenteStyles.css">
+    <?php endif; ?>
 </head>
-<body>
-<div class="container mt-4">
+<body<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
+<div class="container mt-4"<?php if ($_SESSION['usuario']['rol'] === 'DOCENTE') echo ' style="background-color: #F7F8BA;"'; ?>>
     <h2>Bienvenido, <?php echo htmlspecialchars($_SESSION['usuario']['nombre']); ?></h2>
     <p><strong>Correo:</strong> <?php echo htmlspecialchars($_SESSION['usuario']['correo']); ?></p>
     <p><strong>Rol:</strong> <?php echo htmlspecialchars($_SESSION['usuario']['rol']); ?></p>

@@ -1,6 +1,11 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F7F8BA;
+}
+
+html {
+    background-color: #F7F8BA;
 }
 
 #mainFrame {
@@ -13,9 +18,150 @@ body {
 #content {
     flex-grow: 1;
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #F7F8BA;
     transition: margin-left 0.3s ease, width 0.3s ease;
     min-width: 0;
+}
+
+/* Solo aplicar fondo amarillo en páginas de planificación dentro del iframe */
+body > .container {
+    background-color: #F7F8BA;
+    min-height: 100vh;
+}
+
+/* Fondo para selects y inputs solo dentro del contenido */
+.container select, 
+.container .form-select,
+.container input[type="text"], 
+.container input[type="search"], 
+.container .form-control {
+    border-color: #6a6a6a !important;
+}
+
+#buscadorUnidades {
+    background-color: #F7F8BA !important;
+    border-color: #999 !important;
+}
+
+/* Fondo para cards solo dentro del container */
+.container .card {
+    background-color: #F7F8BA !important;
+    border-color: #d4d6a0;
+}
+
+/* Excepción: Las unidades del carrusel mantienen sus colores originales */
+.container .unidad-card {
+    background-color: #F7F8BA !important;
+    border-color: #999 !important;
+}
+
+/* La Unidad Base (Unidad 1) mantiene su color azul */
+.container .unidad-card.unidad-base {
+    background-color: rgb(44, 64, 115) !important;
+}
+
+.container .card-body {
+    background-color: #F7F8BA !important;
+}
+
+/* Excepción: El card-body de las unidades mantiene transparencia */
+.container .unidad-card .card-body {
+    background-color: transparent !important;
+}
+
+/* Fondo para alertas dentro del container */
+.container .alert {
+    background-color: #F7F8BA !important;
+    border-color: #d4d6a0;
+}
+
+/* Fondo para tablas dentro del container */
+.container .table,
+.container table {
+    background-color: #F7F8BA !important;
+}
+
+.container .table td, 
+.container .table th {
+    background-color: transparent;
+}
+
+/* Fondo para el acordeón */
+.accordion, .accordion-item, .accordion-body {
+    background-color: #F7F8BA !important;
+    border-color: #999 !important;
+
+}
+
+.accordion-collapse {
+    background-color: #F7F8BA !important;
+    border-color: #999 !important;
+
+}
+
+/* Fondo para labels */
+label, .form-label {
+    background-color: #F7F8BA !important;
+}
+/* Fondo para tablas dentro del container */
+.container .table,
+.container table {
+    background-color: #F7F8BA !important;
+    border-color: #999 !important;
+}
+
+.container .table td, 
+.container .table th {
+    background-color: transparent;
+    border-color: #999 !important;
+}
+/* Encabezado de tabla con fondo gris */
+.container table thead,
+.container .table thead {
+    background-color: #e0e0e0 !important;
+}
+
+.container table thead th,
+.container .table thead th {
+    background-color: #e0e0e0 !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+}
+/* Botón Editar de la tabla de semanas */
+.container table .btn-outline-secondary {
+    color: #8B5C2A !important;
+    border: 2px solid #8B5C2A !important;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.container table .btn-outline-secondary:hover,
+.container table .btn-outline-secondary:focus {
+    background-color: #8B5C2A !important;
+    color: #fff !important;
+    border-color: #8B5C2A !important;
+}
+/* Fondo para alertas dentro del container */
+.container .alert {
+    background-color: #F7F8BA !important;
+    border-color: #d4d6a0;
+}
+
+/* Alerta de advertencia con mejor contraste */
+/* Alerta de advertencia con mejor contraste */
+.container .alert-warning {
+    background-color: #e8f4f8 !important;
+    border-color: #005994 !important;
+    color: #000e18 !important;
+    font-weight: 500 !important;
+}
+
+/* Alerta de información con color celeste */
+.container .alert-info {
+    background-color: #d1ecf1 !important;
+    border-color: #17a2b8 !important;
+    color: #0c5460 !important;
+    font-weight: 500 !important;
 }
 
 #content.full-width {
