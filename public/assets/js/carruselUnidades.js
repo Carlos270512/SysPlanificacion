@@ -20,11 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!resp.ok) return;
         let unidades = await resp.json();
         
-        // Filtrar Unidad 1 si el usuario es DOCENTE
-        if (typeof userRole !== 'undefined' && userRole === 'DOCENTE') {
-            unidades = unidades.filter(u => u.numero_unidad != 1);
-        }
-        
         unidadesOriginales = unidades;
 
         mostrarUnidades(unidadesOriginales);
@@ -71,11 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
         buscador.addEventListener('input', function () {
             const texto = this.value.trim().toLowerCase();
             let filtradas = unidadesOriginales.filter(u => u.nombre.toLowerCase().includes(texto));
-            
-            // Filtrar Unidad 1 si el usuario es DOCENTE
-            if (typeof userRole !== 'undefined' && userRole === 'DOCENTE') {
-                filtradas = filtradas.filter(u => u.numero_unidad != 1);
-            }
             
             mostrarUnidades(filtradas);
         });
