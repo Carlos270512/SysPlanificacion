@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- DEBUG: Verificar datos de semana linea base ---
+    console.log('=== INICIANDO crearSemanaLinea.js ===');
+    console.log('window.semanaLineaBase existe:', !!window.semanaLineaBase);
+    if (window.semanaLineaBase) {
+        console.log('Contenido de window.semanaLineaBase:', window.semanaLineaBase);
+    }
+    console.log('====================================');
+    
     const form = document.getElementById('formSemanaPL');
     if (!form) return;
 
@@ -79,6 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(`✗ NO SE ENCONTRÓ el elemento con ID: ${field.id}`);
         }
     });
+
+    console.log('✅ Editores Quill inicializados correctamente');
 
     // Función para pintar verde
     function pintarVerde(element) {

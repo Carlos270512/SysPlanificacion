@@ -211,11 +211,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (window.quill_editors_pl) {
                         Object.values(window.quill_editors_pl).forEach(editor => editor.setContents([]));
                     }
-                    // Oculta el acordeón antes de mostrarlo
+                    
+                    // Ocultar y colapsar el acordeón
                     const acordeon = document.getElementById('acordeonPlanificacion');
-                    if (acordeon) acordeon.style.display = 'none';
+                    if (acordeon) {
+                        acordeon.style.display = 'none';
+                        const collapseEl = document.getElementById('collapsePlanificacion');
+                        if (collapseEl) {
+                            collapseEl.classList.remove('show');
+                            const accordionButton = document.querySelector('#headingPlanificacion button');
+                            if (accordionButton) {
+                                accordionButton.classList.add('collapsed');
+                                accordionButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    }
 
                     // Crear semana S en la base de datos
+                    // Los datos de semana_linea base se copian automáticamente en el backend
                     try {
                         const resp = await fetch('/SysPlanificacion/app/SemanaLinea/createSemanaLinea.php', {
                             method: 'POST',
@@ -225,33 +238,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         const data = await resp.json();
                         if (data.success && data.id_semana_linea) {
-                            // Muestra el acordeón y coloca la fecha en el campo
-                            if (acordeon) {
-                                acordeon.style.display = 'block';
-                                
-                                // Expandir el acordeón automáticamente
-                                const collapseEl = document.getElementById('collapsePlanificacion');
-                                if (collapseEl) {
-                                    collapseEl.classList.add('show');
-                                    const accordionButton = document.querySelector('#headingPlanificacion button');
-                                    if (accordionButton) {
-                                        accordionButton.classList.remove('collapsed');
-                                        accordionButton.setAttribute('aria-expanded', 'true');
-                                    }
-                                }
-                            }
-                            
-                            const inputFecha = document.querySelector('input[name="fecha_sabado"]');
-                            if (inputFecha) {
-                                inputFecha.value = result.value.fechaSabado;
-                            }
-                            // --- ASIGNA EL ID AL INPUT HIDDEN ---
+                            // Asignar el ID al input hidden (para futuras ediciones)
                             const inputId = document.querySelector('input[name="id_semana_linea"]');
                             if (inputId) inputId.value = data.id_semana_linea;
+                            const inputFecha = document.querySelector('input[name="fecha_sabado"]');
+                            if (inputFecha) inputFecha.value = result.value.fechaSabado;
 
-                            Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla.', 'success');
-                            // Recargar la tabla de semanas si tienes una para S
-                            if (typeof cargarSemanasLinea === 'function') cargarSemanasLinea();
+                            // Mostrar mensaje de éxito
+                            Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
+                            
+                            // Recargar la tabla de semanas
+                            cargarSemanasLinea();
                         } else {
                             Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
                         }
@@ -340,7 +337,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     document.getElementById('btnVisualizarPDF').disabled = true;
 
-                    // Crear semana vacía en la base de datos con ambas fechas
+                    // Ocultar y colapsar el acordeón
+                    const acordeon = document.getElementById('acordeonPlanificacion');
+                    if (acordeon) {
+                        acordeon.style.display = 'none';
+                        const collapseEl = document.getElementById('collapsePlanificacion');
+                        if (collapseEl) {
+                            collapseEl.classList.remove('show');
+                            const accordionButton = document.querySelector('#headingPlanificacion button');
+                            if (accordionButton) {
+                                accordionButton.classList.add('collapsed');
+                                accordionButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    }
+
+                    // Crear semana en la base de datos con ambas fechas
+                    // Los datos de semana base se copian automáticamente en el backend
                     try {
                         const resp = await fetch('/SysPlanificacion/app/Semana/createSemana.php', {
                             method: 'POST',
@@ -356,30 +369,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             document.getElementById('semana_inicio').value = result.value.fechaInicio;
                             document.getElementById('semana_fin').value = result.value.fechaFin;
 
-                            // Mostrar el acordeón SOLO después de crear la semana
-                            const acordeon = document.getElementById('acordeonPlanificacion');
-                            if (acordeon) {
-                                acordeon.style.display = 'block';
-                                
-                                // Expandir el acordeón automáticamente
-                                const collapseEl = document.getElementById('collapsePlanificacion');
-                                if (collapseEl) {
-                                    collapseEl.classList.add('show');
-                                    const accordionButton = document.querySelector('#headingPlanificacion button');
-                                    if (accordionButton) {
-                                        accordionButton.classList.remove('collapsed');
-                                        accordionButton.setAttribute('aria-expanded', 'true');
-                                    }
-                                }
-                            }
-
-                            // Habilitar el botón PDF
-                            document.getElementById('btnVisualizarPDF').disabled = false;
+                            // Mostrar mensaje de éxito
+                            Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
 
                             // Recargar la tabla de semanas
                             cargarSemanas();
-
-                            Swal.fire('Nueva semana creada', 'Puedes comenzar a editarla o visualizar el PDF.', 'success');
                         } else {
                             Swal.fire('Error', data.message || 'No se pudo crear la semana.', 'error');
                         }
@@ -397,6 +391,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const idSemana = e.target.getAttribute('data-id');
             const acordeon = document.getElementById('acordeonPlanificacion');
             if (acordeon) acordeon.style.display = 'block';
+            
+            // Expandir el acordeón para mostrar el formulario
+            const collapseEl = document.getElementById('collapsePlanificacion');
+            if (collapseEl) {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+                bsCollapse.show();
+            }
+            
             const btnGuardar = document.getElementById('btnGuardarSemana');
             //if (btnGuardar) {
             //btnGuardar.disabled = false;
@@ -408,15 +410,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await resp.json();
                 if (data.success && data.semana) {
                     const semana = data.semana;
+                    
+                    console.log('📝 Editando semana ID:', idSemana);
+                    
                     // Fechas principales
                     document.getElementById('semana_inicio').value = semana.fecha_semana || '';
                     document.getElementById('semana_fin').value = semana.semana_fin || '';
                     document.querySelector('input[name="tiempo_previas"]').value = semana.tiempo_actividades_previas || '';
+                    
                     // Actividades previas
                     if (window.quill_editors && window.quill_editors['actividades_previas']) {
                         window.quill_editors['actividades_previas'].root.innerHTML = semana.actividades_previas || '';
                     }
                     document.querySelector('input[name="actividades_previas"]').value = semana.actividades_previas || '';
+                    
                     // Contenido
                     if (window.quill_editors && window.quill_editors['contenido']) {
                         window.quill_editors['contenido'].root.innerHTML = semana.contenido || '';
@@ -463,10 +470,17 @@ document.addEventListener('DOMContentLoaded', function () {
         // ...existing code...
         if (e.target.classList.contains('btn-editar-semana-linea')) {
             const idSemanaLinea = e.target.getAttribute('data-id');
-            console.log(`Editando semana linea: ${idSemanaLinea}`);
+            console.log(`📝 Editando semana linea: ${idSemanaLinea}`);
             
             const acordeon = document.getElementById('acordeonPlanificacion');
             if (acordeon) acordeon.style.display = 'block';
+            
+            // Expandir el acordeón para mostrar el formulario
+            const collapseEl = document.getElementById('collapsePlanificacion');
+            if (collapseEl) {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+                bsCollapse.show();
+            }
 
             // Coloca el id en el input hidden
             const inputId = document.querySelector('input[name="id_semana_linea"]');
@@ -487,10 +501,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log('Data completo:', data);
                     if (data.success && data.semana) {
                         console.log('Semana object:', data.semana);
-                        console.log('tema_clase_SAnterior:', data.semana.tema_clase_SAnterior);
-                        console.log('Atividades_previas_clase:', data.semana.Atividades_previas_clase);
-                        console.log('tiempo_actividades_previas_clase:', data.semana.tiempo_actividades_previas_clase);
-                        console.log('====================================');
                         
                         const semana = data.semana;
                         
@@ -501,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 input.value = semana[name] || '';
                                 console.log(`✓ Campo ${name} cargado: "${input.value}"`);
                             } else {
-                                console.error(`✗ NO se encontró input[name="${name}"]`);
+                                console.log(`⚠️ NO se encontró input[name="${name}"]`);
                             }
                         });
                         
@@ -520,25 +530,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                     }
                                     console.log(`✓ Editor ${name} cargado con: "${contenido.substring(0, 50)}..."`);
                                 } else {
-                                    console.error(`✗ NO existe window.quill_editors_pl[${name}]`);
+                                    console.log(`⚠️ NO existe window.quill_editors_pl[${name}]`);
                                 }
                             });
                         } else {
                             console.error('✗ window.quill_editors_pl NO EXISTE');
                         }
                         
-                        // Expandir el acordeón para mostrar el formulario
-                        const collapseEl = document.getElementById('collapsePlanificacion');
-                        if (collapseEl) {
-                            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
-                            bsCollapse.show();
-                        }
-                        
-                        console.log('Datos de edición cargados correctamente');
+                        console.log('✅ Datos de edición cargados correctamente');
                     }
                 })
                 .catch(err => {
-                    console.error('Error al cargar datos de edición:', err);
+                    console.error('❌ Error al cargar datos de edición:', err);
                 });
         }
         // 4. Botón "Eliminar" (opcional)

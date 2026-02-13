@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- DEBUG: Verificar datos de semana base ---
+    console.log('=== INICIANDO crearSemana.js ===');
+    console.log('window.semanaBase existe:', !!window.semanaBase);
+    if (window.semanaBase) {
+        console.log('Contenido de window.semanaBase:', window.semanaBase);
+        console.log('Actividades previas:', window.semanaBase.actividades_previas ? 'SÍ' : 'NO');
+        console.log('Contenido:', window.semanaBase.contenido ? 'SÍ' : 'NO');
+    }
+    console.log('================================');
+    
     // --- Lógica de fechas y encabezados (sin Pikaday) ---
     const semanaInicio = document.querySelector('input[name="semana_inicio"]');
     const semanaFin = document.querySelector('input[name="semana_fin"]');
@@ -73,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-      // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
+    // --- Inicialización de Quill.js para todos los campos de texto enriquecido ---
     const quillToolbar = [
         ['bold', 'italic', 'underline'],
         [{ 'list': 'ordered' }, { 'list': 'bullet' }]
@@ -87,16 +97,17 @@ document.addEventListener('DOMContentLoaded', function () {
         theme: 'snow',
         modules: { toolbar: quillToolbar }
     });
-    window.quill_editors['contenido'] = new Quill('#editor_contenido', {
-        theme: 'snow',
-        modules: { toolbar: quillToolbar }
-    });
-
     // Sincronización automática con input hidden
     window.quill_editors['actividades_previas'].on('text-change', function () {
         const input = document.querySelector('input[name="actividades_previas"]');
         if (input) input.value = window.quill_editors['actividades_previas'].root.innerHTML;
     });
+    
+    window.quill_editors['contenido'] = new Quill('#editor_contenido', {
+        theme: 'snow',
+        modules: { toolbar: quillToolbar }
+    });
+    // Sincronización automática con input hidden
     window.quill_editors['contenido'].on('text-change', function () {
         const input = document.querySelector('input[name="contenido"]');
         if (input) input.value = window.quill_editors['contenido'].root.innerHTML;
@@ -120,14 +131,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 const id = `#editor_${campo}_${dia}`;
                 const el = document.querySelector(id);
                 if (el) {
-                    window.quill_editors[`${campo}_${dia}`] = new Quill(id, {
+                    const key = `${campo}_${dia}`;
+                    window.quill_editors[key] = new Quill(id, {
                         theme: 'snow',
                         modules: { toolbar: quillToolbar }
                     });
                     // Sincroniza con input hidden
-                    window.quill_editors[`${campo}_${dia}`].on('text-change', function () {
-                        const input = document.querySelector(`input[name="${campo}_${dia}"]`);
-                        if (input) input.value = window.quill_editors[`${campo}_${dia}`].root.innerHTML;
+                    window.quill_editors[key].on('text-change', function () {
+                        const input = document.querySelector(`input[name="${key}"]`);
+                        if (input) input.value = window.quill_editors[key].root.innerHTML;
                     });
                 }
             });
@@ -139,7 +151,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 tab.classList.remove('show', 'active');
             }
         });
+        
+        console.log('✅ Editores Quill inicializados correctamente');
     }
+    
     // --- Manejo del formulario por AJAX (original) ---
     const form = document.getElementById('formSemana');
     const msgDiv = document.getElementById('msgSemana');

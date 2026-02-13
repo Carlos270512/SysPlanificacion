@@ -212,12 +212,12 @@ if ($id_unidad) {
                     &larr; Atrás
                 </button>
                 <div>
-                    <?php if (!$unidad): ?>
+                    <?php if (!$unidad || !$unidad['id_unidad']): ?>
                         <button type="submit" id="btnGuardarSemana" class="btn btn-primary">
                             Guardar Unidad
                         </button>
                     <?php endif; ?>
-                    <button type="button" id="btnNuevaSemana" class="btn  ms-2 btn-nueva-semana-custom" <?php echo ($unidad ? '' : 'disabled'); ?>>
+                    <button type="button" id="btnNuevaSemana" class="btn  ms-2 btn-nueva-semana-custom" <?php echo ($unidad && $unidad['id_unidad'] ? '' : 'disabled'); ?>>
                         Nueva semana
                     </button>
                 </div>

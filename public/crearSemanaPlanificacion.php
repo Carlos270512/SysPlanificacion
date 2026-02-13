@@ -323,6 +323,7 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
     <script>
         window.nombreUnidad = "<?php echo addslashes($nombre_unidad); ?>";
         window.tipo_jornada = "<?php echo $tipo_jornada; ?>";
+        // Datos de semana base ahora se copian automáticamente en el backend al crear la semana
     </script>
 
 </body>

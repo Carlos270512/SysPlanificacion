@@ -15,27 +15,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_semana = nullIfEmpty($_POST['semana_inicio'] ?? null);
         $semana_fin = nullIfEmpty($_POST['semana_fin'] ?? null);
 
-        $actividades_previas = $_POST['actividades_previas'] ?? null;
-        $tiempo_previas = $_POST['tiempo_previas'] ?? null;
-        $contenido = $_POST['contenido'] ?? null;
+        // --- NUEVO: Verificar si debe copiar datos de semana base ---
+        $semana_base = null;
+        
+        // Verificar datos de la unidad actual
+        $stmtCheckBase = $pdo->prepare("SELECT unidad_base, asignatura_codigo FROM unidad WHERE id_unidad = ?");
+        $stmtCheckBase->execute([$id_unidad]);
+        $unidadActual = $stmtCheckBase->fetch(PDO::FETCH_ASSOC);
+        
+        if ($unidadActual) {
+            // PASO 1: Intentar buscar la ÚLTIMA semana creada en la MISMA unidad
+            $stmtUltimaSemana = $pdo->prepare("SELECT * FROM semana 
+                                                WHERE id_unidad = ? 
+                                                ORDER BY fecha_semana DESC 
+                                                LIMIT 1");
+            $stmtUltimaSemana->execute([$id_unidad]);
+            $semana_base = $stmtUltimaSemana->fetch(PDO::FETCH_ASSOC);
+            
+            // PASO 2: Si no hay semanas en esta unidad, buscar semana de la Unidad Base
+            if (!$semana_base && $unidadActual['unidad_base'] != 1) {
+                $asignatura_codigo = $unidadActual['asignatura_codigo'];
+                
+                // Buscar la unidad base de esta asignatura
+                $stmtUnidadBase = $pdo->prepare("SELECT id_unidad FROM unidad 
+                                                  WHERE asignatura_codigo = ? 
+                                                  AND numero_unidad = 1 
+                                                  AND unidad_base = 1 
+                                                  LIMIT 1");
+                $stmtUnidadBase->execute([$asignatura_codigo]);
+                $unidadBase = $stmtUnidadBase->fetch(PDO::FETCH_ASSOC);
+                
+                if ($unidadBase) {
+                    $id_unidad_base = $unidadBase['id_unidad'];
+                    
+                    // Buscar la primera semana de la unidad base
+                    $stmtSemanaBase = $pdo->prepare("SELECT * FROM semana 
+                                                     WHERE id_unidad = ? 
+                                                     ORDER BY fecha_semana ASC 
+                                                     LIMIT 1");
+                    $stmtSemanaBase->execute([$id_unidad_base]);
+                    $semana_base = $stmtSemanaBase->fetch(PDO::FETCH_ASSOC);
+                }
+            }
+        }
+        // --- FIN NUEVO ---
+
+        // Si hay semana base, usar sus datos como valores por defecto
+        if ($semana_base) {
+            $actividades_previas = $_POST['actividades_previas'] ?? $semana_base['actividades_previas'];
+            $tiempo_previas = $_POST['tiempo_previas'] ?? $semana_base['tiempo_actividades_previas'];
+            $contenido = $_POST['contenido'] ?? $semana_base['contenido'];
+        } else {
+            $actividades_previas = $_POST['actividades_previas'] ?? null;
+            $tiempo_previas = $_POST['tiempo_previas'] ?? null;
+            $contenido = $_POST['contenido'] ?? null;
+        }
 
         $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
         $campos = [];
         foreach ($dias as $dia) {
-            $campos[$dia] = [
-                'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
-                'objetivo' => $_POST['objetivo_' . $dia] ?? null,
-                'innovacion' => $_POST['innovacion_' . $dia] ?? null,
-                'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? null,
-                'apertura' => $_POST['apertura_' . $dia] ?? null,
-                'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? null,
-                'desarrollo' => $_POST['desarrollo_' . $dia] ?? null,
-                'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? null,
-                'cierre' => $_POST['cierre_' . $dia] ?? null,
-                'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? null,
-                'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? null,
-                'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
-            ];
+            if ($semana_base) {
+                // Usar datos de semana base como valores por defecto
+                $campos[$dia] = [
+                    'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
+                    'objetivo' => $_POST['objetivo_' . $dia] ?? $semana_base['objetivo_' . $dia],
+                    'innovacion' => $_POST['innovacion_' . $dia] ?? $semana_base['innovacion_' . $dia],
+                    'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? $semana_base['tiempo_objetivo_' . $dia],
+                    'apertura' => $_POST['apertura_' . $dia] ?? $semana_base['apertura_' . $dia],
+                    'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? $semana_base['tiempo_apertura_' . $dia],
+                    'desarrollo' => $_POST['desarrollo_' . $dia] ?? $semana_base['desarrollo_' . $dia],
+                    'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? $semana_base['tiempo_desarrollo_' . $dia],
+                    'cierre' => $_POST['cierre_' . $dia] ?? $semana_base['cierre_' . $dia],
+                    'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? $semana_base['tiempo_cierre_' . $dia],
+                    'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? $semana_base['trabajo_autonomo_' . $dia],
+                    'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
+                ];
+            } else {
+                // Sin semana base, usar solo POST
+                $campos[$dia] = [
+                    'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
+                    'objetivo' => $_POST['objetivo_' . $dia] ?? null,
+                    'innovacion' => $_POST['innovacion_' . $dia] ?? null,
+                    'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? null,
+                    'apertura' => $_POST['apertura_' . $dia] ?? null,
+                    'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? null,
+                    'desarrollo' => $_POST['desarrollo_' . $dia] ?? null,
+                    'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? null,
+                    'cierre' => $_POST['cierre_' . $dia] ?? null,
+                    'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? null,
+                    'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? null,
+                    'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
+                ];
+            }
         }
 
         $stmt = $pdo->prepare("
