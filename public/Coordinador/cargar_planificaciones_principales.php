@@ -190,10 +190,9 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 html += `
                     <div class="asignatura-item">
                         <div class="row align-items-center">
-                            <div class="col-md-8">
+                            <div class="col-md-7">
                                 <h6 class="mb-2">
-                                    <i class="fas fa-book-open me-2 text-primary"></i>
-                                    ${asig.nombre_asignatura}"></i>
+                                    <i class="fas fa-book-open me-2"></i>
                                     ${asig.nombre_asignatura}
                                 </h6>
                                 <div class="d-flex gap-3 flex-wrap">
@@ -203,9 +202,15 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <small><strong>Aula:</strong> ${asig.aula}</small>
                                 </div>
                             </div>
-                            <div class="col-md-4 text-end">
+                            <div class="col-md-3 text-end">
                                 <small class="text-muted">${asig.periodo_academico}</small><br>
-                                <small class="text-muted">${asig.horario}</small
+                                <small class="text-muted">${asig.horario}</small>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-primary" onclick="abrirPlanificacionBase('${asig.codigo}')" title="Gestionar Planificación Base">
+                                    <i class="fas fa-edit me-1"></i>Gestionar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -213,6 +218,11 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             $('#listaAsignaturas').html(html);
             $('#asignaturasContainer').show();
+        }
+
+        function abrirPlanificacionBase(codigoAsignatura) {
+            // Redirigir a crearPlanificaciones.php con el código de la asignatura
+            window.parent.location.href = '../crearPlanificaciones.php?codigo=' + codigoAsignatura + '&unidad_base=1';
         }
     </script>
 </body>

@@ -59,13 +59,38 @@ switch ($jornada) {
 // Cambia aquí también:
 $soloCamposPL = ($jornada === 'S' || $jornada === 'EL');
 
-// --- NUEVO: Cargar datos de la unidad si viene id_unidad ---
+// --- NUEVO: Cargar datos de la unidad si viene id_unidad O unidad_base ---
 $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : null;
+$es_unidad_base = isset($_GET['unidad_base']) && $_GET['unidad_base'] == '1';
 $unidad = null;
+
 if ($id_unidad) {
+    // Cargar unidad específica por ID
     $stmtUnidadData = $pdo->prepare("SELECT * FROM unidad WHERE id_unidad = ?");
     $stmtUnidadData->execute([$id_unidad]);
     $unidad = $stmtUnidadData->fetch(PDO::FETCH_ASSOC);
+} elseif ($es_unidad_base) {
+    // Buscar la unidad base de esta asignatura (numero_unidad = 1 AND unidad_base = 1)
+    $stmtUnidadBase = $pdo->prepare("SELECT * FROM unidad 
+                                      WHERE asignatura_codigo = ? 
+                                      AND numero_unidad = 1 
+                                      AND unidad_base = 1 
+                                      LIMIT 1");
+    $stmtUnidadBase->execute([$codigo]);
+    $unidad = $stmtUnidadBase->fetch(PDO::FETCH_ASSOC);
+    
+    // Si no existe la unidad base, preparar para crearla
+    if (!$unidad) {
+        $unidad = [];
+        $unidad['id_unidad'] = null;
+        $unidad['numero_unidad'] = 1;
+        $unidad['nombre'] = '';
+        $unidad['objetivo_unidad'] = '';
+        $unidad['bibliografia'] = '';
+        $unidad['metodologia'] = '';
+        $unidad['actividades_recuperacion'] = '';
+        $unidad['recursos_didacticos'] = '';
+    }
 } else {
     // Si NO es edición y la siguiente unidad NO es la #1, cargar datos de la unidad base
     if ($siguiente_numero_unidad > 1) {
@@ -242,7 +267,7 @@ if ($id_unidad) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="planificaciones.php" class="btn btn-danger">Sí, regresar</a>
+                    <a href="<?php echo $es_unidad_base ? 'Coordinador/cargar_planificaciones_principales.php' : 'planificaciones.php'; ?>" class="btn btn-danger">Sí, regresar</a>
                 </div>
             </div>
         </div>

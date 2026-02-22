@@ -9,14 +9,16 @@ require_once __DIR__ . '/../config/conexion.php';
 
 $id_unidad = isset($_GET['id_unidad']) ? intval($_GET['id_unidad']) : null;
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : '';
+$es_unidad_base = false;
 $jornada = '';
 $nombre_unidad = '';
 if ($id_unidad) {
-    $stmt = $pdo->prepare("SELECT u.nombre, a.jornada FROM unidad u INNER JOIN asignatura a ON u.asignatura_codigo = a.codigo WHERE u.id_unidad = ?");
+    $stmt = $pdo->prepare("SELECT u.nombre, u.unidad_base, a.jornada FROM unidad u INNER JOIN asignatura a ON u.asignatura_codigo = a.codigo WHERE u.id_unidad = ?");
     $stmt->execute([$id_unidad]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $nombre_unidad = $row ? $row['nombre'] : '';
     $jornada = $row ? strtoupper($row['jornada']) : '';
+    $es_unidad_base = $row && $row['unidad_base'] == 1;
 }
 $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
 ?>
@@ -158,7 +160,7 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                 <div class="mt-3 text-end">
                                     <button type="submit" class="btn btn-primary" id="btnGuardarSemana" style="display:none;">Guardar Semana</button>
                                     <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDFLinea">Visualizar PDF</button>
-                                    <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?>" class="btn btn-secondary ms-2">
+                                    <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?><?php echo $es_unidad_base ? '&unidad_base=1' : ''; ?>" class="btn btn-secondary ms-2">
                                         &larr; Atrás
                                     </a>
                                 </div>
@@ -289,7 +291,7 @@ $tipo_jornada = ($jornada === 'S' || $jornada === 'EL') ? $jornada : '';
                                 <div class="mt-3 text-end">
                                     <button type="submit" class="btn btn-primary" id="btnGuardarSemana" style="display:none;">Guardar Semana</button>
                                     <button type="button" class="btn btn-success ms-2" id="btnVisualizarPDF" disabled>Visualizar PDF</button>
-                                    <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?>" class="btn btn-secondary ms-2">
+                                    <a href="crearPlanificaciones.php?codigo=<?php echo urlencode($codigo); ?>&volver=1&id_unidad=<?php echo urlencode($id_unidad); ?><?php echo $es_unidad_base ? '&unidad_base=1' : ''; ?>" class="btn btn-secondary ms-2">
                                         &larr; Atrás
                                     </a>
                                 </div>
