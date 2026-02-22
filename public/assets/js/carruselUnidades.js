@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!resp.ok) return;
         let unidades = await resp.json();
         
+        // Filtrar Unidad 1 solo para el rol DOCENTE
+        if (typeof userRole !== 'undefined' && userRole === 'DOCENTE') {
+            unidades = unidades.filter(u => u.numero_unidad != 1);
+        }
+        
         unidadesOriginales = unidades;
 
         mostrarUnidades(unidadesOriginales);
@@ -112,5 +117,41 @@ document.addEventListener('DOMContentLoaded', function () {
         if (select.value) {
             cargarUnidades(select.value);
         }
+    }
+
+    // Botón Planificación Principal
+    const btnPlanificacionPrincipal = document.getElementById('btnPlanificacionPrincipal');
+    if (btnPlanificacionPrincipal) {
+        btnPlanificacionPrincipal.addEventListener('click', function() {
+            // Buscar la Unidad 1 en el carrusel
+            const todasLasUnidades = unidadesCarousel.querySelectorAll('.unidad-card');
+            let unidad1 = null;
+            let btnVerEditar1 = null;
+
+            todasLasUnidades.forEach(card => {
+                const titulo = card.querySelector('.nombre-unidad');
+                if (titulo && titulo.textContent.includes('Unidad 1')) {
+                    unidad1 = card;
+                    btnVerEditar1 = card.querySelector('.btnVerEditarUnidad');
+                }
+            });
+
+            if (unidad1 && btnVerEditar1) {
+                // Hacer scroll a la Unidad 1
+                unidad1.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                
+                // Agregar efecto de brillo
+                unidad1.classList.add('unidad-destaque');
+                
+                // Después de 4.5 segundos (3 ciclos de animación), hacer clic automáticamente
+                setTimeout(() => {
+                    unidad1.classList.remove('unidad-destaque');
+                    btnVerEditar1.click();
+                }, 4500);
+            } else {
+                // No existe la Unidad 1
+                alert('⚠️ No se encontró la Unidad 1 (Planificación Principal).\n\nPor favor, cree una planificación primero usando el botón "Generar Planificación".');
+            }
+        });
     }
 });

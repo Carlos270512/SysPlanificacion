@@ -41,13 +41,20 @@ if ($docente) {
         <form>
             <div class="mb-3">
                 <label for="asignatura" class="form-label">Seleccione una asignatura:</label>
-                <select class="form-select" id="asignatura" name="asignatura">
-                    <?php foreach ($asignaturas as $asig): ?>
-                        <option value="<?php echo htmlspecialchars($asig['codigo']); ?>">
-                            <?php echo htmlspecialchars($asig['nombre_asignatura']) . " - " . htmlspecialchars($asig['codigo']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="d-flex align-items-center gap-2">
+                    <select class="form-select" id="asignatura" name="asignatura" style="flex: 1;">
+                        <?php foreach ($asignaturas as $asig): ?>
+                            <option value="<?php echo htmlspecialchars($asig['codigo']); ?>">
+                                <?php echo htmlspecialchars($asig['nombre_asignatura']) . " - " . htmlspecialchars($asig['codigo']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if ($_SESSION['usuario']['rol'] !== 'DOCENTE'): ?>
+                    <button type="button" class="btn btn-primary" id="btnPlanificacionPrincipal" title="Ir a la Planificación Principal (Unidad 1)">
+                        <i class="bi bi-star-fill"></i> Planificación Principal
+                    </button>
+                    <?php endif; ?>
+                </div>
             </div>
         </form>
         <div id="asignaturaCard" class="card mb-4" style="display:none;">

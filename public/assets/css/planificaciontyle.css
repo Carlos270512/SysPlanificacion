@@ -186,3 +186,22 @@
     border-color: #8B5C2A !important;
     color: #fff !important;
 }
+
+/* Efecto de brillo para la Unidad Principal */
+.unidad-destaque {
+    animation: brilloDestaque 1.5s ease-in-out 3;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.8) !important;
+    border: 2px solid #ffc107 !important;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+@keyframes brilloDestaque {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 193, 7, 1),
+                    0 0 40px rgba(255, 193, 7, 0.7);
+    }
+}
