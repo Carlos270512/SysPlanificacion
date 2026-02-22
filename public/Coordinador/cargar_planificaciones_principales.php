@@ -57,12 +57,19 @@ $docentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div class="container mt-4">
         <!-- Header -->
-        <div class="header-section">
-            <h2 class="mb-0">
-                <i class="fas fa-chalkboard-teacher me-2"></i>
-                Cargar Planificaciones Principales
-            </h2>
-            <p class="text-muted mb-0 mt-2">Seleccione un docente para ver sus asignaturas</p>
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-0">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>
+                    Cargar Planificaciones Principales
+                </h2>
+                <p class="text-muted mb-0 mt-2">Seleccione un docente para ver sus asignaturas</p>
+            </div>
+            <div>
+                <a href="coordinador_dashboard.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Regresar
+                </a>
+            </div>
         </div>
 
         <!-- Selector de Docente -->
