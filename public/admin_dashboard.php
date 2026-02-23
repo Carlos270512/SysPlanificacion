@@ -198,11 +198,7 @@ $necesitaCambiarPassword = is_null($_SESSION['usuario']['fecha_ingreso']);
                 </li>
 
                 <!-- NUEVO BOTÓN DE IA -->
-                <li class="nav-item mx-2">
-                    <a class="nav-link custom-nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#chatAIOffcanvas" title="Asistente IA">
-                        <i class="fas fa-robot me-2"></i>
-                    </a>
-                </li>
+                
 
                 <li class="nav-item dropdown mx-2">
                     <a class="nav-link custom-nav-link position-relative" href="#" id="notificacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
