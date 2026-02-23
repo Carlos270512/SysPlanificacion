@@ -62,7 +62,7 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                         <option value="">-- Seleccione --</option>
                         <?php foreach ($docentes as $doc): ?>
                             <option value="<?php echo htmlspecialchars($doc['codigo']); ?>" <?php if(isset($codigoDocente) && $codigoDocente == $doc['codigo']) echo 'selected'; ?>>
-                                <?php echo htmlspecialchars($doc['nombre']); ?>
+                                <?php echo htmlspecialchars($doc['codigo'] . ' - ' . $doc['nombre']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -74,7 +74,7 @@ if (isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] !== '') {
                         <option value="">-- Seleccione --</option>
                         <?php foreach ($asignaturas as $asig): ?>
                             <option value="<?php echo htmlspecialchars($asig['codigo']); ?>" <?php if(isset($_GET['asignatura_codigo']) && $_GET['asignatura_codigo'] == $asig['codigo']) echo 'selected'; ?>>
-                                <?php echo htmlspecialchars($asig['nombre_asignatura']); ?>
+                                <?php echo htmlspecialchars($asig['codigo'] . ' - ' . $asig['nombre_asignatura']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
