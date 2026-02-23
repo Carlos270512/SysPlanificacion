@@ -16,7 +16,22 @@ if (!$pdf) {
     exit('Archivo no encontrado');
 }
 
-header('Content-Type: ' . $pdf['tipo_mime']);
+// Limpiar cualquier salida previa
+if (ob_get_level()) {
+    ob_end_clean();
+}
+
+// Headers necesarios para Chrome
+header('Content-Type: application/pdf');
 header('Content-Disposition: inline; filename="' . $pdf['nombre_archivo'] . '"');
+header('Content-Length: ' . strlen($pdf['archivo_pdf']));
+header('Accept-Ranges: bytes');
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+header('X-Content-Type-Options: nosniff');
+
+// Enviar el PDF
 echo $pdf['archivo_pdf'];
+flush();
 exit;

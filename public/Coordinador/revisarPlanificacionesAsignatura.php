@@ -104,9 +104,9 @@ if (!$docente || !$asignatura) {
             width: 100%;
             min-height: 600px;
             height: 70vh;
-            border: none;
+            border: 1px solid #dee2e6;
             border-radius: 0.5rem;
-            overflow: hidden;
+            background: #ffffff;
         }
     </style>
 </head>
@@ -174,7 +174,7 @@ if (!$docente || !$asignatura) {
                             <i class="bi bi-chat-dots"></i> Observaciones
                         </button>
                     </div>
-                    <iframe class="iframe-container" src="about:blank"></iframe>
+                    <iframe class="iframe-container" src="about:blank" type="application/pdf" allow="fullscreen"></iframe>
                 </div>
             </div>
         </div>
@@ -271,38 +271,34 @@ if (!$docente || !$asignatura) {
                     iframe.src = "about:blank";
                     iframe.style.background = '#f8f9fa url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMSAxKSIgZmlsbD0iIzAwN2JmZiI+CiAgICAgICAgICAgIDxjaXJjbGUgY3g9IjUiIGN5PSI1MCIgcj0iNSI+CiAgICAgICAgICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJjeS1iZWdpbiIgdmFsdWVzPSI1MDs1OzUwOzUwIiBkdXI9IjJzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgogICAgICAgICAgICA8L2NpcmNsZT4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=") center no-repeat';
                     
-                    // Intentar cargar la planificación
-                    iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId;
-                    
-                    // Verificar si la planificación se carga correctamente
-                    iframe.onload = function() {
-                        // Verificar si hay contenido o es una página de error
-                        try {
-                            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                            var hasError = iframeDoc.body.textContent.includes('Archivo no encontrado') || 
-                                         iframeDoc.body.textContent.includes('No se encontró') ||
-                                         iframeDoc.body.innerHTML.trim() === '';
-                            
-                            if (hasError) {
-                                tienePlanificacion = false;
-                                iframe.style.background = '#f8f9fa';
-                                iframe.src = "data:text/html;charset=utf-8,<html><body style='font-family: Arial; text-align: center; padding: 50px; color: #6c757d;'><i class='bi bi-file-earmark-x' style='font-size: 48px;'></i><h4>Sin planificación</h4><p>Esta unidad aún no tiene planificaciones subidas por el docente.</p></body></html>";
-                            } else {
-                                tienePlanificacion = true;
-                                iframe.style.background = 'white';
-                            }
-                        } catch (e) {
-                            // Si no podemos acceder al contenido del iframe por CORS, asumimos que se cargó
+                    // Verificar primero si existe la planificación con fetch
+                    fetch("../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId, {
+                        method: 'HEAD'
+                    })
+                    .then(response => {
+                        if (response.ok && response.headers.get('Content-Type') === 'application/pdf') {
+                            // La planificación existe, cargar en iframe
                             tienePlanificacion = true;
                             iframe.style.background = 'white';
+                            // Agregar timestamp para evitar caché
+                            iframe.src = "../../app/RevisarPlanificaciones/getFilePlanification.php?unidad_id=" + unidadId + "&t=" + new Date().getTime();
+                        } else {
+                            // No hay planificación
+                            tienePlanificacion = false;
+                            iframe.style.background = '#f8f9fa';
+                            iframe.src = "data:text/html;charset=utf-8,<html><body style='font-family: Arial; text-align: center; padding: 50px; color: #6c757d;'><svg style='width:48px; height:48px' viewBox='0 0 24 24'><path fill='%236c757d' d='M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18.5,20H5.5V4H13V9H18.5V20M10,19L12,15H9V10L7,14H10V19Z'/></svg><h4>Sin planificación</h4><p>Esta unidad aún no tiene planificaciones subidas por el docente.</p></body></html>";
                         }
-                    };
-                    
-                    // Error al cargar
-                    iframe.onerror = function() {
+                    })
+                    .catch(error => {
+                        // Error de red o servidor
                         tienePlanificacion = false;
                         iframe.style.background = '#f8f9fa';
-                    };
+                        iframe.src = "data:text/html;charset=utf-8,<html><body style='font-family: Arial; text-align: center; padding: 50px; color: #dc3545;'><svg style='width:48px; height:48px' viewBox='0 0 24 24'><path fill='%23dc3545' d='M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg><h4>Error al cargar</h4><p>No se pudo cargar la planificación.</p></body></html>";
+                    });
+                    
+                    // Limpiar eventos previos del iframe
+                    iframe.onload = null;
+                    iframe.onerror = null;
                     
                     // Guardar la unidad actual
                     unidadActual = {

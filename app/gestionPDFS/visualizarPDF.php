@@ -138,11 +138,11 @@ if ($unidad_id) {
         <table border='1' cellpadding='4' cellspacing='0' width='100%' style='font-size:9px;'>
             <tr style='background:#FFF9C4; text-align:center; font-weight:bold; font-size:12px;'>
                 <td width='16%'></td>
-                <td width='16%'>Lunes</td>
-                <td width='16%'>Martes</td>
-                <td width='16%'>Miércoles</td>
-                <td width='16%'>Jueves</td>
-                <td width='16%'>Viernes</td>
+                <td width='16%'>1</td>
+                <td width='16%'>2</td>
+                <td width='16%'>3</td>
+                <td width='16%'>4</td>
+                <td width='16%'>5</td>
             </tr>
             <tr>
                 <td style='font-weight:bold;'>Objetivo</td>
