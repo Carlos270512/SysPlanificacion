@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_semana = nullIfEmpty($_POST['semana_inicio'] ?? null);
         $semana_fin = nullIfEmpty($_POST['semana_fin'] ?? null);
 
-        // --- NUEVO: Verificar si debe copiar datos de semana base ---
-        $semana_base = null;
+        // --- NUEVO: Verificar si debe copiar TODAS las semanas de la unidad base ---
+        $semanas_base = [];
         
         // Verificar datos de la unidad actual
         $stmtCheckBase = $pdo->prepare("SELECT unidad_base, asignatura_codigo FROM unidad WHERE id_unidad = ?");
@@ -24,16 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $unidadActual = $stmtCheckBase->fetch(PDO::FETCH_ASSOC);
         
         if ($unidadActual) {
-            // PASO 1: Intentar buscar la ÚLTIMA semana creada en la MISMA unidad
-            $stmtUltimaSemana = $pdo->prepare("SELECT * FROM semana 
-                                                WHERE id_unidad = ? 
-                                                ORDER BY fecha_semana DESC 
-                                                LIMIT 1");
-            $stmtUltimaSemana->execute([$id_unidad]);
-            $semana_base = $stmtUltimaSemana->fetch(PDO::FETCH_ASSOC);
+            // PASO 1: Verificar si ya existen semanas en la unidad actual
+            $stmtExistentes = $pdo->prepare("SELECT COUNT(*) as total FROM semana WHERE id_unidad = ?");
+            $stmtExistentes->execute([$id_unidad]);
+            $existentes = $stmtExistentes->fetch(PDO::FETCH_ASSOC);
             
-            // PASO 2: Si no hay semanas en esta unidad, buscar semana de la Unidad Base
-            if (!$semana_base && $unidadActual['unidad_base'] != 1) {
+            // PASO 2: Si NO hay semanas Y no es unidad base, copiar TODAS las semanas de la unidad base
+            if ($existentes['total'] == 0 && $unidadActual['unidad_base'] != 1) {
                 $asignatura_codigo = $unidadActual['asignatura_codigo'];
                 
                 // Buscar la unidad base de esta asignatura
@@ -48,65 +45,160 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($unidadBase) {
                     $id_unidad_base = $unidadBase['id_unidad'];
                     
-                    // Buscar la primera semana de la unidad base
-                    $stmtSemanaBase = $pdo->prepare("SELECT * FROM semana 
-                                                     WHERE id_unidad = ? 
-                                                     ORDER BY fecha_semana ASC 
-                                                     LIMIT 1");
-                    $stmtSemanaBase->execute([$id_unidad_base]);
-                    $semana_base = $stmtSemanaBase->fetch(PDO::FETCH_ASSOC);
+                    // Buscar TODAS las semanas de la unidad base ordenadas por fecha
+                    $stmtSemanasBase = $pdo->prepare("SELECT * FROM semana 
+                                                      WHERE id_unidad = ? 
+                                                      ORDER BY fecha_semana ASC");
+                    $stmtSemanasBase->execute([$id_unidad_base]);
+                    $semanas_base = $stmtSemanasBase->fetchAll(PDO::FETCH_ASSOC);
                 }
             }
         }
         // --- FIN NUEVO ---
 
-        // Si hay semana base, usar sus datos como valores por defecto
-        if ($semana_base) {
-            $actividades_previas = $_POST['actividades_previas'] ?? $semana_base['actividades_previas'];
-            $tiempo_previas = $_POST['tiempo_previas'] ?? $semana_base['tiempo_actividades_previas'];
-            $contenido = $_POST['contenido'] ?? $semana_base['contenido'];
-        } else {
-            $actividades_previas = $_POST['actividades_previas'] ?? null;
-            $tiempo_previas = $_POST['tiempo_previas'] ?? null;
-            $contenido = $_POST['contenido'] ?? null;
+        // ========== CREAR MÚLTIPLES SEMANAS DESDE LA BASE ==========
+        if (!empty($semanas_base)) {
+            // Hay semanas en la unidad base, crear TODAS automáticamente
+            $semanas_creadas = [];
+            
+            foreach ($semanas_base as $semana_base) {
+                $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO semana (
+                        id_unidad, fecha_semana, semana_fin, actividades_previas, tiempo_actividades_previas, contenido,
+                        fecha_lunes, objetivo_lunes, innovacion_lunes, tiempo_objetivo_lunes, apertura_lunes, tiempo_apertura_lunes, desarrollo_lunes, tiempo_desarrollo_lunes, cierre_lunes, tiempo_cierre_lunes, trabajo_autonomo_lunes, fecha_entrega_lunes,
+                        fecha_martes, objetivo_martes, innovacion_martes, tiempo_objetivo_martes, apertura_martes, tiempo_apertura_martes, desarrollo_martes, tiempo_desarrollo_martes, cierre_martes, tiempo_cierre_martes, trabajo_autonomo_martes, fecha_entrega_martes,
+                        fecha_miercoles, objetivo_miercoles, innovacion_miercoles, tiempo_objetivo_miercoles, apertura_miercoles, tiempo_apertura_miercoles, desarrollo_miercoles, tiempo_desarrollo_miercoles, cierre_miercoles, tiempo_cierre_miercoles, trabajo_autonomo_miercoles, fecha_entrega_miercoles,
+                        fecha_jueves, objetivo_jueves, innovacion_jueves, tiempo_objetivo_jueves, apertura_jueves, tiempo_apertura_jueves, desarrollo_jueves, tiempo_desarrollo_jueves, cierre_jueves, tiempo_cierre_jueves, trabajo_autonomo_jueves, fecha_entrega_jueves,
+                        fecha_viernes, objetivo_viernes, innovacion_viernes, tiempo_objetivo_viernes, apertura_viernes, tiempo_apertura_viernes, desarrollo_viernes, tiempo_desarrollo_viernes, cierre_viernes, tiempo_cierre_viernes, trabajo_autonomo_viernes, fecha_entrega_viernes
+                    ) VALUES (
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    )
+                ");
+
+                $params = [
+                    $id_unidad,
+                    $semana_base['fecha_semana'],
+                    $semana_base['semana_fin'],
+                    $semana_base['actividades_previas'],
+                    $semana_base['tiempo_actividades_previas'],
+                    $semana_base['contenido'],
+
+                    // Lunes
+                    $semana_base['fecha_lunes'],
+                    $semana_base['objetivo_lunes'],
+                    $semana_base['innovacion_lunes'],
+                    $semana_base['tiempo_objetivo_lunes'],
+                    $semana_base['apertura_lunes'],
+                    $semana_base['tiempo_apertura_lunes'],
+                    $semana_base['desarrollo_lunes'],
+                    $semana_base['tiempo_desarrollo_lunes'],
+                    $semana_base['cierre_lunes'],
+                    $semana_base['tiempo_cierre_lunes'],
+                    $semana_base['trabajo_autonomo_lunes'],
+                    $semana_base['fecha_entrega_lunes'],
+
+                    // Martes
+                    $semana_base['fecha_martes'],
+                    $semana_base['objetivo_martes'],
+                    $semana_base['innovacion_martes'],
+                    $semana_base['tiempo_objetivo_martes'],
+                    $semana_base['apertura_martes'],
+                    $semana_base['tiempo_apertura_martes'],
+                    $semana_base['desarrollo_martes'],
+                    $semana_base['tiempo_desarrollo_martes'],
+                    $semana_base['cierre_martes'],
+                    $semana_base['tiempo_cierre_martes'],
+                    $semana_base['trabajo_autonomo_martes'],
+                    $semana_base['fecha_entrega_martes'],
+
+                    // Miércoles
+                    $semana_base['fecha_miercoles'],
+                    $semana_base['objetivo_miercoles'],
+                    $semana_base['innovacion_miercoles'],
+                    $semana_base['tiempo_objetivo_miercoles'],
+                    $semana_base['apertura_miercoles'],
+                    $semana_base['tiempo_apertura_miercoles'],
+                    $semana_base['desarrollo_miercoles'],
+                    $semana_base['tiempo_desarrollo_miercoles'],
+                    $semana_base['cierre_miercoles'],
+                    $semana_base['tiempo_cierre_miercoles'],
+                    $semana_base['trabajo_autonomo_miercoles'],
+                    $semana_base['fecha_entrega_miercoles'],
+
+                    // Jueves
+                    $semana_base['fecha_jueves'],
+                    $semana_base['objetivo_jueves'],
+                    $semana_base['innovacion_jueves'],
+                    $semana_base['tiempo_objetivo_jueves'],
+                    $semana_base['apertura_jueves'],
+                    $semana_base['tiempo_apertura_jueves'],
+                    $semana_base['desarrollo_jueves'],
+                    $semana_base['tiempo_desarrollo_jueves'],
+                    $semana_base['cierre_jueves'],
+                    $semana_base['tiempo_cierre_jueves'],
+                    $semana_base['trabajo_autonomo_jueves'],
+                    $semana_base['fecha_entrega_jueves'],
+
+                    // Viernes
+                    $semana_base['fecha_viernes'],
+                    $semana_base['objetivo_viernes'],
+                    $semana_base['innovacion_viernes'],
+                    $semana_base['tiempo_objetivo_viernes'],
+                    $semana_base['apertura_viernes'],
+                    $semana_base['tiempo_apertura_viernes'],
+                    $semana_base['desarrollo_viernes'],
+                    $semana_base['tiempo_desarrollo_viernes'],
+                    $semana_base['cierre_viernes'],
+                    $semana_base['tiempo_cierre_viernes'],
+                    $semana_base['trabajo_autonomo_viernes'],
+                    $semana_base['fecha_entrega_viernes'],
+                ];
+
+                $stmt->execute($params);
+                $semanas_creadas[] = $pdo->lastInsertId();
+            }
+
+            $pdo->commit();
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Se crearon ' . count($semanas_creadas) . ' semanas automáticamente desde la unidad base',
+                'semanas_ids' => $semanas_creadas,
+                'total_semanas' => count($semanas_creadas)
+            ]);
+            exit;
         }
+        // ========== FIN CREAR MÚLTIPLES SEMANAS ==========
+
+        // Si no hay semanas base, crear normalmente
+        $actividades_previas = $_POST['actividades_previas'] ?? null;
+        $tiempo_previas = $_POST['tiempo_previas'] ?? null;
+        $contenido = $_POST['contenido'] ?? null;
 
         $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
         $campos = [];
         foreach ($dias as $dia) {
-            if ($semana_base) {
-                // Usar datos de semana base como valores por defecto
-                $campos[$dia] = [
-                    'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
-                    'objetivo' => $_POST['objetivo_' . $dia] ?? $semana_base['objetivo_' . $dia],
-                    'innovacion' => $_POST['innovacion_' . $dia] ?? $semana_base['innovacion_' . $dia],
-                    'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? $semana_base['tiempo_objetivo_' . $dia],
-                    'apertura' => $_POST['apertura_' . $dia] ?? $semana_base['apertura_' . $dia],
-                    'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? $semana_base['tiempo_apertura_' . $dia],
-                    'desarrollo' => $_POST['desarrollo_' . $dia] ?? $semana_base['desarrollo_' . $dia],
-                    'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? $semana_base['tiempo_desarrollo_' . $dia],
-                    'cierre' => $_POST['cierre_' . $dia] ?? $semana_base['cierre_' . $dia],
-                    'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? $semana_base['tiempo_cierre_' . $dia],
-                    'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? $semana_base['trabajo_autonomo_' . $dia],
-                    'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
-                ];
-            } else {
-                // Sin semana base, usar solo POST
-                $campos[$dia] = [
-                    'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
-                    'objetivo' => $_POST['objetivo_' . $dia] ?? null,
-                    'innovacion' => $_POST['innovacion_' . $dia] ?? null,
-                    'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? null,
-                    'apertura' => $_POST['apertura_' . $dia] ?? null,
-                    'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? null,
-                    'desarrollo' => $_POST['desarrollo_' . $dia] ?? null,
-                    'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? null,
-                    'cierre' => $_POST['cierre_' . $dia] ?? null,
-                    'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? null,
-                    'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? null,
-                    'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
-                ];
-            }
+            // Sin semana base, usar solo POST
+            $campos[$dia] = [
+                'fecha' => nullIfEmpty($_POST['fecha_' . $dia] ?? null),
+                'objetivo' => $_POST['objetivo_' . $dia] ?? null,
+                'innovacion' => $_POST['innovacion_' . $dia] ?? null,
+                'tiempo_objetivo' => $_POST['tiempo_objetivo_' . $dia] ?? null,
+                'apertura' => $_POST['apertura_' . $dia] ?? null,
+                'tiempo_apertura' => $_POST['tiempo_apertura_' . $dia] ?? null,
+                'desarrollo' => $_POST['desarrollo_' . $dia] ?? null,
+                'tiempo_desarrollo' => $_POST['tiempo_desarrollo_' . $dia] ?? null,
+                'cierre' => $_POST['cierre_' . $dia] ?? null,
+                'tiempo_cierre' => $_POST['tiempo_cierre_' . $dia] ?? null,
+                'trabajo_autonomo' => $_POST['trabajo_autonomo_' . $dia] ?? null,
+                'fecha_entrega' => nullIfEmpty($_POST['entrega_' . $dia] ?? null),
+            ];
         }
 
         $stmt = $pdo->prepare("

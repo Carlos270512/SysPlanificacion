@@ -237,9 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '&fecha_sabado=' + encodeURIComponent(result.value.fechaSabado)
                         });
                         const data = await resp.json();
-                        if (data.success && data.id_semana_linea) {
-                            // NO llenar los campos todavía - solo al editar
-                            
+                        if (data.success) {
                             // ASEGURAR que el acordeón permanezca oculto
                             const acordeon = document.getElementById('acordeonPlanificacion');
                             if (acordeon) {
@@ -255,8 +253,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
 
-                            // Mostrar mensaje de éxito
-                            Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
+                            // Verificar si se crearon múltiples semanas automáticamente
+                            if (data.total_semanas && data.total_semanas > 1) {
+                                Swal.fire(
+                                    '¡Semanas creadas automáticamente!', 
+                                    `Se crearon ${data.total_semanas} semanas desde la unidad base. Haz clic en "Editar" en la tabla para modificar cualquier semana.`, 
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
+                            }
                             
                             // Recargar la tabla de semanas
                             cargarSemanasLinea();
@@ -374,9 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '&semana_fin=' + encodeURIComponent(result.value.fechaFin)
                         });
                         const data = await resp.json();
-                        if (data.success && data.semana_id) {
-                            // NO llenar los campos todavía - solo al editar
-                            
+                        if (data.success) {
                             // ASEGURAR que el acordeón permanezca oculto
                             const acordeon = document.getElementById('acordeonPlanificacion');
                             if (acordeon) {
@@ -392,8 +396,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
 
-                            // Mostrar mensaje de éxito
-                            Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
+                            // Verificar si se crearon múltiples semanas automáticamente
+                            if (data.total_semanas && data.total_semanas > 1) {
+                                Swal.fire(
+                                    '¡Semanas creadas automáticamente!', 
+                                    `Se crearon ${data.total_semanas} semanas desde la unidad base. Haz clic en "Editar" en la tabla para modificar cualquier semana.`, 
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire('Nueva semana creada', 'Haz clic en "Editar" en la tabla para modificar la semana.', 'success');
+                            }
 
                             // Recargar la tabla de semanas
                             cargarSemanas();

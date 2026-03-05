@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../config/conexion.php';
 $id_unidad = intval($_POST['unidad_id'] ?? 0);
 $fecha_sabado = $_POST['fecha_sabado'] ?? null;
 
-// --- NUEVO: Verificar si debe copiar datos de semana_linea base ---
-$semana_linea_base = null;
+// --- NUEVO: Verificar si debe copiar TODAS las semanas_linea de la unidad base ---
+$semanas_linea_base = [];
 
 // Verificar datos de la unidad actual
 $stmtCheckBase = $pdo->prepare("SELECT unidad_base, asignatura_codigo FROM unidad WHERE id_unidad = ?");
@@ -13,16 +13,13 @@ $stmtCheckBase->execute([$id_unidad]);
 $unidadActual = $stmtCheckBase->fetch(PDO::FETCH_ASSOC);
 
 if ($unidadActual) {
-    // PASO 1: Intentar buscar la ÚLTIMA semana creada en la MISMA unidad
-    $stmtUltimaSemana = $pdo->prepare("SELECT * FROM semana_linea 
-                                        WHERE id_unidad = ? 
-                                        ORDER BY fecha_sabado DESC 
-                                        LIMIT 1");
-    $stmtUltimaSemana->execute([$id_unidad]);
-    $semana_linea_base = $stmtUltimaSemana->fetch(PDO::FETCH_ASSOC);
+    // PASO 1: Verificar si ya existen semanas_linea en la unidad actual
+    $stmtExistentes = $pdo->prepare("SELECT COUNT(*) as total FROM semana_linea WHERE id_unidad = ?");
+    $stmtExistentes->execute([$id_unidad]);
+    $existentes = $stmtExistentes->fetch(PDO::FETCH_ASSOC);
     
-    // PASO 2: Si no hay semanas en esta unidad, buscar semana de la Unidad Base
-    if (!$semana_linea_base && $unidadActual['unidad_base'] != 1) {
+    // PASO 2: Si NO hay semanas_linea Y no es unidad base, copiar TODAS las semanas_linea de la unidad base
+    if ($existentes['total'] == 0 && $unidadActual['unidad_base'] != 1) {
         $asignatura_codigo = $unidadActual['asignatura_codigo'];
         
         // Buscar la unidad base de esta asignatura
@@ -37,50 +34,81 @@ if ($unidadActual) {
         if ($unidadBase) {
             $id_unidad_base = $unidadBase['id_unidad'];
             
-            // Buscar la primera semana_linea de la unidad base
-            $stmtSemanaBase = $pdo->prepare("SELECT * FROM semana_linea 
-                                             WHERE id_unidad = ? 
-                                             ORDER BY fecha_sabado ASC 
-                                             LIMIT 1");
-            $stmtSemanaBase->execute([$id_unidad_base]);
-            $semana_linea_base = $stmtSemanaBase->fetch(PDO::FETCH_ASSOC);
+            // Buscar TODAS las semanas_linea de la unidad base ordenadas por fecha
+            $stmtSemanasBase = $pdo->prepare("SELECT * FROM semana_linea 
+                                              WHERE id_unidad = ? 
+                                              ORDER BY fecha_sabado ASC");
+            $stmtSemanasBase->execute([$id_unidad_base]);
+            $semanas_linea_base = $stmtSemanasBase->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 }
 // --- FIN NUEVO ---
 
-// Si hay semana_linea base, usar sus datos como valores por defecto
-if ($semana_linea_base) {
-    $contenido = $_POST['contenido'] ?? $semana_linea_base['contenido'];
-    $tema_clase_SAnterior = $_POST['tema_clase_SAnterior'] ?? $semana_linea_base['tema_clase_SAnterior'];
-    $Atividades_previas_clase = $_POST['Atividades_previas_clase'] ?? $semana_linea_base['Atividades_previas_clase'];
-    $tiempo_actividades_previas_clase = $_POST['tiempo_actividades_previas_clase'] ?? $semana_linea_base['tiempo_actividades_previas_clase'];
-    $objetivo = $_POST['objetivo'] ?? $semana_linea_base['objetivo'];
-    $innovacion = $_POST['innovacion'] ?? $semana_linea_base['innovacion'];
-    $apertura = $_POST['apertura'] ?? $semana_linea_base['apertura'];
-    $tiempo_apertura = $_POST['tiempo_apertura'] ?? $semana_linea_base['tiempo_apertura'];
-    $desarrollo = $_POST['desarrollo'] ?? $semana_linea_base['desarrollo'];
-    $tiempo_desarrollo = $_POST['tiempo_desarrollo'] ?? $semana_linea_base['tiempo_desarrollo'];
-    $cierre = $_POST['cierre'] ?? $semana_linea_base['cierre'];
-    $tiempo_cierre = $_POST['tiempo_cierre'] ?? $semana_linea_base['tiempo_cierre'];
-    $trabajo_autonomo = $_POST['trabajo_autonomo'] ?? $semana_linea_base['trabajo_autonomo'];
-    $fecha_entrega = $_POST['fecha_entrega'] ?? null;
-} else {
-    $contenido = $_POST['contenido'] ?? '';
-    $tema_clase_SAnterior = $_POST['tema_clase_SAnterior'] ?? '';
-    $Atividades_previas_clase = $_POST['Atividades_previas_clase'] ?? '';
-    $tiempo_actividades_previas_clase = $_POST['tiempo_actividades_previas_clase'] ?? '';
-    $objetivo = $_POST['objetivo'] ?? '';
-    $innovacion = $_POST['innovacion'] ?? '';
-    $apertura = $_POST['apertura'] ?? '';
-    $tiempo_apertura = $_POST['tiempo_apertura'] ?? '';
-    $desarrollo = $_POST['desarrollo'] ?? '';
-    $tiempo_desarrollo = $_POST['tiempo_desarrollo'] ?? '';
-    $cierre = $_POST['cierre'] ?? '';
-    $tiempo_cierre = $_POST['tiempo_cierre'] ?? '';
-    $trabajo_autonomo = $_POST['trabajo_autonomo'] ?? '';
-    $fecha_entrega = $_POST['fecha_entrega'] ?? null;
+// ========== CREAR MÚLTIPLES SEMANAS EN LÍNEA DESDE LA BASE ==========
+if (!empty($semanas_linea_base)) {
+    // Hay semanas en la unidad base, crear TODAS automáticamente
+    $semanas_creadas = [];
+    
+    try {
+        foreach ($semanas_linea_base as $semana_base) {
+            $stmt = $pdo->prepare("INSERT INTO semana_linea 
+                (id_unidad, fecha_sabado, contenido, tema_clase_SAnterior, Atividades_previas_clase, tiempo_actividades_previas_clase, objetivo, innovacion, apertura, tiempo_apertura, desarrollo, tiempo_desarrollo, cierre, tiempo_cierre, trabajo_autonomo, fecha_entrega)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            $stmt->execute([
+                $id_unidad,
+                $semana_base['fecha_sabado'],
+                $semana_base['contenido'],
+                $semana_base['tema_clase_SAnterior'],
+                $semana_base['Atividades_previas_clase'],
+                $semana_base['tiempo_actividades_previas_clase'],
+                $semana_base['objetivo'],
+                $semana_base['innovacion'],
+                $semana_base['apertura'],
+                $semana_base['tiempo_apertura'],
+                $semana_base['desarrollo'],
+                $semana_base['tiempo_desarrollo'],
+                $semana_base['cierre'],
+                $semana_base['tiempo_cierre'],
+                $semana_base['trabajo_autonomo'],
+                $semana_base['fecha_entrega']
+            ]);
+            
+            $semanas_creadas[] = $pdo->lastInsertId();
+        }
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Se crearon ' . count($semanas_creadas) . ' semanas en línea automáticamente desde la unidad base',
+            'semanas_ids' => $semanas_creadas,
+            'total_semanas' => count($semanas_creadas)
+        ]);
+        exit;
+        
+    } catch (Exception $e) {
+        error_log("Error al crear semanas_linea múltiples: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
+    }
 }
+// ========== FIN CREAR MÚLTIPLES SEMANAS EN LÍNEA ==========
+
+// Si no hay semanas base múltiples, usar datos del POST o vacío
+$contenido = $_POST['contenido'] ?? '';
+$tema_clase_SAnterior = $_POST['tema_clase_SAnterior'] ?? '';
+$Atividades_previas_clase = $_POST['Atividades_previas_clase'] ?? '';
+$tiempo_actividades_previas_clase = $_POST['tiempo_actividades_previas_clase'] ?? '';
+$objetivo = $_POST['objetivo'] ?? '';
+$innovacion = $_POST['innovacion'] ?? '';
+$apertura = $_POST['apertura'] ?? '';
+$tiempo_apertura = $_POST['tiempo_apertura'] ?? '';
+$desarrollo = $_POST['desarrollo'] ?? '';
+$tiempo_desarrollo = $_POST['tiempo_desarrollo'] ?? '';
+$cierre = $_POST['cierre'] ?? '';
+$tiempo_cierre = $_POST['tiempo_cierre'] ?? '';
+$trabajo_autonomo = $_POST['trabajo_autonomo'] ?? '';
+$fecha_entrega = $_POST['fecha_entrega'] ?? null;
 
 // Validación: verificar que la fecha sea un sábado
 if (empty($fecha_sabado)) {
