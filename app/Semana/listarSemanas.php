@@ -8,7 +8,7 @@ if (!$id_unidad) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT id_semana, fecha_semana, semana_fin FROM semana WHERE id_unidad = ? ORDER BY fecha_semana ASC");
+$stmt = $pdo->prepare("SELECT id_semana, fecha_semana, semana_fin FROM semana WHERE id_unidad = ? ORDER BY id_semana ASC");
 $stmt->execute([$id_unidad]);
 $semanas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
