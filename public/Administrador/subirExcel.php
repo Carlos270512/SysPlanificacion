@@ -417,7 +417,7 @@ $hayErrores = isset($_GET['errores']);
             $(document).ready(function() {
                 $('#tablaErroresExcel').DataTable({
                     language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                        url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
                     },
                     pageLength: 5
                 });
@@ -432,7 +432,7 @@ $hayErrores = isset($_GET['errores']);
         $(document).ready(function() {
             $('#asignaturasTable').DataTable({
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
                 }
             });
 

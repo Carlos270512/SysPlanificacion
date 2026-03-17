@@ -14,7 +14,7 @@ $sheet = $spreadsheet->getActiveSheet();
 
 // Encabezados
 $headers = [
-    'Código',
+    'Codigo',
     'Asignatura',
     'Horario',
     'Jornada',
@@ -23,7 +23,7 @@ $headers = [
     'Nivel',
     'Fecha Inicio',
     'Fecha Fin',
-    'Codigo Profesor'
+    'Profesor'
 ];
 $sheet->fromArray($headers, null, 'A1');
 
