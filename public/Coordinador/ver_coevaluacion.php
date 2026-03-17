@@ -285,9 +285,7 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                 <a href="coevaluacion_inicio.php" class="btn btn-cafe">
                     <i class="fas fa-plus"></i> Nueva Coevaluación
                 </a>
-                <a href="../coordinador.php" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel
-                </a>
+
             </div>
             <div class="col-md-6 text-end">
                 <?php if (!empty($pdfs)): ?>
